@@ -5,3 +5,7 @@ testMonitor <- function() {
     invisible(.Call('_RcppThreads_testMonitor', PACKAGE = 'RcppThreads'))
 }
 
+testThreadClass <- function() {
+    invisible(.Call('_RcppThreads_testThreadClass', PACKAGE = 'RcppThreads'))
+}
+
