@@ -5,11 +5,11 @@ interrupted from R.
 
 ## Installation
 
-You can install cppthreadsafe from github with:
+You can install RcppThreads from github with:
 
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("tnagler/cppthreadsafe")
+devtools::install_github("tnagler/RcppThreads")
 ```
 
