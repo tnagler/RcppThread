@@ -21,11 +21,10 @@ public:
     {
         if (thread_.joinable())
             thread_.join();
-        releaseMsgBuffer();
     }
 
     template<class Function, class... Args> explicit
-        Thread(Function&& f, Args&&... args)
+    Thread(Function&& f, Args&&... args)
         {
             auto f0 = [=] () {
                 if ( !isInterrupted() )
@@ -58,6 +57,7 @@ public:
 
     //! checks for interrupt + msgs every `checkEvery` milliseconds and after
     //! computations have finished.
+    //! @param checkEvery time between periodic checks in milliseconds.
     void join(size_t checkEvery = 500)
     {
         auto timeout = std::chrono::milliseconds(checkEvery);
