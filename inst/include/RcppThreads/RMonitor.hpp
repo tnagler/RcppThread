@@ -18,6 +18,7 @@ static std::thread::id masterThreadID = std::this_thread::get_id();
 
 //! A singleton lass for tracking threads and safe communication.
 class RMonitor {
+
 public:
     RMonitor(RMonitor const&) = delete;            // copy construct
     RMonitor(RMonitor&&) = delete;                 // move construct
@@ -34,7 +35,7 @@ public:
 
     // user-facing functions must be declared friends, so they can access
     // protected members of RMonitor.
-    friend void checkUserInterrupt(bool condition = true);
+    friend void checkInterrupt(bool condition = true);
     friend bool isInterrupted(bool condition = true);
     template<class T>
     friend void print(const T& object = NULL);
@@ -48,7 +49,7 @@ protected:
     }
 
     //! checks for user interruptions, but only if called from master thread.
-    void safelyCheckUserInterrupt()
+    void safelyCheckInterrupt()
     {
         if ( safelyIsInterrupted() ) {
             throw std::runtime_error("C++ call interrupted by user");
@@ -122,10 +123,10 @@ private:
 //! checks for user interruptions, but only if called from master thread.
 //! @param condition optional; a condition for the check to be executed.
 //! @details Declared as a friend in `RMonitor`.
-inline void checkUserInterrupt(bool condition)
+inline void checkInterrupt(bool condition)
 {
     if (condition)
-        RMonitor::instance().safelyCheckUserInterrupt();
+        RMonitor::instance().safelyCheckInterrupt();
 }
 
 //! checks for user interruptions, but only if called from master thread
