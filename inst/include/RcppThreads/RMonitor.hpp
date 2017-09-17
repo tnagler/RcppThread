@@ -20,8 +20,13 @@ namespace RcppThreads {
 //! global variable holding id of master thread-
 static std::thread::id masterThreadID = std::this_thread::get_id();
 
-//! A singleton lass for tracking threads and safe communication.
+//! A singleton class for tracking threads and safe communication.
 class RMonitor {
+    // user-facing functionality must be friends, so they can access
+    // protected members of RMonitor.
+    friend class RPrinter;
+    friend void checkUserInterrupt(bool condition = true);
+    friend bool isInterrupted(bool condition = true);
 
 public:
     RMonitor(RMonitor const&) = delete;            // copy construct
@@ -37,13 +42,6 @@ public:
         return instance_;
     }
 
-    // user-facing functions must be declared friends, so they can access
-    // protected members of RMonitor.
-    friend void checkUserInterrupt(bool condition = true);
-    friend bool isInterrupted(bool condition = true);
-    template<class T>
-    friend void print(const T& object = NULL);
-    friend void releaseMsgBuffer();
 
 protected:
     //! returns `true` only when called from master thread.
@@ -143,25 +141,5 @@ inline bool isInterrupted(bool condition)
         return RMonitor::instance().safelyIsInterrupted();
     return false;
 }
-
-//! prints `object` to R console íf called from master thread; otherwise
-//! adds a printable version of `object` to a buffer for deferred printing.
-//! @param object a string to print.
-//! @details Declared as a friend in `RMonitor`.
-template<class T>
-void print(const T& object)
-{
-    RMonitor::instance().safelyPrint(object);
-}
-
-//! prints the messages in the buffer to the R console, but only if called
-//! from master thread.
-//! @details Declared as a friend in `RMonitor`.
-inline void releaseMsgBuffer()
-{
-    RMonitor::instance().safelyReleaseMsgBuffer();
-}
-
-static Rcpp::Rostream<true> Rcout;
 
 }

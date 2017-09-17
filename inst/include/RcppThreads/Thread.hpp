@@ -7,6 +7,7 @@
 #pragma once
 
 #include "RcppThreads/RMonitor.hpp"
+#include "RcppThreads/Rcout.hpp"
 
 #include <thread>
 #include <future>
@@ -68,10 +69,10 @@ public:
     {
         auto timeout = std::chrono::milliseconds(500);
         while (future_.wait_for(timeout) != std::future_status::ready) {
-            releaseMsgBuffer();
+            Rcout.release();
             checkUserInterrupt();
         }
-        releaseMsgBuffer();
+        Rcout.release();
         checkUserInterrupt();
         thread_.join();
     }
