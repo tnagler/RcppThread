@@ -1,4 +1,4 @@
 library(testthat)
-library(RcppThreads)
+library(RcppThread)
 
-test_check("RcppThreads")
+test_check("RcppThread")

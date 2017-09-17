@@ -1,21 +1,21 @@
 // Copyright © 2017 Thomas Nagler
 //
-// This file is part of the RcppThreads and licensed under the terms of
+// This file is part of the RcppThread and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE.md file in the root directory of
-// RcppThreads or https://github.com/tnagler/RcppThreads/blob/master/LICENSE.md.
+// RcppThread or https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
 
 #include <Rcpp.h>
 
-#include "RcppThreads.h"
+#include "RcppThread.h"
 
-using namespace RcppThreads;
+using namespace RcppThread;
 
 // [[Rcpp::export]]
 void testMonitor()
 {
     auto checks = [] () -> void {
         checkUserInterrupt();             // should have no effect since not master
-        Rcout << "RcppThreads says hi!";  // should print to R console
+        Rcout << "RcppThread says hi!";  // should print to R console
         if (isInterrupted())
             throw std::runtime_error("isInterrupted should not return 'true'");
         if (isInterrupted(false))

@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 testMonitor <- function() {
-    invisible(.Call('_RcppThreads_testMonitor', PACKAGE = 'RcppThreads'))
+    invisible(.Call('_RcppThread_testMonitor', PACKAGE = 'RcppThread'))
 }
 
 testThreadClass <- function() {
-    invisible(.Call('_RcppThreads_testThreadClass', PACKAGE = 'RcppThreads'))
+    invisible(.Call('_RcppThread_testThreadClass', PACKAGE = 'RcppThread'))
 }
 
 testThreadPool <- function() {
-    invisible(.Call('_RcppThreads_testThreadPool', PACKAGE = 'RcppThreads'))
+    invisible(.Call('_RcppThread_testThreadPool', PACKAGE = 'RcppThread'))
 }
 

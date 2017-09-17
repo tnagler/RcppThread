@@ -1,19 +1,19 @@
 // Copyright © 2017 Thomas Nagler
 //
-// This file is part of the RcppThreads and licensed under the terms of
+// This file is part of the RcppThread and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE.md file in the root directory of
-// RcppThreads or https://github.com/tnagler/RcppThreads/blob/master/LICENSE.md.
+// RcppThread or https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
 
 #pragma once
 
-#include "RcppThreads/RMonitor.hpp"
-#include "RcppThreads/Rcout.hpp"
+#include "RcppThread/RMonitor.hpp"
+#include "RcppThread/Rcout.hpp"
 
 #include <thread>
 #include <future>
 #include <functional>
 
-namespace RcppThreads {
+namespace RcppThread {
 
 class Thread {
 public:

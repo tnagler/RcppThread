@@ -3,8 +3,8 @@
 #' Provides a C++11-style thread class and thread pool that can safely be
 #' interrupted from R.
 #'
-#' @name RcppThreads
+#' @name RcppThread
 #' @docType package
-#' @useDynLib RcppThreads
+#' @useDynLib RcppThread
 #' @importFrom Rcpp sourceCpp
 NULL

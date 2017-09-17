@@ -1,4 +1,4 @@
-Package: RcppThreads
+Package: RcppThread
 Title: R-friendly C++11 threads
 Version: 0.0.0.9000
 Authors@R: person("Thomas", "Nagler", email = "mail@tnagler.com", role = c("aut", "cre"))

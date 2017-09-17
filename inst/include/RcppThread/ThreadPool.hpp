@@ -1,19 +1,19 @@
 // Copyright © 2017 Thomas Nagler
 //
-// This file is part of the RcppThreads and licensed under the terms of
+// This file is part of the RcppThread and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE.md file in the root directory of
-// RcppThreads or https://github.com/tnagler/RcppThreads/blob/master/LICENSE.md.
+// RcppThread or https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
 
 #pragma once
 
-#include "RcppThreads/Thread.hpp"
+#include "RcppThread/Thread.hpp"
 
 #include <vector>
 #include <queue>
 #include <condition_variable>
 #include <memory>
 
-namespace RcppThreads {
+namespace RcppThread {
 
 class ThreadPool {
 public:
