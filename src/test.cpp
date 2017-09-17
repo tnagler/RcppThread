@@ -30,6 +30,7 @@ void testThreadClass()
     int printID = 1;
     auto dummy = [&] () -> void {
         print(printID++);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     };
     Thread(dummy).join();
     Thread(dummy).detach();
