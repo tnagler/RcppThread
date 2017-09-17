@@ -19,9 +19,7 @@ public:
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create.
-    //! @param checkEvery time between periodic checks in milliseconds, see
-    //! `Thread()`.
-    ThreadPool(size_t nThreads, size_t checkEvery = 500) : stopped_(false)
+    ThreadPool(size_t nThreads) : stopped_(false)
     {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
@@ -43,7 +41,7 @@ public:
                         if (jobs_.empty())
                             continue;
 
-                        // steal job from the queue
+                        // take job from the queue
                         job = std::move(jobs_.front());
                         jobs_.pop();
                     }
@@ -97,7 +95,9 @@ public:
     }
 
     //! waits for all jobs to finish and joins all threads.
-    void wait()
+    //! @param checkEvery time between periodic checks in milliseconds, see
+    //! `Thread::join()`.
+    void wait(size_t checkEvery = 500)
     {
         // signal all threads to stop
         {
@@ -109,7 +109,7 @@ public:
         // join threads if not done already
         if (pool_[0].joinable()) {
             for (auto &worker : pool_) {
-                worker.join();
+                worker.join(checkEvery);
             }
         }
     }
