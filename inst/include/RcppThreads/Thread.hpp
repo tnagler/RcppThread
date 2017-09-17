@@ -62,12 +62,11 @@ public:
         return thread_.joinable();
     }
 
-    //! checks for interrupt + msgs every `checkEvery` milliseconds and after
+    //! checks for interrupt + msgs every 0.5 seconds and after
     //! computations have finished.
-    //! @param checkEvery time between periodic checks in milliseconds.
-    void join(size_t checkEvery = 500)
+    void join()
     {
-        auto timeout = std::chrono::milliseconds(checkEvery);
+        auto timeout = std::chrono::milliseconds(500);
         while (future_.wait_for(timeout) != std::future_status::ready) {
             releaseMsgBuffer();
             checkUserInterrupt();
