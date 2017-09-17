@@ -70,10 +70,10 @@ public:
         auto timeout = std::chrono::milliseconds(checkEvery);
         while (future_.wait_for(timeout) != std::future_status::ready) {
             releaseMsgBuffer();
-            checkInterrupt();
+            checkUserInterrupt();
         }
         releaseMsgBuffer();
-        checkInterrupt();
+        checkUserInterrupt();
         thread_.join();
     }
 

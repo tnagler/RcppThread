@@ -14,7 +14,7 @@ using namespace RcppThreads;
 void testMonitor()
 {
     auto checks = [] () -> void {
-        checkInterrupt();               // should have no effect since not master
+        checkUserInterrupt();               // should have no effect since not master
         print("RcppThreads says hi!");  // should print to R console
         if (isInterrupted())
             throw std::runtime_error("isInterrupted should not return 'true'");

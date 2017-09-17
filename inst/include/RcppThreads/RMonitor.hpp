@@ -39,7 +39,7 @@ public:
 
     // user-facing functions must be declared friends, so they can access
     // protected members of RMonitor.
-    friend void checkInterrupt(bool condition = true);
+    friend void checkUserInterrupt(bool condition = true);
     friend bool isInterrupted(bool condition = true);
     template<class T>
     friend void print(const T& object = NULL);
@@ -53,7 +53,7 @@ protected:
     }
 
     //! checks for user interruptions, but only if called from master thread.
-    void safelyCheckInterrupt()
+    void safelycheckUserInterrupt()
     {
         if ( safelyIsInterrupted() ) {
             throw std::runtime_error("C++ call interrupted by user");
@@ -127,10 +127,10 @@ private:
 //! checks for user interruptions, but only if called from master thread.
 //! @param condition optional; a condition for the check to be executed.
 //! @details Declared as a friend in `RMonitor`.
-inline void checkInterrupt(bool condition)
+inline void checkUserInterrupt(bool condition)
 {
     if (condition)
-        RMonitor::instance().safelyCheckInterrupt();
+        RMonitor::instance().safelycheckUserInterrupt();
 }
 
 //! checks for user interruptions, but only if called from master thread
