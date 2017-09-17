@@ -63,7 +63,7 @@ public:
     //! default destructor; waits for all jobs to finish and joins threads.
     ~ThreadPool()
     {
-        wait();
+        join();
     }
 
     // assignment operators
@@ -101,9 +101,7 @@ public:
     }
 
     //! waits for all jobs to finish and joins all threads.
-    //! @param checkEvery time between periodic checks in milliseconds, see
-    //! `Thread::join()`.
-    void wait(size_t checkEvery = 500)
+    void join()
     {
         // signal all threads to stop
         {
@@ -115,7 +113,7 @@ public:
         // join threads if not done already
         if (pool_[0].joinable()) {
             for (auto &worker : pool_) {
-                worker.join(checkEvery);
+                worker.join();
             }
         }
     }
