@@ -23,10 +23,20 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// testThreadPool
+void testThreadPool();
+RcppExport SEXP _RcppThreads_testThreadPool() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testThreadPool();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppThreads_testMonitor", (DL_FUNC) &_RcppThreads_testMonitor, 0},
     {"_RcppThreads_testThreadClass", (DL_FUNC) &_RcppThreads_testThreadClass, 0},
+    {"_RcppThreads_testThreadPool", (DL_FUNC) &_RcppThreads_testThreadPool, 0},
     {NULL, NULL, 0}
 };
 

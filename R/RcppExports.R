@@ -9,3 +9,7 @@ testThreadClass <- function() {
     invisible(.Call('_RcppThreads_testThreadClass', PACKAGE = 'RcppThreads'))
 }
 
+testThreadPool <- function() {
+    invisible(.Call('_RcppThreads_testThreadPool', PACKAGE = 'RcppThreads'))
+}
+

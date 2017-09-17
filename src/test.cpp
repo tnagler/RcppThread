@@ -2,6 +2,7 @@
 
 #include "RcppThreads/RMonitor.hpp"
 #include "RcppThreads/Thread.hpp"
+#include "RcppThreads/ThreadPool.hpp"
 
 using namespace RcppThreads;
 
@@ -9,7 +10,7 @@ using namespace RcppThreads;
 void testMonitor()
 {
     auto checks = [] () -> void {
-        checkUserInterrupt();           // should have no effect since not master
+        checkInterrupt();               // should have no effect since not master
         print("RcppThreads says hi!");  // should print to R console
         if (isInterrupted())
             throw std::runtime_error("isInterrupted should not return 'true'");
@@ -38,4 +39,18 @@ void testThreadClass()
     t1.joinable();
     t1.join();
     t2.join();
+}
+
+// [[Rcpp::export]]
+void testThreadPool()
+{
+    std::atomic_int printID;
+    printID.store(1);
+    auto dummy = [&] () -> void {
+        print(printID++);
+    };
+    ThreadPool pool(3);
+    for (int i = 0; i < 50; i++)
+        pool.push(dummy);
+    pool.wait();
 }
