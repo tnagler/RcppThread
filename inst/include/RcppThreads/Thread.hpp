@@ -27,7 +27,7 @@ public:
     ~Thread()
     {
         if (thread_.joinable())
-            std::terminate();
+            thread_.join();
     }
 
     template<class Function, class... Args> explicit
