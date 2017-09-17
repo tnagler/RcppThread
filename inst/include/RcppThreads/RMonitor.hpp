@@ -1,9 +1,7 @@
 #pragma once
 
 // R API
-#define R_NO_REMAP
-#include <R.h>
-#include <Rinternals.h>
+#include <Rcpp.h>
 
 // for tracking threads
 #include <thread>
@@ -153,7 +151,7 @@ void print(const T& object)
 //! prints the messages in the buffer to the R console, but only if called
 //! from master thread.
 //! @details Declared as a friend in `RMonitor`.
-void releaseMsgBuffer()
+inline void releaseMsgBuffer()
 {
     RMonitor::instance().safelyReleaseMsgBuffer();
 }

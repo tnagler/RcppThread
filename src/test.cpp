@@ -1,8 +1,6 @@
 #include <Rcpp.h>
 
-#include "RcppThreads/RMonitor.hpp"
-#include "RcppThreads/Thread.hpp"
-#include "RcppThreads/ThreadPool.hpp"
+#include "RcppThreads.h"
 
 using namespace RcppThreads;
 

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "RcppThreads/RMonitor.hpp"
+
 #include <thread>
 #include <future>
 #include <functional>
-#include "RcppThreads/RMonitor.hpp"
 
 namespace RcppThreads {
 
