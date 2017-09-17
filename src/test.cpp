@@ -33,6 +33,7 @@ void testThreadClass()
     //  check if all methods work
     int printID = 1;
     auto dummy = [&] () -> void {
+        checkUserInterrupt();
         print(printID++);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     };
@@ -55,10 +56,12 @@ void testThreadPool()
     std::atomic_int printID;
     printID.store(1);
     auto dummy = [&] () -> void {
+        checkUserInterrupt();
         print(printID++);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     };
     ThreadPool pool(3);
     for (int i = 0; i < 50; i++)
         pool.push(dummy);
-    pool.wait();
+    pool.join();
 }
