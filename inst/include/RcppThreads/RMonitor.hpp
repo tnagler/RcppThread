@@ -1,3 +1,9 @@
+// Copyright © 2017 Thomas Nagler
+//
+// This file is part of the RcppThreads and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE.md file in the root directory of
+// RcppThreads or https://github.com/tnagler/RcppThreads/blob/master/LICENSE.md.
+
 #pragma once
 
 // R API
@@ -155,5 +161,7 @@ inline void releaseMsgBuffer()
 {
     RMonitor::instance().safelyReleaseMsgBuffer();
 }
+
+static Rcpp::Rostream<true> Rcout;
 
 }

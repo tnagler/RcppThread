@@ -1,3 +1,9 @@
+// Copyright © 2017 Thomas Nagler
+//
+// This file is part of the RcppThreads and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE.md file in the root directory of
+// RcppThreads or https://github.com/tnagler/RcppThreads/blob/master/LICENSE.md.
+
 #include <Rcpp.h>
 
 #include "RcppThreads.h"
@@ -31,7 +37,10 @@ void testThreadClass()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     };
     Thread(dummy).join();
-    Thread(dummy).detach();
+    Thread t0(dummy);
+    t0.detach();
+    if (t0.joinable())
+        throw std::runtime_error("thread wasn't detached");
     Thread t1 = Thread(dummy);
     Thread t2 = Thread(dummy);
     t1.swap(t2);
