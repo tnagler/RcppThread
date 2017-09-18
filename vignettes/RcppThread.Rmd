@@ -169,9 +169,12 @@ void pool()
 Result after interrupting:
 
 ``` r  
-> wait_2x1s()
-slept for one second
-Error in wait_2s() : C++ call interrupted by user
+> pool()
+Task fetched by thread 140173991360256
+Task fetched by thread 140173999752960
+Task fetched by thread 140173982967552
+
+Error in RcppThreads:::pool() : C++ call interrupted by user
 ```
 
 

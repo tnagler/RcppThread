@@ -14,4 +14,7 @@ RoxygenNote: 6.0.1
 NeedsCompilation: TRUE
 Imports: Rcpp
 LinkingTo: Rcpp
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
