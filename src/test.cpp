@@ -24,7 +24,7 @@ void testMonitor()
 
     std::thread t = std::thread(checks);
     t.join();
-    Rcout.release();
+    Rcout << "";
 }
 
 // [[Rcpp::export]]

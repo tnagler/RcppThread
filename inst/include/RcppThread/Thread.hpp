@@ -69,10 +69,10 @@ public:
     {
         auto timeout = std::chrono::milliseconds(500);
         while (future_.wait_for(timeout) != std::future_status::ready) {
-            Rcout.release();
+            Rcout << "";
             checkUserInterrupt();
         }
-        Rcout.release();
+        Rcout << "";
         checkUserInterrupt();
         thread_.join();
     }

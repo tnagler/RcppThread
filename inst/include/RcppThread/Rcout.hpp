@@ -32,13 +32,6 @@ public:
         RMonitor::instance().safelyPrint(object);
         return *this;
     }
-
-    //! prints the messages in the buffer to the R console, but only if called
-    //! from master thread.
-    void release()
-    {
-        RMonitor::instance().safelyReleaseMsgBuffer();
-    }
 };
 
 //! global instance called 'Rcout' (as in Rcpp)
