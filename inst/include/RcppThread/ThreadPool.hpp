@@ -43,6 +43,9 @@ public:
                             return stopped_ || !jobs_.empty();
                         });
 
+                        // check if interrupted
+                        checkUserInterrupt();
+
                         // check if there are any jobs left in the queue
                         if (jobs_.empty())
                             continue;
@@ -97,7 +100,6 @@ public:
 
         // return future result of the job
         return job->get_future();
-;
     }
 
     //! waits for all jobs to finish and joins all threads.

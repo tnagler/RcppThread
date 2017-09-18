@@ -93,8 +93,6 @@ protected:
                 // clear message buffer
                 msgs_ = std::stringstream();
             }
-            // release messages in buffer
-            Rcpp::Rcout << msgs_.str();
         }
     }
 
