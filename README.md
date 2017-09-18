@@ -10,9 +10,13 @@ Provides R-friendly threading functionality:
   * thread safe versions of [Rcpp's](http://www.rcpp.org/)
     `checkUserInterrupt()` and `Rcout`.
 
-The library is header-only, platform-independent, and only 
+For a detailed description of its functionality and examples, see the 
+[vignette](https://github.com/tnagler/RcppThread/blob/master/vignettes/RcppThread.Rmd).
+
+The library is header-only, platform-independent. It only 
 requires a 
 [C++11-compatible compiler](http://en.cppreference.com/w/cpp/compiler_support).
+
 
 ## Installation
 
