@@ -4,19 +4,20 @@ Provides R-friendly threading functionality:
 
   * `Thread`: an interruptible thread class that otherwise behaves like 
    [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread).
-  * `ThreadPool`: a class implementing the [thread pool
+  * `ThreadPool`: a `Thread`-based class implementing the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) for easy and flexible
     parallelism.
   * thread safe versions of [Rcpp's](http://www.rcpp.org/)
     `checkUserInterrupt()` and `Rcout`.
 
+The library is header-only, platform-independent, and only 
+requires a 
+[C++11-compatible compiler](http://en.cppreference.com/w/cpp/compiler_support#cpp11).
+
+## Functionality
+
 For a detailed description of its functionality and examples, see the 
 [vignette](https://github.com/tnagler/RcppThread/blob/master/vignettes/RcppThread.Rmd).
-
-The library is header-only, platform-independent. It only 
-requires a 
-[C++11-compatible compiler](http://en.cppreference.com/w/cpp/compiler_support).
-
 
 ## Installation
 
@@ -29,7 +30,8 @@ devtools::install_github("tnagler/RcppThread")
 
 ## How to use it
 
-To use RcppThread, you need to let the compiler know that C++11 functionality is used:
+To use RcppThread, you need to tell the compiler that C++11 functionality will
+be used:
 
 ###### with sourceCpp
 

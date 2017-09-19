@@ -1,19 +1,19 @@
 ---
-title: "R-friendly threading in C++ code with `RcppThread`"
+title: "R-friendly threading in C++ with `RcppThread`"
 author: "Thomas Nagler"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{R-friendly threading in C++ code with `RcppThread`}
+  %\VignetteIndexEntry{R-friendly threading in C++ with `RcppThread`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette explains the functionality of the RcppThread package.
+This vignette explains the functionality of the RcppThread package:
 
   * `Thread`: an interruptible thread class that otherwise behaves like 
    [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread).
-  * `ThreadPool`: a class implementing the [thread pool
+  * `ThreadPool`: a `Thread`-based class implementing the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) for easy and flexible
     parallelism.
   * thread safe versions of [Rcpp's](http://www.rcpp.org/)
@@ -22,11 +22,9 @@ This vignette explains the functionality of the RcppThread package.
 
 ## Some background
 
-Calling multi-threaded C++ code from R is a bit tricky. R is single-threaded,
-and using R's C API from multiple threads causes unexpected behavior or 
-crashes your R session. In particular, communication with R from within C++ code
-is problematic. We can neither check for user interruptions during long 
-computations nor should we print messages to the R console. 
+Calling multi-threaded C++ code from R is a bit tricky because R is single-threaded. Using R's C API from multiple threads crashes your R session or causes other unexpected behavior. In particular, communication between your 
+C++ code and R is problematic. We can neither check for user interruptions 
+during long computations nor should we print messages to the R console. 
 
 It is possible to resolve this, but not without effort. 
 RcppThread relieves us of that burden. 
@@ -34,8 +32,8 @@ RcppThread relieves us of that burden.
 ## Thread safe communication with R
 
 It is not safe to call R's C API from multiple threads. It is safe, however,
-to call it from the master thread. This is the idea behind `RcppThread`'s
-`checkUserInterrupt()` and `Rcout`. They behave just like their [Rcpp](https://github.com/RcppCore/Rcpp/blob/master/README.md) versions, but
+to call it from the master thread. That's the idea behind `RcppThread`'s
+`checkUserInterrupt()` and `Rcout`. They behave almost like their [Rcpp](https://github.com/RcppCore/Rcpp/blob/master/README.md) versions, but
 only communicate with R when called from the master thread. Here's an example
 of their use with 
 [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread):
@@ -45,103 +43,111 @@ of their use with
 #include <thread>  // C++11 threads
 
 // [[Rcpp::export]]
-void wait_2s()
+void pyjamaParty()
 {
-    // give thread some work via a lambda
-    std::thread t([] () {
+    // some work that will be done in separate threads
+    auto work = [] {
+        auto id = std::this_thread::get_id();
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        RcppThread::Rcout << "slept for one second\n";
+        RcppThread::Rcout << id << " slept for one second" << std::endl;
 
         // Rcpp::checkUserInterrupt();      // R would crash
         RcppThread::checkUserInterrupt();  // does not crash
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        RcppThread::Rcout << "slept for another second\n";
-    });
-    t.join();  // wait for thread to finish work
+        RcppThread::Rcout << id << " slept for another second" << std::endl;
+    };
+
+    // create two new threads
+    std::thread t1(work);
+    std::thread t2(work);
+
+    // wait for threads to finish work
+    t1.join();
+    t2.join();
 }
 ```
 
-
-This is thread safe, no matter what threading framework is used 
-(e.g., [C++11 threads](http://en.cppreference.com/w/cpp/thread/thread), 
-[OpenMP](http://www.openmp.org/), 
-[TinyThread](http://tinythreadpp.bitsnbites.eu/),
-[Intel TBB](https://www.threadingbuildingblocks.org/)). But be careful: they
-only communicate with R from the master thread. When called from another thread,
+`RcppThread::checkUserInterrupt()` and `RcppThread::Rcout` are thread safe, no matter what threading framework is used. But be careful: they only communicate with R from the master thread. When called from another thread,
 
   * `checkUserInterrupt()` does nothing. This drastically limits its usefulness
-    if it is *only* called from non-master threads (this is not an issue with
-    with OpenMP). 
+    if it is *only* called from non-master threads. This is usually not an issue with [OpenMP](http://www.openmp.org/), but with many others like [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) or 
+    [TinyThread](http://tinythreadpp.bitsnbites.eu/).
   * `Rcout` only stores the messages, but doesn't print to the R console. This 
-    is less of a problem: calling `RcppThread::Rcout << "` once after the 
+    is less of a problem: calling `RcppThread::Rcout << ""` once after the 
     parallel computations have finished releases all messages left in the 
     buffer.
 
-RcppThread also provides convenient threading classes that resolve these 
-issues. 
+Because of this, the above example is neither interruptible nor does it print
+anything to the R console. Conveniently, RcppThread also provides two threading classes that resolve these issues, see below. 
+
+##### Remark
+
+If you want to do some clean-up before interrupting, `isInterrupted()` returns a `bool` with the interruption status.
 
 ## An R-friendly threading class
 As of C++11, the [standard template library](https://en.wikipedia.org/wiki/C%2B%2B_Standard_Library) provides the 
 class [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) for 
-executing code in parallel. 
+executing code in parallel. RcppThread's `Thread` class is an R-friendly wrapper
+to `std::thread`. 
 
-RcppThread's `Thread` class is an R-friendly wrapper
-to `std::thread`. Whenever other threads are doing some work, it periodically
-synchronizes with R from the master thread (at least every 0.5 seconds): it 
-checks for user interruptions and releases buffered messages to the R console.
-After the user interrupts a threaded computation, the thread will stop as soon
-as it encounters a `checkUserInterrupt()`.
+Instances of class `Thread` behave just like instances of `std::thread`, with 
+one exception: Whenever other threads are doing some work, the master thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a `checkUserInterrupt()`.
 
-Besides this feature, instances of class `Thread` behave just like 
-instances of `std::thread`.
+
  
 ##### Example
 
 ``` cpp  
 // [[Rcpp::export]]
-void wait_2x1s()
+void pyjamaParty2()
 {
-    // give thread some work via a lambda
-    RcppThread::Thread t([] () {
+    // some work that will be done in separate threads
+    auto work = [] {
+        auto id = std::this_thread::get_id();
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        RcppThread::Rcout << "slept for one second\n";
-        
+        RcppThread::Rcout << id << " slept for one second" << std::endl;
+
         RcppThread::checkUserInterrupt();
-        
+
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        RcppThread::Rcout << "slept for another second\n";
-    });
-    t.join();  // wait for thread to finish work
+        RcppThread::Rcout << id << " slept for another second" << std::endl;
+    };
+
+    // create two new threads
+    RcppThread::Thread t1(work);
+    RcppThread::Thread t2(work);
+
+    // wait for threads to finish work
+    t1.join();
+    t2.join();
 }
 ```
+
 Result after interrupting:
 
 ``` r  
-> wait_2x1s()
-slept for one second
-Error in wait_2s() : C++ call interrupted by user
+> pyjamaParty2()
+139862637561600 slept for one second
+139862645954304 slept for one second
+Error in pyjamaParty2() : C++ call interrupted by user
 ```
 
 ### A thread pool class
 
 A [thread pool](https://en.wikipedia.org/wiki/Thread_pool) is an abstraction for
 executing tasks in parallel. A thread pool consists of a fixed number of 
-threads that wait for incoming tasks. When a new task arrives, one of the 
-workers will do the work, and after it has finished, check whether 
-there are any more tasks to do. 
+threads that wait for incoming tasks. Whenever a new task arrives, a waiting
+worker fetches the task and does the work. 
 
-A thread pool is helpful when
+Besides being easy to use, a thread pool is helpful when
 
-  - some tasks take more time than others,
+  - some tasks take more time than others (because tasks are assigned dynamically),
   - you want to limit the number of threads running concurrently (strongly 
-    encouraged for R code),
-  - you want to make your life easier.
+    encouraged for R code).
      
 The class `ThreadPool` implements the thread pool pattern using `Thread` 
-objects. In addition to `Thread`'s periodic checks for user interruptions, 
-another check is done after each task.
-
+objects and, thus, plays nicely with `RcppThread::checkUserInterrupt()` and `RcppThread:Rcout`.
 
 ##### Example
 
@@ -152,7 +158,7 @@ void pool()
     // set up thread pool with 3 threads
     RcppThread::ThreadPool pool(3);
 
-    // each job prints thread id
+    // each tasks prints thread id
     auto task = [] () {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         RcppThread::checkUserInterrupt();
@@ -160,21 +166,24 @@ void pool()
             "Task fetched by thread " << std::this_thread::get_id() << "\n";
     };
 
-    // push 10 jobs to the pool
+    // push 10 tasks to the pool
     for (int i = 0; i < 10; i++)
         pool.push(task);
-    pool.join();  // wait for pool to finish work
+        
+    // wait for pool to finish work
+    pool.join();
 }
 ```
+
 Result after interrupting:
 
 ``` r  
 > pool()
-Task fetched by thread 140173991360256
-Task fetched by thread 140173999752960
-Task fetched by thread 140173982967552
+Task fetched by thread 140201245763328
+Task fetched by thread 140201262548736
+Task fetched by thread 140201254156032
 
-Error in RcppThreads:::pool() : C++ call interrupted by user
+Error in pool() : C++ call interrupted by user
 ```
 
 
