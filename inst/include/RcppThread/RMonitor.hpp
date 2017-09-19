@@ -54,6 +54,8 @@ protected:
     void safelycheckUserInterrupt()
     {
         if ( safelyIsInterrupted() ) {
+            if ( iAmMaster() )
+                isInterrupted_ = false;  // reset for next call
             throw std::runtime_error("C++ call interrupted by user");
         }
     }
@@ -61,9 +63,8 @@ protected:
     //! checks for user interruptions, but only if called from master thread.
     bool safelyIsInterrupted()
     {
-        if ( iAmMaster() ) {
+        if (!isInterrupted_ &  iAmMaster())
             isInterrupted_ = isInterrupted();
-        }
         return isInterrupted_;
     }
 
@@ -73,26 +74,13 @@ protected:
     template<class T>
     void safelyPrint(const T& object)
     {
-        {
-            std::lock_guard<std::mutex> lk(m_);
-            msgs_ << object;
-        }
-        safelyReleaseMsgBuffer();
-    }
-
-    //! prints the messages in the buffer to the R console, but only if called
-    //! from master thread.
-    void safelyReleaseMsgBuffer()
-    {
         std::lock_guard<std::mutex> lk(m_);
+        msgs_ << object;
         if ( iAmMaster() ) {
-            msgs_.seekg(0, std::ios::end);
-            if ( msgs_.tellg() ) {
-                // release messages in buffer
-                Rcpp::Rcout << msgs_.str();
-                // clear message buffer
-                msgs_ = std::stringstream();
-            }
+            // release messages in buffer
+            Rcpp::Rcout << msgs_.str();
+            // clear message buffer
+            msgs_ = std::stringstream();
         }
     }
 

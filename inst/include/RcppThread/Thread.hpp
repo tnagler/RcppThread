@@ -67,10 +67,10 @@ public:
     //! computations have finished.
     void join()
     {
-        auto timeout = std::chrono::milliseconds(500);
+        auto timeout = std::chrono::milliseconds(250);
         while (future_.wait_for(timeout) != std::future_status::ready) {
             Rcout << "";
-            checkUserInterrupt();
+            isInterrupted();
         }
         Rcout << "";
         checkUserInterrupt();
