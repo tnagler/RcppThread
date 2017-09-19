@@ -32,6 +32,12 @@ public:
         RMonitor::instance().safelyPrint(object);
         return *this;
     }
+
+    RPrinter& operator<< (std::ostream& (*var)(std::ostream&))
+    {
+        RMonitor::instance().safelyPrint(var);
+        return *this;
+    }
 };
 
 //! global instance called 'Rcout' (as in Rcpp)
