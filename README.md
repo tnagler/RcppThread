@@ -18,7 +18,7 @@ requires a
 
 For a detailed description of its functionality and examples, see the 
 [vignette](https://github.com/tnagler/RcppThread/blob/master/vignettes/RcppThread.Rmd)
-or the [API documentation](/https://tnagler.github.io/RcppThread/).
+or the [API documentation](https://tnagler.github.io/RcppThread/).
 
 ## Installation
 
