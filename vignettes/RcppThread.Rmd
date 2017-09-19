@@ -68,10 +68,14 @@ void pyjamaParty()
 }
 ```
 
-`RcppThread::checkUserInterrupt()` and `RcppThread::Rcout` are thread safe, no matter what threading framework is used. But be careful: they only communicate with R from the master thread. When called from another thread,
+`RcppThread::checkUserInterrupt()` and `RcppThread::Rcout` are thread safe, no 
+matter what threading framework is used. But be careful: they only communicate 
+with R from the master thread. When called from another thread,
 
   * `checkUserInterrupt()` does nothing. This drastically limits its usefulness
-    if it is *only* called from non-master threads. This is usually not an issue with [OpenMP](http://www.openmp.org/), but with many others like [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) or 
+    if it is *only* called from non-master threads. This is usually not an issue
+     with [OpenMP](http://www.openmp.org/), but with many others like 
+     [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) or 
     [TinyThread](http://tinythreadpp.bitsnbites.eu/).
   * `Rcout` only stores the messages, but doesn't print to the R console. This 
     is less of a problem: calling `RcppThread::Rcout << ""` once after the 
@@ -79,20 +83,26 @@ void pyjamaParty()
     buffer.
 
 Because of this, the above example is neither interruptible nor does it print
-anything to the R console. Conveniently, RcppThread also provides two threading classes that resolve these issues, see below. 
+anything to the R console. Conveniently, RcppThread also provides two threading 
+classes that resolve these issues, see below. 
 
 ##### Remark
 
-If you want to do some clean-up before interrupting, `isInterrupted()` returns a `bool` with the interruption status.
+If you want to do some clean-up before interrupting, `isInterrupted()` returns a
+ `bool` with the interruption status.
 
 ## An R-friendly threading class
-As of C++11, the [standard template library](https://en.wikipedia.org/wiki/C%2B%2B_Standard_Library) provides the 
-class [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) for 
-executing code in parallel. RcppThread's `Thread` class is an R-friendly wrapper
-to `std::thread`. 
+As of C++11, the 
+[standard template library](https://en.wikipedia.org/wiki/C%2B%2B_Standard_Library) 
+provides the class [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) 
+for executing code in parallel. RcppThread's `Thread` class is an R-friendly 
+wrapper to `std::thread`. 
 
 Instances of class `Thread` behave just like instances of `std::thread`, with 
-one exception: Whenever other threads are doing some work, the master thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a `checkUserInterrupt()`.
+one exception: Whenever other threads are doing some work, the master thread 
+periodically synchronizes with R. When the user interrupts a threaded 
+computation, any thread will stop as soon as it encounters a 
+`checkUserInterrupt()`.
 
 
  

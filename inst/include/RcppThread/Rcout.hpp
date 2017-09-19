@@ -11,36 +11,43 @@
 
 namespace RcppThread {
 
-//! A class for safely printing to the R console from threaded code.
+//! Safely printing to the R console from threaded code.
 class RPrinter {
 public:
-
+    
+    //! @defgroup formatting Formatting operator
     //! prints `object` to R console íf called from master thread; otherwise
     //! adds a printable version of `object` to a buffer for deferred printing.
     //! @param object a string (or coercible object) to print.
     //! @details Declared as a friend in `RMonitor`.
+    //! @{
+    
+    //! by reference.
     template<class T>
     RPrinter& operator << (T& object)
     {
         RMonitor::instance().safelyPrint(object);
         return *this;
     }
-
+    
+    //! by constant reference.
     template<class T>
     RPrinter& operator << (const T& object)
     {
         RMonitor::instance().safelyPrint(object);
         return *this;
     }
-
-    RPrinter& operator<< (std::ostream& (*var)(std::ostream&))
+    
+    //! handles std::endl.
+    RPrinter& operator<< (std::ostream& (*object)(std::ostream&))
     {
-        RMonitor::instance().safelyPrint(var);
+        RMonitor::instance().safelyPrint(object);
         return *this;
     }
+    //! @}
 };
 
-//! global instance called 'Rcout' (as in Rcpp)
+//! global `RPrinter` instance called 'Rcout' (as in Rcpp).
 static RPrinter Rcout;
 
 }

@@ -15,10 +15,10 @@
 
 namespace RcppThread {
 
+//! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool {
 public:
 
-    // default move and copy constructors
     ThreadPool() = default;
     ThreadPool(ThreadPool&) = delete;
     ThreadPool(const ThreadPool&) = delete;
@@ -63,7 +63,6 @@ public:
         }
     }
 
-    //! default destructor; waits for all jobs to finish and joins threads.
     ~ThreadPool()
     {
         join();

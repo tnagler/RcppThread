@@ -20,7 +20,7 @@ namespace RcppThread {
 //! global variable holding id of master thread-
 static std::thread::id masterThreadID = std::this_thread::get_id();
 
-//! A singleton class for tracking threads and safe communication.
+//! Singleton class for tracking threads and safe communication.
 class RMonitor {
     // user-facing functionality must be friends, so they can access
     // protected members of RMonitor.
@@ -29,10 +29,14 @@ class RMonitor {
     friend bool isInterrupted(bool condition = true);
 
 public:
-    RMonitor(RMonitor const&) = delete;            // copy construct
-    RMonitor(RMonitor&&) = delete;                 // move construct
-    RMonitor& operator=(RMonitor const&) = delete; // copy assign
-    RMonitor& operator=(RMonitor &&) = delete;     // move assign
+    //! copy constructor (forbidden)
+    RMonitor(RMonitor const&) = delete;
+    //! move constructor (forbidden) 
+    RMonitor(RMonitor&&) = delete;
+    //! copy assignment (forbidden)
+    RMonitor& operator=(RMonitor const&) = delete;
+    //! move assignment (forbidden)
+    RMonitor& operator=(RMonitor &&) = delete;
 
     //! constructs the instance when called for the first time, returns ref
     //! to instance.
@@ -106,7 +110,6 @@ private:
     std::atomic_bool isInterrupted_;
 };
 
-// user-facing API -----------------------------
 
 //! checks for user interruptions, but only if called from master thread.
 //! @param condition optional; a condition for the check to be executed.
@@ -127,5 +130,6 @@ inline bool isInterrupted(bool condition)
         return RMonitor::instance().safelyIsInterrupted();
     return false;
 }
+
 
 }

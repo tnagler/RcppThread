@@ -1,5 +1,5 @@
 Package: RcppThread
-Title: R-friendly C++11 threads
+Title: R-friendly threading in C++
 Version: 0.0.0.9000
 Authors@R: person("Thomas", "Nagler", email = "mail@tnagler.com", role = c("aut", "cre"))
 Description: Provides a C++11-style thread class and thread pool that can safely be interrupted from R.

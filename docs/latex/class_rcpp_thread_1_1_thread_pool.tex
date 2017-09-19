@@ -1,0 +1,66 @@
+\hypertarget{class_rcpp_thread_1_1_thread_pool}{}\section{Rcpp\+Thread\+:\+:Thread\+Pool Class Reference}
+\label{class_rcpp_thread_1_1_thread_pool}\index{Rcpp\+Thread\+::\+Thread\+Pool@{Rcpp\+Thread\+::\+Thread\+Pool}}
+
+
+Implemenation of the thread pool pattern based on {\ttfamily \hyperlink{class_rcpp_thread_1_1_thread}{Thread}}.  
+
+
+
+
+{\ttfamily \#include $<$Thread\+Pool.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_rcpp_thread_1_1_thread_pool_a4526bfec0fe5afb4f0533d551c0b804d}{Thread\+Pool} (size\+\_\+t n\+Threads)
+\item 
+{\footnotesize template$<$class F , class... Args$>$ }\\auto \hyperlink{class_rcpp_thread_1_1_thread_pool_a37abc7774539bf217d307de601ce0d79}{push} (F \&\&f, Args \&\&...args) -\/$>$ std\+::future$<$ decltype(f(args...))$>$
+\item 
+void \hyperlink{class_rcpp_thread_1_1_thread_pool_a1ba95e4fe30c81e19c7980c865a8ce86}{join} ()\hypertarget{class_rcpp_thread_1_1_thread_pool_a1ba95e4fe30c81e19c7980c865a8ce86}{}\label{class_rcpp_thread_1_1_thread_pool_a1ba95e4fe30c81e19c7980c865a8ce86}
+
+\begin{DoxyCompactList}\small\item\em waits for all jobs to finish and joins all threads. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Implemenation of the thread pool pattern based on {\ttfamily \hyperlink{class_rcpp_thread_1_1_thread}{Thread}}. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Rcpp\+Thread\+::\+Thread\+Pool@{Rcpp\+Thread\+::\+Thread\+Pool}!Thread\+Pool@{Thread\+Pool}}
+\index{Thread\+Pool@{Thread\+Pool}!Rcpp\+Thread\+::\+Thread\+Pool@{Rcpp\+Thread\+::\+Thread\+Pool}}
+\subsubsection[{\texorpdfstring{Thread\+Pool(size\+\_\+t n\+Threads)}{ThreadPool(size_t nThreads)}}]{\setlength{\rightskip}{0pt plus 5cm}Rcpp\+Thread\+::\+Thread\+Pool\+::\+Thread\+Pool (
+\begin{DoxyParamCaption}
+\item[{size\+\_\+t}]{n\+Threads}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_rcpp_thread_1_1_thread_pool_a4526bfec0fe5afb4f0533d551c0b804d}{}\label{class_rcpp_thread_1_1_thread_pool_a4526bfec0fe5afb4f0533d551c0b804d}
+constructs a thread pool with {\ttfamily n\+Threads} threads. 
+\begin{DoxyParams}{Parameters}
+{\em n\+Threads} & number of threads to create. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\index{Rcpp\+Thread\+::\+Thread\+Pool@{Rcpp\+Thread\+::\+Thread\+Pool}!push@{push}}
+\index{push@{push}!Rcpp\+Thread\+::\+Thread\+Pool@{Rcpp\+Thread\+::\+Thread\+Pool}}
+\subsubsection[{\texorpdfstring{push(\+F \&\&f, Args \&\&...\+args) -\/$>$ std\+::future$<$ decltype(f(args...))$>$}{push(F &&f, Args &&...args) -> std::future< decltype(f(args...))>}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class F , class... Args$>$ auto Rcpp\+Thread\+::\+Thread\+Pool\+::push (
+\begin{DoxyParamCaption}
+\item[{F \&\&}]{f, }
+\item[{Args \&\&...}]{args}
+\end{DoxyParamCaption}
+) -\/$>$ std\+::future$<$decltype(f(args...))$>$
+    \hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_rcpp_thread_1_1_thread_pool_a37abc7774539bf217d307de601ce0d79}{}\label{class_rcpp_thread_1_1_thread_pool_a37abc7774539bf217d307de601ce0d79}
+pushes new jobs to the thread pool. 
+\begin{DoxyParams}{Parameters}
+{\em f} & a function taking an arbitrary number of arguments. \\
+\hline
+{\em args} & a comma-\/seperated list of the other arguments that shall be passed to {\ttfamily f}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+an {\ttfamily std\+::shared\+\_\+future}, where the user can get the result and rethrow the catched exceptions. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Rcpp\+Thread/inst/include/\+Rcpp\+Thread/Thread\+Pool.\+hpp\end{DoxyCompactItemize}

@@ -1,0 +1,56 @@
+\hypertarget{namespace_rcpp_thread}{}\section{Rcpp\+Thread Namespace Reference}
+\label{namespace_rcpp_thread}\index{Rcpp\+Thread@{Rcpp\+Thread}}
+
+
+{\ttfamily \hyperlink{namespace_rcpp_thread}{Rcpp\+Thread}} functionality  
+
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_rcpp_thread_1_1_r_monitor}{R\+Monitor}
+\begin{DoxyCompactList}\small\item\em Singleton class for tracking threads and safe communication. \end{DoxyCompactList}\item 
+class \hyperlink{class_rcpp_thread_1_1_r_printer}{R\+Printer}
+\begin{DoxyCompactList}\small\item\em Safely printing to the R console from threaded code. \end{DoxyCompactList}\item 
+class \hyperlink{class_rcpp_thread_1_1_thread}{Thread}
+\begin{DoxyCompactList}\small\item\em R-\/friendly version of {\ttfamily std\+::thread}. \end{DoxyCompactList}\item 
+class \hyperlink{class_rcpp_thread_1_1_thread_pool}{Thread\+Pool}
+\begin{DoxyCompactList}\small\item\em Implemenation of the thread pool pattern based on {\ttfamily \hyperlink{class_rcpp_thread_1_1_thread}{Thread}}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespace_rcpp_thread_ade67c61ac7a988425ba74d9ac56b4327}{check\+User\+Interrupt} (bool condition)
+\item 
+bool \hyperlink{namespace_rcpp_thread_a9696a4fe6aae79039e0a6ccdd4aab365}{is\+Interrupted} (bool condition)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+{\ttfamily \hyperlink{namespace_rcpp_thread}{Rcpp\+Thread}} functionality 
+
+\subsection{Function Documentation}
+\index{Rcpp\+Thread@{Rcpp\+Thread}!check\+User\+Interrupt@{check\+User\+Interrupt}}
+\index{check\+User\+Interrupt@{check\+User\+Interrupt}!Rcpp\+Thread@{Rcpp\+Thread}}
+\subsubsection[{\texorpdfstring{check\+User\+Interrupt(bool condition)}{checkUserInterrupt(bool condition)}}]{\setlength{\rightskip}{0pt plus 5cm}void Rcpp\+Thread\+::check\+User\+Interrupt (
+\begin{DoxyParamCaption}
+\item[{bool}]{condition = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespace_rcpp_thread_ade67c61ac7a988425ba74d9ac56b4327}{}\label{namespace_rcpp_thread_ade67c61ac7a988425ba74d9ac56b4327}
+checks for user interruptions, but only if called from master thread. 
+\begin{DoxyParams}{Parameters}
+{\em condition} & optional; a condition for the check to be executed.\\
+\hline
+\end{DoxyParams}
+Declared as a friend in {\ttfamily \hyperlink{class_rcpp_thread_1_1_r_monitor}{R\+Monitor}}. \index{Rcpp\+Thread@{Rcpp\+Thread}!is\+Interrupted@{is\+Interrupted}}
+\index{is\+Interrupted@{is\+Interrupted}!Rcpp\+Thread@{Rcpp\+Thread}}
+\subsubsection[{\texorpdfstring{is\+Interrupted(bool condition)}{isInterrupted(bool condition)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Rcpp\+Thread\+::is\+Interrupted (
+\begin{DoxyParamCaption}
+\item[{bool}]{condition = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespace_rcpp_thread_a9696a4fe6aae79039e0a6ccdd4aab365}{}\label{namespace_rcpp_thread_a9696a4fe6aae79039e0a6ccdd4aab365}
+checks for user interruptions, but only if called from master thread (otherwise returns {\ttfamily false}). 
+\begin{DoxyParams}{Parameters}
+{\em condition} & optional; a condition for the check to be executed.\\
+\hline
+\end{DoxyParams}
+Declared as a friend in {\ttfamily \hyperlink{class_rcpp_thread_1_1_r_monitor}{R\+Monitor}}. 

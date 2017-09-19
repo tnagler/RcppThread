@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 LICENSE.md
 examples
+Doxyfile.in
+inst/include/mainpage.h
+docs

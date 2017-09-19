@@ -13,8 +13,18 @@
 #include <future>
 #include <functional>
 
+//! `RcppThread` functionality
 namespace RcppThread {
 
+//! @brief R-friendly version of `std::thread`. 
+//! 
+//! Instances of class `Thread` behave just like instances of `std::thread`, 
+//! see http://en.cppreference.com/w/cpp/thread/thread for methods and examples.
+//! There is one difference exception: Whenever other threads are doing some 
+//! work, the master thread  periodically synchronizes with R. When the user 
+//! interrupts a threaded computation, any thread will stop as soon as it 
+//! encounters a `checkUserInterrupt()`.
+//! 
 class Thread {
 public:
     Thread() = default;
@@ -30,7 +40,7 @@ public:
         if (thread_.joinable())
             thread_.join();
     }
-
+    
     template<class Function, class... Args> explicit
     Thread(Function&& f, Args&&... args)
         {
@@ -63,8 +73,8 @@ public:
         return thread_.joinable();
     }
 
-    //! checks for interrupt + msgs every 0.5 seconds and after
-    //! computations have finished.
+    // checks for interrupt + msgs every 0.25 seconds and after
+    // computations have finished.
     void join()
     {
         auto timeout = std::chrono::milliseconds(250);
