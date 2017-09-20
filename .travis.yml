@@ -1,7 +1,23 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+dist: trusty
+sudo: required
 
 language: R
-sudo: false
-cache: packages
+warnings_are_errors: false
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo add-apt-repository ppa:marutter/c2d4u -y
+  - sudo apt-get update -q
+  - sudo apt-get install g++-4.9 -y
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 100
+ 
+apt_packages:
+  - r-cran-rcpp
+  - r-cran-testthat
+  - r-cran-knitr
+  - r-cran-rmarkdown
+  - r-cran-covr
+
 after_success:
   - Rscript -e 'covr::codecov(line_exclusions = "src/test.cpp")'
