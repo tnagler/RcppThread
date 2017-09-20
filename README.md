@@ -8,9 +8,9 @@ Provides R-friendly threading functionality:
 
   * thread safe versions of [Rcpp's](http://www.rcpp.org/)
     `checkUserInterrupt()` and `Rcout`,
-  * `Thread`: an interruptible thread class that otherwise behaves like 
+  * an interruptible thread class that otherwise behaves like 
    [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread),
-  * `ThreadPool`: a `Thread`-based class implementing the [thread pool
+  * a class implementing the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) for easy and flexible
     parallelism.
 
