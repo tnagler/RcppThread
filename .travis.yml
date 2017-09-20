@@ -20,7 +20,6 @@ apt_packages:
   - r-cran-covr
 
 r:
-  - oldrel
   - release
   - devel
 
