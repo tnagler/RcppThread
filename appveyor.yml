@@ -13,6 +13,10 @@ install:
 cache:
   - C:\RLibrary
 
+platform:
+  - x86
+  - x64
+
 # Adapt as necessary starting from here
 
 build_script:
