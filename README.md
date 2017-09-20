@@ -1,14 +1,18 @@
 # RcppThread
 
+[![Travis-CI Build Status](https://travis-ci.org/tnagler/RcppThreads.svg?branch=master)](https://travis-ci.org/tnagler/RcppThreads) 
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tnagler/RcppThreads?branch=master&svg=true)](https://ci.appveyor.com/project/tnagler/RcppThreads)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tnagler/RcppThreads/master.svg)](https://codecov.io/github/tnagler/RcppThreads?branch=master)
+
 Provides R-friendly threading functionality: 
 
+  * thread safe versions of [Rcpp's](http://www.rcpp.org/)
+    `checkUserInterrupt()` and `Rcout`,
   * `Thread`: an interruptible thread class that otherwise behaves like 
-   [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread).
+   [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread),
   * `ThreadPool`: a `Thread`-based class implementing the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) for easy and flexible
     parallelism.
-  * thread safe versions of [Rcpp's](http://www.rcpp.org/)
-    `checkUserInterrupt()` and `Rcout`.
 
 The library is header-only, platform-independent, and only 
 requires a 

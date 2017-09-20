@@ -31,7 +31,7 @@ class RMonitor {
 public:
     //! copy constructor (forbidden)
     RMonitor(RMonitor const&) = delete;
-    //! move constructor (forbidden) 
+    //! move constructor (forbidden)
     RMonitor(RMonitor&&) = delete;
     //! copy assignment (forbidden)
     RMonitor& operator=(RMonitor const&) = delete;
@@ -84,7 +84,7 @@ protected:
             // release messages in buffer
             Rcpp::Rcout << msgs_.str();
             // clear message buffer
-            msgs_ = std::stringstream();
+            msgs_.str("");
         }
     }
 
