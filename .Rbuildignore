@@ -7,3 +7,4 @@ inst/include/mainpage.h
 docs
 ^\.travis\.yml$
 ^appveyor\.yml$
+^codecov\.yml$

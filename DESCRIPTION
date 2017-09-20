@@ -16,5 +16,6 @@ Imports: Rcpp
 LinkingTo: Rcpp
 Suggests: testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
