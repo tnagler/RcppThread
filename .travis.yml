@@ -19,5 +19,10 @@ apt_packages:
   - r-cran-rmarkdown
   - r-cran-covr
 
+r:
+  - oldrel
+  - release
+  - devel
+
 after_success:
   - Rscript -e 'covr::codecov(line_exclusions = "src/test.cpp")'
