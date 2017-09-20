@@ -1,8 +1,8 @@
 # RcppThread
 
-[![Travis-CI Build Status](https://travis-ci.org/tnagler/RcppThreads.svg?branch=master)](https://travis-ci.org/tnagler/RcppThreads) 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tnagler/RcppThreads?branch=master&svg=true)](https://ci.appveyor.com/project/tnagler/RcppThreads)
-[![Coverage Status](https://img.shields.io/codecov/c/github/tnagler/RcppThreads/master.svg)](https://codecov.io/github/tnagler/RcppThreads?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/tnagler/RcppThread.svg?branch=master)](https://travis-ci.org/tnagler/RcppThread) 
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tnagler/RcppThread?branch=master&svg=true)](https://ci.appveyor.com/project/tnagler/RcppThread)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tnagler/RcppThread/master.svg)](https://codecov.io/github/tnagler/RcppThread?branch=master)
 
 Provides R-friendly threading functionality: 
 
