@@ -5,3 +5,5 @@ examples
 Doxyfile.in
 inst/include/mainpage.h
 docs
+^\.travis\.yml$
+^appveyor\.yml$
