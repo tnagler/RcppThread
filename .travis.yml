@@ -12,12 +12,15 @@ before_install:
   - sudo apt-get install g++-4.9 -y
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 100
 
-apt_packages:
-  - r-cran-rcpp
-  - r-cran-testthat
-  - r-cran-knitr
-  - r-cran-rmarkdown
-  - r-cran-covr
+r_packages:
+  - Rcpp
+  - testthat
+  - knitr
+  - rmarkdown
+  - covr
+
+repos:
+  CRAN: http://cran.rstudio.com
 
 r:
   - release
