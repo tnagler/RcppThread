@@ -83,7 +83,7 @@ public:
     {
         // create pacakged task on the heap to avoid stack overlows.
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
-            [&f, &args...] { return f(args...); }
+            [&f, args...] { return f(args...); }
         );
 
         // add job to the queue
