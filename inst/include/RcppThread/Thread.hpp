@@ -43,15 +43,15 @@ public:
     
     template<class Function, class... Args> explicit
     Thread(Function&& f, Args&&... args)
-        {
-            auto f0 = [=] () {
-                if ( !isInterrupted() )
-                    f(args...);
-            };
-            auto task = std::packaged_task<void()>(f0);
-            future_ = task.get_future();
-            thread_ = std::thread(std::move(task));
-        }
+    {
+        auto f0 = [=] () {
+            if ( !isInterrupted() )
+                f(args...);
+        };
+        auto task = std::packaged_task<void()>(f0);
+        future_ = task.get_future();
+        thread_ = std::thread(std::move(task));
+    }
 
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&& other)

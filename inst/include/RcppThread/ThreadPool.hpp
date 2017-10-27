@@ -20,7 +20,7 @@ class ThreadPool {
 public:
 
     ThreadPool() = default;
-    ThreadPool(ThreadPool&) = delete;
+    ThreadPool(ThreadPool&&) = delete;
     ThreadPool(const ThreadPool&) = delete;
 
     //! constructs a thread pool with `nThreads` threads.
