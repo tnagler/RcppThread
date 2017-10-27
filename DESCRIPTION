@@ -1,5 +1,5 @@
 Package: RcppThread
-Title: R-friendly threading in C++
+Title: R-Friendly Threading in C++
 Version: 0.1.0
 Authors@R: 
     person("Thomas", "Nagler", email = "mail@tnagler.com", role = c("aut", "cre"))
