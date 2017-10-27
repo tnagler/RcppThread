@@ -10,8 +10,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 SystemRequirements: C++11
-URL: https://github.com/tnagler/cppthreadsafe
-BugReports: https://github.com/tnagler/cppthreadsafe/issues
+URL: https://github.com/tnagler/RcppThread
+BugReports: https://github.com/tnagler/RcppThread/issues
 RoxygenNote: 6.0.1
 NeedsCompilation: TRUE
 Imports: 
