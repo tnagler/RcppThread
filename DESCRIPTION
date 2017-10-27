@@ -1,8 +1,10 @@
 Package: RcppThread
 Title: R-friendly threading in C++
-Version: 0.0.0.9000
-Authors@R: person("Thomas", "Nagler", email = "mail@tnagler.com", role = c("aut", "cre"))
-Description: Provides a C++11-style thread class and thread pool that can safely be interrupted from R.
+Version: 0.1.0
+Authors@R: 
+    person("Thomas", "Nagler", email = "mail@tnagler.com", role = c("aut", "cre"))
+Description: Provides a C++11-style thread class and thread pool that can safely
+    be interrupted from R.
 Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -12,9 +14,12 @@ URL: https://github.com/tnagler/cppthreadsafe
 BugReports: https://github.com/tnagler/cppthreadsafe/issues
 RoxygenNote: 6.0.1
 NeedsCompilation: TRUE
-Imports: Rcpp
-LinkingTo: Rcpp
-Suggests: testthat,
+Imports: 
+    Rcpp
+LinkingTo: 
+    Rcpp
+Suggests: 
+    testthat,
     knitr,
     rmarkdown,
     covr
