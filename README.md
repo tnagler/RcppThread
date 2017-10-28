@@ -2,6 +2,7 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/tnagler/RcppThread.svg?branch=master)](https://travis-ci.org/tnagler/RcppThread) 
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tnagler/RcppThread?branch=master&svg=true)](https://ci.appveyor.com/project/tnagler/RcppThread)
+[![CRAN version](http://www.r-pkg.org/badges/version/RcppThread)](https://cran.r-project.org/package=RcppThread) 
 [![Coverage Status](https://img.shields.io/codecov/c/github/tnagler/RcppThread/master.svg)](https://codecov.io/github/tnagler/RcppThread?branch=master)
 
 Provides R-friendly threading functionality: 
@@ -26,7 +27,13 @@ or the [API documentation](https://tnagler.github.io/RcppThread/).
 
 ## Installation
 
-You can install RcppThread from github with:
+Release version from CRAN:
+
+``` r
+install.packages("RcppThread")
+```
+
+Latest development version from github:
 
 ``` r
 # install.packages("devtools")
