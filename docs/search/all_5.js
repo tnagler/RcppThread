@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['operator_3c_3c',['operator&lt;&lt;',['../group__formatting.html#gaeea190c50570dc8f857c8f58716f8418',1,'RcppThread::RPrinter::operator&lt;&lt;(T &amp;object)'],['../group__formatting.html#ga14488ec1ba0121b3e34cc2291edeaef7',1,'RcppThread::RPrinter::operator&lt;&lt;(const T &amp;object)'],['../group__formatting.html#ga1f4bfba8cc5853c021816ffce7714601',1,'RcppThread::RPrinter::operator&lt;&lt;(std::ostream &amp;(*object)(std::ostream &amp;))']]],
-  ['operator_3d',['operator=',['../class_rcpp_thread_1_1_r_monitor.html#a2073f46ded6bb67799d967faff17cd42',1,'RcppThread::RMonitor::operator=(RMonitor const &amp;)=delete'],['../class_rcpp_thread_1_1_r_monitor.html#a4677bdda0a35abaf288e66cf9dcd6032',1,'RcppThread::RMonitor::operator=(RMonitor &amp;&amp;)=delete']]]
+  ['push',['push',['../class_rcpp_thread_1_1_thread_pool.html#a37abc7774539bf217d307de601ce0d79',1,'RcppThread::ThreadPool']]]
 ];

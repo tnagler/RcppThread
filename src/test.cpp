@@ -8,6 +8,8 @@
 
 #include "RcppThread.h"
 
+#include <atomic>
+
 using namespace RcppThread;
 
 // [[Rcpp::export]]
@@ -31,7 +33,8 @@ void testMonitor()
 void testThreadClass()
 {
     //  check if all methods work
-    int printID = 1;
+    std::atomic<int> printID;
+    printID = 1;
     auto dummy = [&] () -> void {
         checkUserInterrupt();
         Rcout << printID++;

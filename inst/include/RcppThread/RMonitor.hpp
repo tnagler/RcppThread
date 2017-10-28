@@ -25,8 +25,8 @@ class RMonitor {
     // user-facing functionality must be friends, so they can access
     // protected members of RMonitor.
     friend class RPrinter;
-    friend void checkUserInterrupt(bool condition = true);
-    friend bool isInterrupted(bool condition = true);
+    friend void checkUserInterrupt(bool condition);
+    friend bool isInterrupted(bool condition);
 
 public:
     //! copy constructor (forbidden)
@@ -114,7 +114,7 @@ private:
 //! checks for user interruptions, but only if called from master thread.
 //! @param condition optional; a condition for the check to be executed.
 //! @details Declared as a friend in `RMonitor`.
-inline void checkUserInterrupt(bool condition)
+inline void checkUserInterrupt(bool condition = true)
 {
     if (condition)
         RMonitor::instance().safelycheckUserInterrupt();
@@ -124,7 +124,7 @@ inline void checkUserInterrupt(bool condition)
 //! (otherwise returns `false`).
 //! @param condition optional; a condition for the check to be executed.
 //! @details Declared as a friend in `RMonitor`.
-inline bool isInterrupted(bool condition)
+inline bool isInterrupted(bool condition = true)
 {
     if (condition)
         return RMonitor::instance().safelyIsInterrupted();
