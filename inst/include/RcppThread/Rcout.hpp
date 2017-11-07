@@ -50,6 +50,6 @@ public:
 };
 
 //! global `RPrinter` instance called 'Rcout' (as in Rcpp).
-static RPrinter Rcout;
+static RPrinter Rcout = RPrinter();
 
 }
