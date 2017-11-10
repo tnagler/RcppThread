@@ -4,6 +4,7 @@
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tnagler/RcppThread?branch=master&svg=true)](https://ci.appveyor.com/project/tnagler/RcppThread)
 [![CRAN version](http://www.r-pkg.org/badges/version/RcppThread)](https://cran.r-project.org/package=RcppThread) 
 [![Coverage Status](https://img.shields.io/codecov/c/github/tnagler/RcppThread/master.svg)](https://codecov.io/github/tnagler/RcppThread?branch=master)
+[![CRAN downloads](http://cranlogs.r-pkg.org/badges/RcppThread)](https://cran.r-project.org/package=RcppThread)
 
 Provides R-friendly threading functionality: 
 
