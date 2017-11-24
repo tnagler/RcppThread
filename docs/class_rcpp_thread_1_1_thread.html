@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">RcppThread 0.1.0</a>
+                    <a class="navbar-brand">RcppThread 0.1.2</a>
                 </div>
             </div>
         </nav>
@@ -113,7 +113,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p><code>#include &lt;<a class="el" href="_thread_8hpp_source.html">Thread.hpp</a>&gt;</code></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>R-friendly version of <code>std::thread</code>. </p>
-<p>Instances of class <code><a class="el" href="class_rcpp_thread_1_1_thread.html" title="R-friendly version of std::thread. ">Thread</a></code> behave just like instances of <code>std::thread</code>, see <a href="http://en.cppreference.com/w/cpp/thread/thread">http://en.cppreference.com/w/cpp/thread/thread</a> for methods and examples. There is one difference exception: Whenever other threads are doing some work, the master thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a <code><a class="el" href="namespace_rcpp_thread.html#ade67c61ac7a988425ba74d9ac56b4327">checkUserInterrupt()</a></code>. </p>
+<p>Instances of class <code><a class="el" href="class_rcpp_thread_1_1_thread.html" title="R-friendly version of std::thread. ">Thread</a></code> behave just like instances of <code>std::thread</code>, see <a href="http://en.cppreference.com/w/cpp/thread/thread">http://en.cppreference.com/w/cpp/thread/thread</a> for methods and examples. There is one difference exception: Whenever other threads are doing some work, the master thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a <code><a class="el" href="namespace_rcpp_thread.html#ae48d2e823f3ac43fb87a2795f242e3df">checkUserInterrupt()</a></code>. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>RcppThread/inst/include/RcppThread/<a class="el" href="_thread_8hpp_source.html">Thread.hpp</a></li>
 </ul>
@@ -126,7 +126,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 27 2017 03:40:17 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 24 2017 17:28:55 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
