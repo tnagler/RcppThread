@@ -35,10 +35,13 @@ void testThreadClass()
     //  check if all methods work
     std::atomic<int> printID;
     printID = 1;
+    std::mutex m;
     auto dummy = [&] () -> void {
         checkUserInterrupt();
-        Rcout << printID++;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        {
+            std::lock_guard<std::mutex> lk(m);
+            Rcout << printID++;
+        }
     };
     Thread(dummy).join();
     Thread t0(dummy);
