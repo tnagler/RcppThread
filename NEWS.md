@@ -1,3 +1,10 @@
+# RcppThread 0.1.3 (November 27, 2017)
+
+BUG FIX
+
+* Don't check print ouptut of multi-threaded code b/c of random results.
+
+
 # RcppThread 0.1.2 (November 24, 2017)
 
 DEPENDS

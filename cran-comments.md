@@ -1,3 +1,5 @@
+Patch following Prof. Ripleys mail regarding a failing unit test. 
+
 ## Test environments
 * ubuntu 12.04 (release, devel)
 * win-builder (release, devel)
