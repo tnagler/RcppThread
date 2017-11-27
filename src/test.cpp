@@ -35,16 +35,14 @@ void testThreadClass()
     //  check if all methods work
     std::atomic<int> printID;
     printID = 1;
-    std::mutex m;
     auto dummy = [&] () -> void {
         checkUserInterrupt();
-        {
-            std::lock_guard<std::mutex> lk(m);
-            Rcout << printID++;
-        }
+        Rcout << printID++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     };
     Thread(dummy).join();
     Thread t0(dummy);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     t0.detach();
     if (t0.joinable())
         throw std::runtime_error("thread wasn't detached");

@@ -5,7 +5,7 @@ test_that("R-monitor works", {
 
 context("Thread class")
 test_that("Thread class works", {
-    expect_output(RcppThread:::testThreadClass(), "1234", fixed = TRUE)
+    expect_output(RcppThread:::testThreadClass())
 })
 
 context("Thread pool")
