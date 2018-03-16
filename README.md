@@ -53,4 +53,4 @@ be used:
 ###### in another R package
 
 1. Add the line `CXX_STD = CXX11` to the `src/Makevars(.win)` files of your package.
-2. Add `RcppThread` to the `LinkingTo` filed of your `DESCRIPTION` file.
+2. Add `RcppThread` to the `LinkingTo` field of your `DESCRIPTION` file.
