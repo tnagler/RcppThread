@@ -1,3 +1,12 @@
+# RcppThread 0.2.0 (April 23, 2018)
+
+NEW FEATURE
+
+* `ThreadPool` has a new method `wait()` that waits for all jobs to be done 
+  without joining the threads. This way the thread pool can be re-used for 
+  different types of tasks that need to be run sequentially.
+
+
 # RcppThread 0.1.3 (November 27, 2017)
 
 BUG FIX
