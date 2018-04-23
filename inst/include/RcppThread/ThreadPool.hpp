@@ -25,7 +25,7 @@ public:
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create.
-    ThreadPool(size_t nThreads) : stopped_(false), num_busy_(0)
+    ThreadPool(size_t nThreads) : num_busy_(0), stopped_(false)
     {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
