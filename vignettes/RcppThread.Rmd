@@ -157,7 +157,8 @@ Besides being easy to use, a thread pool is helpful when
     encouraged for R code).
      
 The class `ThreadPool` implements the thread pool pattern using `Thread` 
-objects and, thus, plays nicely with `RcppThread::checkUserInterrupt()` and `RcppThread:Rcout`.
+objects and, thus, plays nicely with `RcppThread::checkUserInterrupt()` and 
+`RcppThread::Rcout`.
 
 ##### Example
 
@@ -180,11 +181,10 @@ void pool()
     for (int i = 0; i < 10; i++)
         pool.push(task);
         
-    // wait for pool to finish work
+    // wait for pool to finish work and join all threads
     pool.join();
 }
 ```
-
 Result after interrupting:
 
 ``` r  
@@ -195,6 +195,9 @@ Task fetched by thread 140201254156032
 
 Error in pool() : C++ call interrupted by user
 ```
+
+You can also wait for all tasks to be done and re-use the thread pool by calling
+`pool.wait()` instead of `pool.join()` and then pushing new jobs to the pool.
 
 
  
