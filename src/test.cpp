@@ -16,8 +16,8 @@ using namespace RcppThread;
 void testMonitor()
 {
     auto checks = [] () -> void {
-        checkUserInterrupt();             // should have no effect since not master
-        Rcout << "RcppThread says hi!";  // should print to R console
+        checkUserInterrupt();  // should have no effect since not master
+        Rcout << "RcppThread says hi!" << std::endl; // should print to R console
         if (isInterrupted())
             throw std::runtime_error("isInterrupted should not return 'true'");
         if (isInterrupted(false))
@@ -67,5 +67,23 @@ void testThreadPool()
     ThreadPool pool(3);
     for (int i = 0; i < 50; i++)
         pool.push(dummy);
+    pool.join();
+}
+
+// [[Rcpp::export]]
+void testWait()
+{
+    std::atomic_bool finished;
+    finished = false;
+    auto dummy = [&] () -> void {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        finished = true;
+    };
+    ThreadPool pool(3);
+    for (int i = 0; i < 3; i++)
+        pool.push(dummy);
+    Rcout << "pushed" << std::endl;
+    pool.wait();
+    Rcout << "finished" << std::endl;
     pool.join();
 }

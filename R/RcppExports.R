@@ -13,3 +13,7 @@ testThreadPool <- function() {
     invisible(.Call('_RcppThread_testThreadPool', PACKAGE = 'RcppThread'))
 }
 
+testWait <- function() {
+    invisible(.Call('_RcppThread_testWait', PACKAGE = 'RcppThread'))
+}
+

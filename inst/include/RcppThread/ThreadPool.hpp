@@ -25,38 +25,42 @@ public:
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create.
-    ThreadPool(size_t nThreads) : stopped_(false)
+    ThreadPool(size_t nThreads) : stopped_(false), num_busy_(0)
     {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
                 // observe thread pool as long there are jobs or pool has been
                 // stopped
                 while (!stopped_ | !jobs_.empty()) {
-                    std::function<void()> job;
-                    {
-                        // thread must hold the lock while modifying shared
-                        // variables
-                        std::unique_lock<std::mutex> lk(m_);
+                    // thread must hold the lock while modifying shared
+                    // variables
+                    std::unique_lock<std::mutex> lk(m_);
 
-                        // wait for new job or stop signal
-                        cv_.wait(lk, [this] {
-                            return stopped_ || !jobs_.empty();
-                        });
+                    // wait for new job or stop signal
+                    cv_tasks_.wait(lk, [this] {
+                        return stopped_ || !jobs_.empty();
+                    });
 
-                        // check if interrupted
-                        checkUserInterrupt();
+                    // check if there are any jobs left in the queue
+                    if (jobs_.empty())
+                        continue;
 
-                        // check if there are any jobs left in the queue
-                        if (jobs_.empty())
-                            continue;
+                    // take job from the queue
+                    std::function<void()> job = std::move(jobs_.front());
+                    jobs_.pop();
+                    num_busy_++;
+                    lk.unlock();
 
-                        // take job from the queue
-                        job = std::move(jobs_.front());
-                        jobs_.pop();
-                    }
+                    // check if interrupted
+                    checkUserInterrupt();
 
                     // execute job
                     job();
+
+                    // signal that job is done
+                    lk.lock();
+                    num_busy_--;
+                    cv_busy_.notify_one();
                 }
             }
             );
@@ -95,10 +99,17 @@ public:
         }
 
         // signal a waiting worker that there's a new job
-        cv_.notify_one();
+        cv_tasks_.notify_one();
 
         // return future result of the job
         return job->get_future();
+    }
+
+    //! waits for all jobs to finish, but does not join the threads.
+    void wait()
+    {
+        std::unique_lock<std::mutex> lk(m_);
+        cv_busy_.wait(lk, [&] {return (num_busy_ == 0) && jobs_.empty();});
     }
 
     //! waits for all jobs to finish and joins all threads.
@@ -109,7 +120,7 @@ public:
             std::unique_lock<std::mutex> lk(m_);
             stopped_ = true;
         }
-        cv_.notify_all();
+        cv_tasks_.notify_all();
 
         // join threads if not done already
         if (pool_[0].joinable()) {
@@ -125,7 +136,9 @@ private:
 
     // variables for synchronization between workers
     std::mutex m_;
-    std::condition_variable cv_;
+    std::condition_variable cv_tasks_;
+    std::condition_variable cv_busy_;
+    std::atomic_uint num_busy_;
     bool stopped_;
 };
 

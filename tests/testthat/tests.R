@@ -11,4 +11,5 @@ test_that("Thread class works", {
 context("Thread pool")
 test_that("Thread pool works", {
     expect_output(RcppThread:::testThreadPool())
+    expect_output(RcppThread:::testWait())
 })

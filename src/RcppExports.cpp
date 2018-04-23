@@ -33,11 +33,21 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// testWait
+void testWait();
+RcppExport SEXP _RcppThread_testWait() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testWait();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppThread_testMonitor", (DL_FUNC) &_RcppThread_testMonitor, 0},
     {"_RcppThread_testThreadClass", (DL_FUNC) &_RcppThread_testThreadClass, 0},
     {"_RcppThread_testThreadPool", (DL_FUNC) &_RcppThread_testThreadPool, 0},
+    {"_RcppThread_testWait", (DL_FUNC) &_RcppThread_testWait, 0},
     {NULL, NULL, 0}
 };
 
