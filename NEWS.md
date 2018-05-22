@@ -1,3 +1,11 @@
+# RcppThread 0.3.0 (May 22, 2018)
+
+NEW FEATURE
+
+* A `ThreadPool` can now be intantiated with zero threads in the pool. It
+  will then do all work pushed to it in the main thread.
+
+
 # RcppThread 0.2.0 (April 23, 2018)
 
 NEW FEATURE

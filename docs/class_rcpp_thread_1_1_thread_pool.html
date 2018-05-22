@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">RcppThread 0.2.0</a>
+                    <a class="navbar-brand">RcppThread 0.3.0</a>
                 </div>
             </div>
         </nav>
@@ -155,7 +155,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><div class="memdoc">
 <p>constructs a thread pool with <code>nThreads</code> threads. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">nThreads</td><td>number of threads to create. </td></tr>
+    <tr><td class="paramname">nThreads</td><td>number of threads to create; if <code>nThreads = 0</code>, all work pushed to the pool will be done in the main thread. </td></tr>
   </table>
   </dd>
 </dl>
@@ -220,7 +220,7 @@ template&lt;class F , class... Args&gt; </div>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Apr 23 2018 11:55:58 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2018 20:19:58 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
