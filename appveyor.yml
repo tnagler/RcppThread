@@ -17,10 +17,6 @@ platform:
   - x86
   - x64
 
-environment:
-    R_VERSION: release
-
-
 # Adapt as necessary starting from here
 
 build_script:
