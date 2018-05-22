@@ -24,7 +24,8 @@ public:
     ThreadPool(const ThreadPool&) = delete;
 
     //! constructs a thread pool with `nThreads` threads.
-    //! @param nThreads number of threads to create.
+    //! @param nThreads number of threads to create; if `nThreads = 0`, all 
+    //!    work pushed to the pool will be done in the main thread.
     ThreadPool(size_t nThreads) : num_busy_(0), stopped_(false)
     {
         for (size_t t = 0; t < nThreads; t++) {
@@ -89,6 +90,12 @@ public:
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
+        
+        // if there are no workers, just do the job in the main thread
+        if (pool_.size() == 0) {
+            (*job)();
+            return job->get_future();
+        }
 
         // add job to the queue
         {
@@ -123,9 +130,10 @@ public:
         cv_tasks_.notify_all();
 
         // join threads if not done already
-        if (pool_[0].joinable()) {
-            for (auto &worker : pool_) {
-                worker.join();
+        if (pool_.size() > 0) {
+            if (pool_[0].joinable()) {
+                for (auto &worker : pool_)
+                    worker.join();
             }
         }
     }

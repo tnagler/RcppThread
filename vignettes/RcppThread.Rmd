@@ -22,7 +22,9 @@ This vignette explains the functionality of the RcppThread package:
 
 ## Some background
 
-Calling multi-threaded C++ code from R is a bit tricky because R is single-threaded. Using R's C API from multiple threads crashes your R session or causes other unexpected behavior. In particular, communication between your 
+Calling multi-threaded C++ code from R is a bit tricky because R is 
+single-threaded. Using R's C API from multiple threads crashes your R session 
+or causes other unexpected behavior. In particular, communication between your 
 C++ code and R is problematic. We can neither check for user interruptions 
 during long computations nor should we print messages to the R console. 
 
@@ -33,7 +35,8 @@ RcppThread relieves us of that burden.
 
 It is not safe to call R's C API from multiple threads. It is safe, however,
 to call it from the master thread. That's the idea behind `RcppThread`'s
-`checkUserInterrupt()` and `Rcout`. They behave almost like their [Rcpp](https://github.com/RcppCore/Rcpp/blob/master/README.md) versions, but
+`checkUserInterrupt()` and `Rcout`. They behave almost like their 
+[Rcpp](https://github.com/RcppCore/Rcpp/blob/master/README.md) versions, but
 only communicate with R when called from the master thread. Here's an example
 of their use with 
 [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread):
@@ -198,6 +201,6 @@ Error in pool() : C++ call interrupted by user
 
 You can also wait for all tasks to be done and re-use the thread pool by calling
 `pool.wait()` instead of `pool.join()` and then pushing new jobs to the pool.
-
+A thread pool created with zero threads will do all work in the main thread.
 
  

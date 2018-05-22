@@ -17,3 +17,7 @@ testWait <- function() {
     invisible(.Call('_RcppThread_testWait', PACKAGE = 'RcppThread'))
 }
 
+testSingleThreaded <- function() {
+    invisible(.Call('_RcppThread_testSingleThreaded', PACKAGE = 'RcppThread'))
+}
+

@@ -42,12 +42,22 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// testSingleThreaded
+void testSingleThreaded();
+RcppExport SEXP _RcppThread_testSingleThreaded() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testSingleThreaded();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppThread_testMonitor", (DL_FUNC) &_RcppThread_testMonitor, 0},
     {"_RcppThread_testThreadClass", (DL_FUNC) &_RcppThread_testThreadClass, 0},
     {"_RcppThread_testThreadPool", (DL_FUNC) &_RcppThread_testThreadPool, 0},
     {"_RcppThread_testWait", (DL_FUNC) &_RcppThread_testWait, 0},
+    {"_RcppThread_testSingleThreaded", (DL_FUNC) &_RcppThread_testSingleThreaded, 0},
     {NULL, NULL, 0}
 };
 

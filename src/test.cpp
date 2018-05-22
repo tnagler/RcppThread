@@ -87,3 +87,21 @@ void testWait()
     Rcout << "finished" << std::endl;
     pool.join();
 }
+
+// [[Rcpp::export]]
+void testSingleThreaded()
+{
+    std::atomic_bool finished;
+    finished = false;
+    auto dummy = [&] () -> void {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        finished = true;
+    };
+    ThreadPool pool(0);
+    for (int i = 0; i < 3; i++)
+        pool.push(dummy);
+    Rcout << "pushed" << std::endl;
+    pool.wait();
+    Rcout << "finished" << std::endl;
+    pool.join();
+}
