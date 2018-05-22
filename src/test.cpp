@@ -64,7 +64,7 @@ void testThreadPool()
         Rcout << printID++;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     };
-    ThreadPool pool(3);
+    ThreadPool pool(2);
     for (int i = 0; i < 50; i++)
         pool.push(dummy);
     pool.join();
@@ -75,12 +75,18 @@ void testWait()
 {
     std::atomic_bool finished;
     finished = false;
+    std::vector<double> vec(10, 1.0);
+    std::mutex m;
     auto dummy = [&] () -> void {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        {
+            std::unique_lock<std::mutex> lk(m);
+            vec[0] = 0.0;
+        }
         finished = true;
     };
     ThreadPool pool(3);
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 300; i++)
         pool.push(dummy);
     Rcout << "pushed" << std::endl;
     pool.wait();
