@@ -24,7 +24,7 @@ public:
     ThreadPool(const ThreadPool&) = delete;
 
     //! constructs a thread pool with `nThreads` threads.
-    //! @param nThreads number of threads to create; if `nThreads = 0`, all 
+    //! @param nThreads number of threads to create; if `nThreads = 0`, all
     //!    work pushed to the pool will be done in the main thread.
     ThreadPool(size_t nThreads) : num_busy_(0), stopped_(false)
     {
@@ -90,7 +90,7 @@ public:
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
-        
+
         // if there are no workers, just do the job in the main thread
         if (pool_.size() == 0) {
             (*job)();
@@ -110,6 +110,18 @@ public:
 
         // return future result of the job
         return job->get_future();
+    }
+
+    //! maps a function on a list of items, possibly running tasks in parallel.
+    //! @param f function to be mapped.
+    //! @param items an objects containing the items on which `f` shall be mapped;
+    //!     must allow for `auto` loops (i.e., `std::begin(I)`/`std::end(I)` must be
+    //!     defined).
+    template<class F, class I>
+    void map(F&& f, I &&items)
+    {
+        for (const auto &item : items)
+            push(f, item);
     }
 
     //! waits for all jobs to finish, but does not join the threads.

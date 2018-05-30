@@ -120,6 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a37abc7774539bf217d307de601ce0d79"><td class="memTemplParams" colspan="2">template&lt;class F , class... Args&gt; </td></tr>
 <tr class="memitem:a37abc7774539bf217d307de601ce0d79"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a37abc7774539bf217d307de601ce0d79">push</a> (F &amp;&amp;f, Args &amp;&amp;...args) -&gt; std::future&lt; decltype(f(args...))&gt;</td></tr>
 <tr class="separator:a37abc7774539bf217d307de601ce0d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0f94dddc58d21857245ae5010b9d491"><td class="memTemplParams" colspan="2">template&lt;class F , class I &gt; </td></tr>
+<tr class="memitem:ac0f94dddc58d21857245ae5010b9d491"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#ac0f94dddc58d21857245ae5010b9d491">map</a> (F &amp;&amp;f, I &amp;&amp;items)</td></tr>
+<tr class="separator:ac0f94dddc58d21857245ae5010b9d491"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c93f9e84fadfdc1a3357770d47a738a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c93f9e84fadfdc1a3357770d47a738a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a6c93f9e84fadfdc1a3357770d47a738a">wait</a> ()</td></tr>
 <tr class="memdesc:a6c93f9e84fadfdc1a3357770d47a738a"><td class="mdescLeft">&#160;</td><td class="mdescRight">waits for all jobs to finish, but does not join the threads. <br /></td></tr>
@@ -163,6 +166,49 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ac0f94dddc58d21857245ae5010b9d491"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class F , class I &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::ThreadPool::map </td>
+          <td>(</td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">I &amp;&amp;&#160;</td>
+          <td class="paramname"><em>items</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>maps a function on a list of items, possibly running tasks in parallel. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">f</td><td>function to be mapped. </td></tr>
+    <tr><td class="paramname">items</td><td>an objects containing the items on which <code>f</code> shall be mapped; must allow for <code>auto</code> loops (i.e., <code>std::begin(I)</code>/<code>std::end(I)</code> must be defined). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a37abc7774539bf217d307de601ce0d79"></a>
 <div class="memitem">
 <div class="memproto">
@@ -220,7 +266,7 @@ template&lt;class F , class... Args&gt; </div>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2018 20:19:58 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 30 2018 13:29:39 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
