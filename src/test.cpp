@@ -59,14 +59,16 @@ void testThreadPool()
 {
     std::atomic_int printID;
     printID.store(1);
-    auto dummy = [&] () -> void {
+    auto dummy = [&] (size_t id) -> void {
         checkUserInterrupt();
         Rcout << printID++;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     };
     ThreadPool pool(2);
     for (int i = 0; i < 50; i++)
-        pool.push(dummy);
+        pool.push(dummy, i);
+    std::vector<size_t> ids{1, 2, 3};
+    pool.map(dummy, ids);
     pool.join();
 }
 

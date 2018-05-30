@@ -1,3 +1,10 @@
+# RcppThread 0.4.0 (in progress)
+
+NEW FEATURE
+
+* New function `ThreadPool::map()` that allows to map a function a list of items.
+
+
 # RcppThread 0.3.0 (May 22, 2018)
 
 NEW FEATURE
