@@ -1,11 +1,11 @@
-# RcppThread 0.4.0 (in progress)
+# RcppThread 0.4.0
 
 NEW FEATURE
 
 * New function `ThreadPool::map()` that allows to map a function a list of items.
 
 
-# RcppThread 0.3.0 (May 22, 2018)
+# RcppThread 0.3.0
 
 NEW FEATURE
 
@@ -13,7 +13,7 @@ NEW FEATURE
   will then do all work pushed to it in the main thread.
 
 
-# RcppThread 0.2.0 (April 23, 2018)
+# RcppThread 0.2.0
 
 NEW FEATURE
 
@@ -22,7 +22,7 @@ NEW FEATURE
   different types of tasks that need to be run sequentially.
 
 
-# RcppThread 0.1.3 (November 27, 2017)
+# RcppThread 0.1.3
 
 BUG FIX
 
@@ -40,7 +40,7 @@ BUG FIX
 * Fixed a randomly failing unit test.
 
 
-# RcppThread 0.1.1 (November 7, 2017)
+# RcppThread 0.1.1
 
 BUG FIX
 
@@ -48,7 +48,7 @@ BUG FIX
   shared library on r-hub, see discussion in #8) 
 
 
-# RcppThread 0.1.0 (October 27, 2017)
+# RcppThread 0.1.0
 
 * Intial release.
 
