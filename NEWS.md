@@ -1,4 +1,4 @@
-# RcppThread 0.4.0 (in progress)
+# RcppThread 0.4.0 (June 12, 2018)
 
 NEW FEATURE
 
@@ -51,6 +51,3 @@ BUG FIX
 # RcppThread 0.1.0 (October 27, 2017)
 
 * Intial release.
-
-
-
