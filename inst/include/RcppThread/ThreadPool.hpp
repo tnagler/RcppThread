@@ -12,8 +12,44 @@
 #include <queue>
 #include <condition_variable>
 #include <memory>
+#include <cstddef>
+#include <cmath>
+
+#include <iostream>
 
 namespace RcppThread {
+    
+struct Batch {
+    ptrdiff_t begin;
+    ptrdiff_t end;
+};
+
+
+inline size_t computeBatchSize(size_t nTasks, size_t nThreads)
+{
+    if (nTasks < nThreads)
+        return nTasks;
+    return nThreads * (1 + std::floor(std::log(nTasks / nThreads)));
+}
+
+inline std::vector<Batch> createBatches(ptrdiff_t begin, 
+                                        size_t nTasks, 
+                                        size_t nThreads)
+{
+    nThreads = std::max(nThreads, static_cast<size_t>(1));
+    std::vector<Batch> batches(std::min(nTasks, nThreads));
+    size_t    minSize = nTasks / nThreads;
+    ptrdiff_t remSize = nTasks % nThreads;
+    
+    for (size_t i = 0, k = 0; i < nTasks; k++) {
+        ptrdiff_t bBegin = begin + i;
+        ptrdiff_t bSize  = minSize + (remSize-- > 0);
+        batches[k] = Batch{bBegin, bBegin + bSize};
+        i += bSize;
+    }
+
+    return batches;
+}
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool {
@@ -26,42 +62,44 @@ public:
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create; if `nThreads = 0`, all
     //!    work pushed to the pool will be done in the main thread.
-    ThreadPool(size_t nThreads) : num_busy_(0), stopped_(false)
+    ThreadPool(size_t nThreads)
     {
         for (size_t t = 0; t < nThreads; t++) {
-            pool_.emplace_back([this] {
+            workers_.emplace_back([this] {
                 // observe thread pool as long there are jobs or pool has been
                 // stopped
                 while (!stopped_ | !jobs_.empty()) {
-                    // thread must hold the lock while modifying shared
-                    // variables
-                    std::unique_lock<std::mutex> lk(m_);
+                    std::function<void()> job;
+                    
+                    {
+                        // thread must hold the lock while modifying shared
+                        // variables
+                        std::unique_lock<std::mutex> lk(m_);
 
-                    // wait for new job or stop signal
-                    cv_tasks_.wait(lk, [this] {
-                        return stopped_ || !jobs_.empty();
-                    });
+                        // wait for new job or stop signal
+                        cvTasks_.wait(lk, [this] {
+                            return stopped_ || !jobs_.empty();
+                        });
 
-                    // check if there are any jobs left in the queue
-                    if (jobs_.empty())
-                        continue;
+                        // check if there are any jobs left in the queue
+                        if (jobs_.empty())
+                            continue;
 
-                    // take job from the queue
-                    std::function<void()> job = std::move(jobs_.front());
-                    jobs_.pop();
-                    num_busy_++;
-                    lk.unlock();
+                        // take job from the queue
+                        job = std::move(jobs_.front());
+                        jobs_.pop();
+                    }
 
                     // check if interrupted
                     checkUserInterrupt();
 
                     // execute job
+                    numBusy_++;
                     job();
 
                     // signal that job is done
-                    lk.lock();
-                    num_busy_--;
-                    cv_busy_.notify_one();
+                    numBusy_--;
+                    cvBusy_.notify_one();
                 }
             }
             );
@@ -92,7 +130,7 @@ public:
         );
 
         // if there are no workers, just do the job in the main thread
-        if (pool_.size() == 0) {
+        if (workers_.size() == 0) {
             (*job)();
             return job->get_future();
         }
@@ -106,7 +144,7 @@ public:
         }
 
         // signal a waiting worker that there's a new job
-        cv_tasks_.notify_one();
+        cvTasks_.notify_one();
 
         // return future result of the job
         return job->get_future();
@@ -120,17 +158,67 @@ public:
     template<class F, class I>
     void map(F&& f, I &&items)
     {
-        for (const auto &item : items)
-            push(f, item);
+        for (auto &&item : items)
+            this->push(f, item);
     }
-
-    //! waits for all jobs to finish, but does not join the threads.
-    void wait()
+    
+    //! computes an index-based for loop in parallel batches.
+    //! @param begin first index of the loop.
+    //! @param size the loop runs in the range `[begin, begin + size)`.
+    //! @param f a function (the 'loop body').
+    //! @details Consider the following code: 
+    //! ```
+    //! std::vector<double> x(10);
+    //! for (size_t i = 0; i < x.size(); i++) {
+    //!     x[i] = i;
+    //! }
+    //! ```
+    //! The parallel equivalent is given by: 
+    //! ```
+    //! ThreadPool pool(2);
+    //! pool.forIndex(0, 10, [&] (size_t i) {
+    //!     x[i] = i;
+    //! });
+    //! ```
+    //! **Caution**: if the iterations are not independent from another, 
+    //! the tasks need to be synchonized manually using mutexes.
+    template<class F>
+    inline void forIndex(ptrdiff_t begin, size_t size, F&& f)
     {
-        std::unique_lock<std::mutex> lk(m_);
-        cv_busy_.wait(lk, [&] {return (num_busy_ == 0) && jobs_.empty();});
+        static auto func = std::move(f);
+        auto doBatch = [&] (const Batch& b) {
+            for (ptrdiff_t i = b.begin; i < b.end; i++)
+                func(i);
+        };
+        this->map(doBatch, createBatches(begin, size, workers_.size()));
     }
-
+    
+    //! computes a range-based for loop in parallel batches.
+    //! @param items an object allowing for `items.size()` and whose elements
+    //!   are accessed by the `[]` operator.
+    //! @param f a function (the 'loop body').
+    //! @details Consider the following code: 
+    //! ```
+    //! std::vector<double> x(10, 1.0);
+    //! for (auto& xx : x) {
+    //!     xx *= 2;
+    //! }
+    //! ```
+    //! The parallel `ThreadPool` equivalent is 
+    //! ```
+    //! ThreadPool pool(2);
+    //! pool.forEach(x, [&] (double& xx) {
+    //!     xx *= 2;
+    //! });
+    //! ```
+    //! **Caution**: if the iterations are not independent from another, 
+    //! the tasks need to be synchonized manually using mutexes.
+    template<class F, class I>
+    inline void forEach(I&& items, F&& f)
+    {
+        this->forIndex(0, items.size(), f);
+    }
+    
     //! waits for all jobs to finish and joins all threads.
     void join()
     {
@@ -139,27 +227,27 @@ public:
             std::unique_lock<std::mutex> lk(m_);
             stopped_ = true;
         }
-        cv_tasks_.notify_all();
+        cvTasks_.notify_all();
 
         // join threads if not done already
-        if (pool_.size() > 0) {
-            if (pool_[0].joinable()) {
-                for (auto &worker : pool_)
+        if (workers_.size() > 0) {
+            if (workers_[0].joinable()) {
+                for (auto &worker : workers_)
                     worker.join();
             }
         }
     }
 
 private:
-    std::vector<Thread> pool_;                // worker threads in the pool
+    std::vector<Thread> workers_;                // worker threads in the pool
     std::queue<std::function<void()>> jobs_;  // the task queue
 
     // variables for synchronization between workers
     std::mutex m_;
-    std::condition_variable cv_tasks_;
-    std::condition_variable cv_busy_;
-    std::atomic_uint num_busy_;
-    bool stopped_;
+    std::condition_variable cvTasks_;
+    std::condition_variable cvBusy_;
+    std::atomic_uint numBusy_{0};
+    std::atomic_bool stopped_{false};
 };
 
 }
