@@ -182,15 +182,15 @@ public:
     //! The parallel equivalent is given by: 
     //! ```
     //! ThreadPool pool(2);
-    //! pool.forIndex(0, 10, [&] (size_t i) {
+    //! pool.parallelFor(0, 10, [&] (size_t i) {
     //!     x[i] = i;
     //! });
     //! ```
     //! **Caution**: if the iterations are not independent from another, 
     //! the tasks need to be synchonized manually using mutexes.
     template<class F>
-    inline void forIndex(ptrdiff_t begin, size_t size, F&& f, 
-                         size_t nBatches = 0)
+    inline void parallelFor(ptrdiff_t begin, size_t size, F&& f, 
+                            size_t nBatches = 0)
     {
         static auto func = std::move(f);
         auto doBatch = [&] (const Batch& b) {
@@ -226,9 +226,44 @@ public:
     template<class F, class I>
     inline void forEach(I&& items, F&& f, size_t nBatches)
     {
-        this->forIndex(0, items.size(), f, nBatches);
+        this->parallelFor(0, items.size(), f, nBatches);
     }
 
+    //! computes an index-based for loop in parallel batches.
+    //! @param begin first index of the loop.
+    //! @param size the loop runs in the range `[begin, begin + size)`.
+    //! @param f an object callable as a function (the 'loop body'); typically
+    //!   a lambda.
+    //! @param nBatches the number of batches to create; the default (0) 
+    //!   triggers a heuristic to automatically determine the batch size.
+    //! @details Consider the following code: 
+    //! ```
+    //! std::vector<double> x(10);
+    //! for (size_t i = 0; i < x.size(); i++) {
+    //!     x[i] = i;
+    //! }
+    //! ```
+    //! The parallel equivalent is given by: 
+    //! ```
+    //! ThreadPool pool(2);
+    //! pool.forIndex(0, 10, [&] (size_t i) {
+    //!     x[i] = i;
+    //! });
+    //! ```
+    //! **Caution**: if the iterations are not independent from another, 
+    //! the tasks need to be synchonized manually using mutexes.
+    template<class F>
+    inline void reduce(ptrdiff_t begin, size_t size, F&& f, 
+                       size_t nBatches = 0)
+    {
+        static auto func = std::move(f);
+        auto doBatch = [&] (const Batch& b) {
+            for (ptrdiff_t i = b.begin; i < b.end; i++)
+                func(i);
+        };
+        auto batches = createBatches(begin, size, workers_.size(), nBatches);
+        this->map(doBatch, std::move(batches));
+    }
     
     //! waits for all jobs to finish and checks for interruptions, 
     //! but does not join the threads.

@@ -38,14 +38,14 @@ namespace RcppThread {
 //! yourself and using `ThreadPool::forEach()`.
 //! 
 //! **Caution**: if the iterations are not independent from another, 
-//! the tasks need to be synchonized manually using mutexes.
+//! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
 inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
                         size_t nThreads = std::thread::hardware_concurrency(),
                         size_t nBatches = 0)
 {
     ThreadPool pool(nThreads);
-    pool.forIndex(begin, size, f, nBatches);
+    pool.parallelFor(begin, size, f, nBatches);
     pool.join();
 }
 
@@ -76,7 +76,7 @@ inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
 //! yourself and using `ThreadPool::forEach()`.
 //! 
 //! **Caution**: if the iterations are not independent from another, 
-//! the tasks need to be synchonized manually using mutexes.
+//! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class I, class F>
 inline void parallelForEach(I&& items, F&& f,
                         size_t nThreads = std::thread::hardware_concurrency(),
