@@ -64,8 +64,9 @@ public:
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create; if `nThreads = 0`, all
-    //!    work pushed to the pool will be done in the main thread.
-    ThreadPool(size_t nThreads)
+    //!    work pushed to the pool will be done in the main thread. The default
+    //!    equals the number of (virtual) cores on the machine.
+    ThreadPool(size_t nThreads = std::thread::hardware_concurrency())
     {
         for (size_t t = 0; t < nThreads; t++) {
             workers_.emplace_back([this] {
