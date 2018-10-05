@@ -18,6 +18,8 @@ namespace RcppThread {
 //! @param nThreads the number of threads to use; the default uses the number 
 //!   of cores in the machine;  if `nThreads = 0`, all work will be done in the 
 //!   main thread.
+//! @param nBatches the number of batches to create; the default (0) 
+//!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code: 
 //! ```
 //! std::vector<double> x(10);
@@ -39,10 +41,11 @@ namespace RcppThread {
 //! the tasks need to be synchonized manually using mutexes.
 template<class F>
 inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
-                        size_t nThreads = std::thread::hardware_concurrency())
+                        size_t nThreads = std::thread::hardware_concurrency(),
+                        size_t nBatches = 0)
 {
     ThreadPool pool(nThreads);
-    pool.forIndex(begin, size, f);
+    pool.forIndex(begin, size, f, nBatches);
     pool.join();
 }
 
@@ -53,6 +56,8 @@ inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
 //! @param nThreads the number of threads to use; the default uses the number 
 //!   of cores in the machine;  if `nThreads = 0`, all work will be done in the 
 //!   main thread.
+//! @param nBatches the number of batches to create; the default (0) 
+//!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code: 
 //! ```
 //! std::vector<double> x(10, 1.0);
@@ -73,11 +78,12 @@ inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
 //! **Caution**: if the iterations are not independent from another, 
 //! the tasks need to be synchonized manually using mutexes.
 template<class I, class F>
-inline void parallelFor(I&& items, F&& f,
-                        size_t nThreads = std::thread::hardware_concurrency())
+inline void parallelForEach(I&& items, F&& f,
+                        size_t nThreads = std::thread::hardware_concurrency(),
+                        size_t nBatches = 0)
 {
     ThreadPool pool(nThreads);
-    pool.forEach(items, f);
+    pool.forEach(items, f, nBatches);
     pool.join();
 }
 

@@ -30,14 +30,18 @@ inline size_t computeBatchSize(size_t nTasks, size_t nThreads)
     return nThreads * (1 + std::floor(std::log(nTasks / nThreads)));
 }
 
+
 inline std::vector<Batch> createBatches(ptrdiff_t begin, 
                                         size_t nTasks, 
-                                        size_t nThreads)
+                                        size_t nThreads,
+                                        size_t nBatches)
 {
-    nThreads = std::max(nThreads, static_cast<size_t>(1));
-    std::vector<Batch> batches(computeBatchSize(nTasks, nThreads));
-    size_t    minSize = nTasks / nThreads;
-    ptrdiff_t remSize = nTasks % nThreads;
+    if (nBatches == 0)
+        nBatches = computeBatchSize(nTasks, nThreads);
+    nBatches = std::min(nTasks, nBatches);
+    std::vector<Batch> batches(nBatches);
+    size_t    minSize = nTasks / nBatches;
+    ptrdiff_t remSize = nTasks % nBatches;
     
     for (size_t i = 0, k = 0; i < nTasks; k++) {
         ptrdiff_t bBegin = begin + i;
@@ -48,6 +52,7 @@ inline std::vector<Batch> createBatches(ptrdiff_t begin,
 
     return batches;
 }
+
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool {
@@ -163,7 +168,10 @@ public:
     //! computes an index-based for loop in parallel batches.
     //! @param begin first index of the loop.
     //! @param size the loop runs in the range `[begin, begin + size)`.
-    //! @param f a function (the 'loop body').
+    //! @param f an object callable as a function (the 'loop body'); typically
+    //!   a lambda.
+    //! @param nBatches the number of batches to create; the default (0) 
+    //!   triggers a heuristic to automatically determine the batch size.
     //! @details Consider the following code: 
     //! ```
     //! std::vector<double> x(10);
@@ -181,20 +189,24 @@ public:
     //! **Caution**: if the iterations are not independent from another, 
     //! the tasks need to be synchonized manually using mutexes.
     template<class F>
-    inline void forIndex(ptrdiff_t begin, size_t size, F&& f)
+    inline void forIndex(ptrdiff_t begin, size_t size, F&& f, 
+                         size_t nBatches = 0)
     {
         static auto func = std::move(f);
         auto doBatch = [&] (const Batch& b) {
             for (ptrdiff_t i = b.begin; i < b.end; i++)
                 func(i);
         };
-        this->map(doBatch, createBatches(begin, size, workers_.size()));
+        auto batches = createBatches(begin, size, workers_.size(), nBatches);
+        this->map(doBatch, std::move(batches));
     }
-    
+        
     //! computes a range-based for loop in parallel batches.
     //! @param items an object allowing for `items.size()` and whose elements
     //!   are accessed by the `[]` operator.
     //! @param f a function (the 'loop body').
+    //! @param nBatches the number of batches to create; the default (0) 
+    //!   triggers a heuristic to automatically determine the number of batches.
     //! @details Consider the following code: 
     //! ```
     //! std::vector<double> x(10, 1.0);
@@ -212,10 +224,11 @@ public:
     //! **Caution**: if the iterations are not independent from another, 
     //! the tasks need to be synchonized manually using mutexes.
     template<class F, class I>
-    inline void forEach(I&& items, F&& f)
+    inline void forEach(I&& items, F&& f, size_t nBatches)
     {
-        this->forIndex(0, items.size(), f);
+        this->forIndex(0, items.size(), f, nBatches);
     }
+
     
     //! waits for all jobs to finish and checks for interruptions, 
     //! but does not join the threads.
@@ -254,7 +267,7 @@ public:
     }
 
 private:
-    std::vector<Thread> workers_;                // worker threads in the pool
+    std::vector<Thread> workers_;             // worker threads in the pool
     std::queue<std::function<void()>> jobs_;  // the task queue
 
     // variables for synchronization between workers
