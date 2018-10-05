@@ -15,8 +15,6 @@
 #include <cstddef>
 #include <cmath>
 
-#include <iostream>
-
 namespace RcppThread {
     
 struct Batch {
@@ -37,7 +35,7 @@ inline std::vector<Batch> createBatches(ptrdiff_t begin,
                                         size_t nThreads)
 {
     nThreads = std::max(nThreads, static_cast<size_t>(1));
-    std::vector<Batch> batches(std::min(nTasks, nThreads));
+    std::vector<Batch> batches(computeBatchSize(nTasks, nThreads));
     size_t    minSize = nTasks / nThreads;
     ptrdiff_t remSize = nTasks % nThreads;
     
@@ -219,6 +217,23 @@ public:
         this->forIndex(0, items.size(), f);
     }
     
+    //! waits for all jobs to finish and checks for interruptions, 
+    //! but does not join the threads.
+    void wait()
+    {
+        auto pred = [this] {return (numBusy_ == 0) && jobs_.empty();};
+        auto timeout = std::chrono::milliseconds(250);
+        
+        while (!pred()) {
+            Rcout << "";
+            isInterrupted();
+            std::unique_lock<std::mutex> lk(m_);
+            cvBusy_.wait_for(lk, timeout, pred);
+        }
+        Rcout << "";
+        checkUserInterrupt();
+    }
+
     //! waits for all jobs to finish and joins all threads.
     void join()
     {
