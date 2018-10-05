@@ -9,15 +9,43 @@ testThreadClass <- function() {
     invisible(.Call('_RcppThread_testThreadClass', PACKAGE = 'RcppThread'))
 }
 
-testThreadPool <- function() {
-    invisible(.Call('_RcppThread_testThreadPool', PACKAGE = 'RcppThread'))
+testThreadPoolPush <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolPush', PACKAGE = 'RcppThread'))
 }
 
-testWait <- function() {
-    invisible(.Call('_RcppThread_testWait', PACKAGE = 'RcppThread'))
+testThreadPoolMap <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolMap', PACKAGE = 'RcppThread'))
 }
 
-testSingleThreaded <- function() {
-    invisible(.Call('_RcppThread_testSingleThreaded', PACKAGE = 'RcppThread'))
+testThreadPoolParallelFor <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolParallelFor', PACKAGE = 'RcppThread'))
+}
+
+testThreadPoolForEach <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolForEach', PACKAGE = 'RcppThread'))
+}
+
+testThreadPoolSingleThreaded <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolSingleThreaded', PACKAGE = 'RcppThread'))
+}
+
+testParallelFor <- function() {
+    invisible(.Call('_RcppThread_testParallelFor', PACKAGE = 'RcppThread'))
+}
+
+testForEach <- function() {
+    invisible(.Call('_RcppThread_testForEach', PACKAGE = 'RcppThread'))
+}
+
+testThreadInterrupt <- function() {
+    invisible(.Call('_RcppThread_testThreadInterrupt', PACKAGE = 'RcppThread'))
+}
+
+testPoolInterruptJoin <- function() {
+    invisible(.Call('_RcppThread_testPoolInterruptJoin', PACKAGE = 'RcppThread'))
+}
+
+testPoolInterruptWait <- function() {
+    invisible(.Call('_RcppThread_testPoolInterruptWait', PACKAGE = 'RcppThread'))
 }
 

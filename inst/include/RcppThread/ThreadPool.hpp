@@ -16,7 +16,7 @@
 #include <cmath>
 
 namespace RcppThread {
-    
+
 struct Batch {
     ptrdiff_t begin;
     ptrdiff_t end;
@@ -31,18 +31,19 @@ inline size_t computeBatchSize(size_t nTasks, size_t nThreads)
 }
 
 
-inline std::vector<Batch> createBatches(ptrdiff_t begin, 
-                                        size_t nTasks, 
+inline std::vector<Batch> createBatches(ptrdiff_t begin,
+                                        size_t nTasks,
                                         size_t nThreads,
                                         size_t nBatches)
 {
+    nThreads = std::max(nThreads, static_cast<size_t>(1));
     if (nBatches == 0)
         nBatches = computeBatchSize(nTasks, nThreads);
     nBatches = std::min(nTasks, nBatches);
     std::vector<Batch> batches(nBatches);
     size_t    minSize = nTasks / nBatches;
     ptrdiff_t remSize = nTasks % nBatches;
-    
+
     for (size_t i = 0, k = 0; i < nTasks; k++) {
         ptrdiff_t bBegin = begin + i;
         ptrdiff_t bSize  = minSize + (remSize-- > 0);
@@ -60,11 +61,11 @@ public:
 
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool(const ThreadPool&) = delete;
-    
+
     //! constructs a thread pool with as many workers as there are cores.
     ThreadPool() : ThreadPool(std::thread::hardware_concurrency())
     {}
-    
+
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create; if `nThreads = 0`, all
     //!    work pushed to the pool will be done in the main thread.
@@ -76,7 +77,7 @@ public:
                 // stopped
                 while (!stopped_ | !jobs_.empty()) {
                     std::function<void()> job;
-                    
+
                     {
                         // thread must hold the lock while modifying shared
                         // variables
@@ -131,7 +132,7 @@ public:
     auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     {
         // create pacakged task on the heap to avoid stack overlows.
-        alignas(128) auto job = 
+        alignas(128) auto job =
             std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
@@ -168,32 +169,32 @@ public:
         for (auto &&item : items)
             this->push(f, item);
     }
-    
+
     //! computes an index-based for loop in parallel batches.
     //! @param begin first index of the loop.
     //! @param size the loop runs in the range `[begin, begin + size)`.
     //! @param f an object callable as a function (the 'loop body'); typically
     //!   a lambda.
-    //! @param nBatches the number of batches to create; the default (0) 
+    //! @param nBatches the number of batches to create; the default (0)
     //!   triggers a heuristic to automatically determine the batch size.
-    //! @details Consider the following code: 
+    //! @details Consider the following code:
     //! ```
     //! std::vector<double> x(10);
     //! for (size_t i = 0; i < x.size(); i++) {
     //!     x[i] = i;
     //! }
     //! ```
-    //! The parallel equivalent is given by: 
+    //! The parallel equivalent is given by:
     //! ```
     //! ThreadPool pool(2);
     //! pool.forIndex(0, 10, [&] (size_t i) {
     //!     x[i] = i;
     //! });
     //! ```
-    //! **Caution**: if the iterations are not independent from another, 
+    //! **Caution**: if the iterations are not independent from another,
     //! the tasks need to be synchronized manually (e.g., using mutexes).
     template<class F>
-    inline void parallelFor(ptrdiff_t begin, size_t size, F&& f, 
+    inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
                             size_t nBatches = 0)
     {
         static auto func = std::move(f);
@@ -204,43 +205,44 @@ public:
         auto batches = createBatches(begin, size, workers_.size(), nBatches);
         this->map(doBatch, std::move(batches));
     }
-        
+
     //! computes a range-based for loop in parallel batches.
-    //! @param items an object allowing for `items.size()` and whose elements
-    //!   are accessed by the `[]` operator.
+    //! @param items an object allowing for `std::begin()`/`std::end()` and
+    //!   whose elements can be accessed by the `[]` operator.
     //! @param f a function (the 'loop body').
-    //! @param nBatches the number of batches to create; the default (0) 
+    //! @param nBatches the number of batches to create; the default (0)
     //!   triggers a heuristic to automatically determine the number of batches.
-    //! @details Consider the following code: 
+    //! @details Consider the following code:
     //! ```
     //! std::vector<double> x(10, 1.0);
     //! for (auto& xx : x) {
     //!     xx *= 2;
     //! }
     //! ```
-    //! The parallel `ThreadPool` equivalent is 
+    //! The parallel `ThreadPool` equivalent is
     //! ```
     //! ThreadPool pool(2);
     //! pool.forEach(x, [&] (double& xx) {
     //!     xx *= 2;
     //! });
     //! ```
-    //! **Caution**: if the iterations are not independent from another, 
+    //! **Caution**: if the iterations are not independent from another,
     //! the tasks need to be synchronized manually (e.g., using mutexes).
     template<class F, class I>
     inline void forEach(I&& items, F&& f, size_t nBatches = 0)
     {
-        this->parallelFor(0, items.size(), f, nBatches);
+        size_t size = std::end(items) - std::begin(items);
+        this->parallelFor(0, size, f, nBatches);
     }
 
-    
-    //! waits for all jobs to finish and checks for interruptions, 
+
+    //! waits for all jobs to finish and checks for interruptions,
     //! but does not join the threads.
     void wait()
     {
         auto pred = [this] {return (numBusy_ == 0) && jobs_.empty();};
         auto timeout = std::chrono::milliseconds(250);
-        
+
         while (!pred()) {
             Rcout << "";
             isInterrupted();
@@ -263,8 +265,8 @@ public:
 
         // join threads if not done already
         if (workers_.size() > 0) {
-            if (workers_[0].joinable()) {
-                for (auto &worker : workers_)
+            for (auto &worker : workers_) {
+                if (worker.joinable())
                     worker.join();
             }
         }
