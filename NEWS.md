@@ -1,3 +1,10 @@
+# RcppThread 0.5.0.9000
+
+NEW FEATURE
+
+* New functions `parallelFor()` and `ForEach()` allowing parallel `for` loops 
+  with load balancing. Can also be called as method of a `ThreadPool`.
+
 # RcppThread 0.4.0 (June 12, 2018)
 
 NEW FEATURE
