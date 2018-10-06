@@ -1,4 +1,10 @@
-# RcppThread 0.4.0
+
+
+* Options to override `std::thread` and `std::cout` with RcppThread equivalents 
+  (preprocessor variables `RCPPTHREAD_OVERRIDE_THREAD` and 
+  `RCPPTHREAD_OVERRIDE_COUT`).
+
+# RcppThread 0.4.0 (June 12, 2018)
 
 NEW FEATURE
 
@@ -51,6 +57,3 @@ BUG FIX
 # RcppThread 0.1.0
 
 * Intial release.
-
-
-
