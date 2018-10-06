@@ -1,6 +1,6 @@
 * Options to override `std::thread` and `std::cout` with RcppThread equivalents 
   (preprocessor variables `RCPPTHREAD_OVERRIDE_THREAD` and 
-  `RCPPTHREAD_OVERRIDE_COUT`).
+  `RCPPTHREAD_OVERRIDE_COUT`). Both overrides are activated by default.
 
 # RcppThread 0.4.0 (June 12, 2018)
 
