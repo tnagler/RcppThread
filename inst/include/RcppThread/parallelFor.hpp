@@ -45,9 +45,8 @@ inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
                         size_t nBatches = 0)
 {
     ThreadPool pool(nThreads);
-    std::cout << nThreads;
     pool.parallelFor(begin, size, f, nBatches);
-    // pool.join();
+    pool.join();
 }
 
 //! computes a range-based for loop in parallel batches.
