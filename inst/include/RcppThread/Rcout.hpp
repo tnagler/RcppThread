@@ -31,7 +31,7 @@ public:
     //! @param object a string (or coercible object) to print.
     //! @details Declared as a friend in `RMonitor`.
     template<class T>
-    RPrinter& operator << (const T& object)
+    RPrinter& operator<< (const T& object)
     {
         RMonitor::instance().safelyPrint(object);
         return *this;
@@ -53,3 +53,15 @@ public:
 static RPrinter Rcout = RPrinter();
 
 }
+
+// override std::cout to use RcppThread::Rcout instead
+#ifndef RCPPTHREAD_OVERRIDE_COUT
+    #define RCPPTHREAD_OVERRIDE_COUT 1
+#endif
+
+#if RCPPTHREAD_OVERRIDE_COUT
+    #define cout RcppThreadRcout
+    namespace std {
+        static RcppThread::RPrinter RcppThreadRcout = RcppThread::RPrinter();
+    }
+#endif

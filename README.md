@@ -54,3 +54,14 @@ be used:
 
 1. Add the line `CXX_STD = CXX11` to the `src/Makevars(.win)` files of your package.
 2. Add `RcppThread` to the `LinkingTo` field of your `DESCRIPTION` file.
+
+## Automatic override of `std::cout` and `std::thread`
+
+By default, RcppThread overrides all occurences of `std::cout` and `std::thread` 
+with calls to `RcppThread::Rcout` and `RcppThread::Thread` (provided that 
+the RcppThread headers are included first). To deactivate this feature, use 
+```
+#define RCPPTHREAD_OVERRIDE_COUT 0    // no std::cout override
+#define RCPPTHREAD_OVERRIDE_THREAD 0  // no std::thread override
+```
+before including the RcppThread headers.
