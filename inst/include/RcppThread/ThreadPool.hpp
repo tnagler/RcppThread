@@ -73,43 +73,42 @@ public:
     {
         for (size_t t = 0; t < nThreads; t++) {
             workers_.emplace_back([this] {
+                std::function<void()> job;
                 // observe thread pool as long there are jobs or pool has been
                 // stopped
                 while (!stopped_ | !jobs_.empty()) {
-                    std::function<void()> job;
+                    // thread must hold the lock while modifying shared
+                    // variables
+                    std::unique_lock<std::mutex> lk(m_);
 
-                    {
-                        // thread must hold the lock while modifying shared
-                        // variables
-                        std::unique_lock<std::mutex> lk(m_);
+                    // wait for new job or stop signal
+                    cvTasks_.wait(lk, [this] {
+                        return stopped_ || !jobs_.empty();
+                    });
 
-                        // wait for new job or stop signal
-                        cvTasks_.wait(lk, [this] {
-                            return stopped_ || !jobs_.empty();
-                        });
+                    // check if there are any jobs left in the queue
+                    if (jobs_.empty())
+                        continue;
 
-                        // check if there are any jobs left in the queue
-                        if (jobs_.empty())
-                            continue;
+                    // take job from the queue
+                    job = std::move(jobs_.front());
+                    jobs_.pop();
 
-                        // take job from the queue
-                        job = std::move(jobs_.front());
-                        jobs_.pop();
-                    }
-
-                    // check if interrupted
-                    checkUserInterrupt();
+                    // signal that worker will be busy
+                    numBusy_++;
+                    cvBusy_.notify_one();
+                    lk.unlock();
 
                     // execute job
-                    numBusy_++;
+                    checkUserInterrupt();
                     job();
 
                     // signal that job is done
+                    lk.lock();
                     numBusy_--;
                     cvBusy_.notify_one();
                 }
-            }
-            );
+            });
         }
     }
 
@@ -131,7 +130,7 @@ public:
     template<class F, class... Args>
     auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     {
-        // create pacakged task on the heap to avoid stack overlows.
+        // create packaged task on the heap to avoid stack overlows.
         alignas(128) auto job =
             std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
