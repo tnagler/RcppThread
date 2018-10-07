@@ -16,15 +16,15 @@
 //! `RcppThread` functionality
 namespace RcppThread {
 
-//! @brief R-friendly version of `std::thread`. 
-//! 
-//! Instances of class `Thread` behave just like instances of `std::thread`, 
+//! @brief R-friendly version of `std::thread`.
+//!
+//! Instances of class `Thread` behave just like instances of `std::thread`,
 //! see http://en.cppreference.com/w/cpp/thread/thread for methods and examples.
-//! There is one difference exception: Whenever other threads are doing some 
-//! work, the master thread  periodically synchronizes with R. When the user 
-//! interrupts a threaded computation, any thread will stop as soon as it 
+//! There is one difference exception: Whenever other threads are doing some
+//! work, the master thread  periodically synchronizes with R. When the user
+//! interrupts a threaded computation, any thread will stop as soon as it
 //! encounters a `checkUserInterrupt()`.
-//! 
+//!
 class Thread {
 public:
     Thread() = default;
@@ -40,7 +40,7 @@ public:
         if (thread_.joinable())
             thread_.join();
     }
-    
+
     template<class Function, class... Args> explicit
     Thread(Function&& f, Args&&... args)
     {
@@ -97,6 +97,12 @@ public:
         return thread_.get_id();
     }
 
+    typedef __gthread_t native_handle_type;
+    native_handle_type native_handle()
+    {
+        return thread_.native_handle();
+    }
+
     static unsigned int hardware_concurrency()
     {
         return std::thread::hardware_concurrency();
@@ -108,3 +114,18 @@ private:
 };
 
 }
+
+// override std::thread to use RcppThread::Thread instead
+#ifndef RCPPTHREAD_OVERRIDE_THREAD
+#define RCPPTHREAD_OVERRIDE_THREAD 1
+#endif
+
+#if RCPPTHREAD_OVERRIDE_THREAD
+    #define thread RcppThreadThreadThread
+    namespace std {
+        using RcppThreadThreadThread = RcppThread::Thread;
+    }
+    namespace ttread {
+        using RcppThreadThreadThread = RcppThread::Thread;
+    }
+#endif
