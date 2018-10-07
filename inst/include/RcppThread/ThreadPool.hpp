@@ -1,4 +1,4 @@
-// Copyright © 2017 Thomas Nagler
+// Copyright © 2018 Thomas Nagler
 //
 // This file is part of the RcppThread and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE.md file in the root directory of
@@ -12,24 +12,68 @@
 #include <queue>
 #include <condition_variable>
 #include <memory>
+#include <cstddef>
+#include <cmath>
 
 namespace RcppThread {
+
+struct Batch {
+    ptrdiff_t begin;
+    ptrdiff_t end;
+};
+
+
+inline size_t computeBatchSize(size_t nTasks, size_t nThreads)
+{
+    if (nTasks < nThreads)
+        return nTasks;
+    return nThreads * (1 + std::floor(std::log(nTasks / nThreads)));
+}
+
+
+inline std::vector<Batch> createBatches(ptrdiff_t begin,
+                                        size_t nTasks,
+                                        size_t nThreads,
+                                        size_t nBatches)
+{
+    nThreads = std::max(nThreads, static_cast<size_t>(1));
+    if (nBatches == 0)
+        nBatches = computeBatchSize(nTasks, nThreads);
+    nBatches = std::min(nTasks, nBatches);
+    std::vector<Batch> batches(nBatches);
+    size_t    minSize = nTasks / nBatches;
+    ptrdiff_t remSize = nTasks % nBatches;
+
+    for (size_t i = 0, k = 0; i < nTasks; k++) {
+        ptrdiff_t bBegin = begin + i;
+        ptrdiff_t bSize  = minSize + (remSize-- > 0);
+        batches[k] = Batch{bBegin, bBegin + bSize};
+        i += bSize;
+    }
+
+    return batches;
+}
+
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool {
 public:
 
-    ThreadPool() = default;
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool(const ThreadPool&) = delete;
+
+    //! constructs a thread pool with as many workers as there are cores.
+    ThreadPool() : ThreadPool(std::thread::hardware_concurrency())
+    {}
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create; if `nThreads = 0`, all
     //!    work pushed to the pool will be done in the main thread.
-    ThreadPool(size_t nThreads) : num_busy_(0), stopped_(false)
+    ThreadPool(size_t nThreads)
     {
         for (size_t t = 0; t < nThreads; t++) {
-            pool_.emplace_back([this] {
+            workers_.emplace_back([this] {
+                std::function<void()> job;
                 // observe thread pool as long there are jobs or pool has been
                 // stopped
                 while (!stopped_ | !jobs_.empty()) {
@@ -38,7 +82,7 @@ public:
                     std::unique_lock<std::mutex> lk(m_);
 
                     // wait for new job or stop signal
-                    cv_tasks_.wait(lk, [this] {
+                    cvTasks_.wait(lk, [this] {
                         return stopped_ || !jobs_.empty();
                     });
 
@@ -47,24 +91,24 @@ public:
                         continue;
 
                     // take job from the queue
-                    std::function<void()> job = std::move(jobs_.front());
+                    job = std::move(jobs_.front());
                     jobs_.pop();
-                    num_busy_++;
+
+                    // signal that worker will be busy
+                    numBusy_++;
+                    cvBusy_.notify_one();
                     lk.unlock();
 
-                    // check if interrupted
-                    checkUserInterrupt();
-
                     // execute job
+                    checkUserInterrupt();
                     job();
 
                     // signal that job is done
                     lk.lock();
-                    num_busy_--;
-                    cv_busy_.notify_one();
+                    numBusy_--;
+                    cvBusy_.notify_one();
                 }
-            }
-            );
+            });
         }
     }
 
@@ -86,13 +130,14 @@ public:
     template<class F, class... Args>
     auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     {
-        // create pacakged task on the heap to avoid stack overlows.
-        auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
+        // create packaged task on the heap to avoid stack overlows.
+        alignas(128) auto job =
+            std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
 
         // if there are no workers, just do the job in the main thread
-        if (pool_.size() == 0) {
+        if (workers_.size() == 0) {
             (*job)();
             return job->get_future();
         }
@@ -106,7 +151,7 @@ public:
         }
 
         // signal a waiting worker that there's a new job
-        cv_tasks_.notify_one();
+        cvTasks_.notify_one();
 
         // return future result of the job
         return job->get_future();
@@ -120,15 +165,91 @@ public:
     template<class F, class I>
     void map(F&& f, I &&items)
     {
-        for (const auto &item : items)
-            push(f, item);
+        for (auto &&item : items)
+            this->push(f, item);
     }
 
-    //! waits for all jobs to finish, but does not join the threads.
+    //! computes an index-based for loop in parallel batches.
+    //! @param begin first index of the loop.
+    //! @param size the loop runs in the range `[begin, begin + size)`.
+    //! @param f an object callable as a function (the 'loop body'); typically
+    //!   a lambda.
+    //! @param nBatches the number of batches to create; the default (0)
+    //!   triggers a heuristic to automatically determine the batch size.
+    //! @details Consider the following code:
+    //! ```
+    //! std::vector<double> x(10);
+    //! for (size_t i = 0; i < x.size(); i++) {
+    //!     x[i] = i;
+    //! }
+    //! ```
+    //! The parallel equivalent is given by:
+    //! ```
+    //! ThreadPool pool(2);
+    //! pool.forIndex(0, 10, [&] (size_t i) {
+    //!     x[i] = i;
+    //! });
+    //! ```
+    //! **Caution**: if the iterations are not independent from another,
+    //! the tasks need to be synchronized manually (e.g., using mutexes).
+    template<class F>
+    inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
+                            size_t nBatches = 0)
+    {
+        static auto func = std::move(f);
+        auto doBatch = [&] (const Batch& b) {
+            for (ptrdiff_t i = b.begin; i < b.end; i++)
+                func(i);
+        };
+        auto batches = createBatches(begin, size, workers_.size(), nBatches);
+        this->map(doBatch, std::move(batches));
+    }
+
+    //! computes a range-based for loop in parallel batches.
+    //! @param items an object allowing for `std::begin()`/`std::end()` and
+    //!   whose elements can be accessed by the `[]` operator.
+    //! @param f a function (the 'loop body').
+    //! @param nBatches the number of batches to create; the default (0)
+    //!   triggers a heuristic to automatically determine the number of batches.
+    //! @details Consider the following code:
+    //! ```
+    //! std::vector<double> x(10, 1.0);
+    //! for (auto& xx : x) {
+    //!     xx *= 2;
+    //! }
+    //! ```
+    //! The parallel `ThreadPool` equivalent is
+    //! ```
+    //! ThreadPool pool(2);
+    //! pool.forEach(x, [&] (double& xx) {
+    //!     xx *= 2;
+    //! });
+    //! ```
+    //! **Caution**: if the iterations are not independent from another,
+    //! the tasks need to be synchronized manually (e.g., using mutexes).
+    template<class F, class I>
+    inline void forEach(I&& items, F&& f, size_t nBatches = 0)
+    {
+        size_t size = std::end(items) - std::begin(items);
+        this->parallelFor(0, size, f, nBatches);
+    }
+
+
+    //! waits for all jobs to finish and checks for interruptions,
+    //! but does not join the threads.
     void wait()
     {
-        std::unique_lock<std::mutex> lk(m_);
-        cv_busy_.wait(lk, [&] {return (num_busy_ == 0) && jobs_.empty();});
+        auto pred = [this] {return (numBusy_ == 0) && jobs_.empty();};
+        auto timeout = std::chrono::milliseconds(250);
+
+        while (!pred()) {
+            Rcout << "";
+            isInterrupted();
+            std::unique_lock<std::mutex> lk(m_);
+            cvBusy_.wait_for(lk, timeout, pred);
+        }
+        Rcout << "";
+        checkUserInterrupt();
     }
 
     //! waits for all jobs to finish and joins all threads.
@@ -139,27 +260,27 @@ public:
             std::unique_lock<std::mutex> lk(m_);
             stopped_ = true;
         }
-        cv_tasks_.notify_all();
+        cvTasks_.notify_all();
 
         // join threads if not done already
-        if (pool_.size() > 0) {
-            if (pool_[0].joinable()) {
-                for (auto &worker : pool_)
+        if (workers_.size() > 0) {
+            for (auto &worker : workers_) {
+                if (worker.joinable())
                     worker.join();
             }
         }
     }
 
 private:
-    std::vector<Thread> pool_;                // worker threads in the pool
+    std::vector<Thread> workers_;             // worker threads in the pool
     std::queue<std::function<void()>> jobs_;  // the task queue
 
     // variables for synchronization between workers
     std::mutex m_;
-    std::condition_variable cv_tasks_;
-    std::condition_variable cv_busy_;
-    std::atomic_uint num_busy_;
-    bool stopped_;
+    std::condition_variable cvTasks_;
+    std::condition_variable cvBusy_;
+    std::atomic_uint numBusy_{0};
+    std::atomic_bool stopped_{false};
 };
 
 }

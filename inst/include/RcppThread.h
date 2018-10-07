@@ -1,4 +1,4 @@
-// Copyright © 2017 Thomas Nagler
+// Copyright © 2018 Thomas Nagler
 //
 // This file is part of the RcppThread and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE.md file in the root directory of
@@ -9,4 +9,5 @@
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Thread.hpp"
 #include "RcppThread/ThreadPool.hpp"
+#include "RcppThread/parallelFor.hpp"
 #include "RcppThread/Rcout.hpp"
