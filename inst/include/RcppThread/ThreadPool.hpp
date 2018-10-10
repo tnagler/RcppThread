@@ -137,7 +137,7 @@ public:
         {
             std::unique_lock<std::mutex> lk(m_);
             if (stopped_)
-                throw std::runtime_error("cannot push to stopped thread pool");
+                throw std::runtime_error("cannot push to joined thread pool");
             jobs_.emplace([job] () { (*job)(); });
         }
 
