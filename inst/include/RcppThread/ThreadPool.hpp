@@ -71,42 +71,30 @@ public:
     //!    work pushed to the pool will be done in the main thread.
     ThreadPool(size_t nThreads)
     {
-        for (size_t t = 0; t < nThreads; t++) {
+        for (size_t t = 0; t < nThreads; ++t) {
             workers_.emplace_back([this] {
                 std::function<void()> job;
-                // observe thread pool as long there are jobs or pool has been
-                // stopped
+                // observe thread pool; only stop after all jobs are done
                 while (!stopped_ | !jobs_.empty()) {
-                    // thread must hold the lock while modifying shared
-                    // variables
-                    std::unique_lock<std::mutex> lk(m_);
+                    // thread must hold a lock while modifying shared variables
+                    {
+                        std::unique_lock<std::mutex> lk(m_);
 
-                    // wait for new job or stop signal
-                    cvTasks_.wait(lk, [this] {
-                        return stopped_ || !jobs_.empty();
-                    });
+                        // wait for new job or stop signal
+                        cvTasks_.wait(lk, [this] {
+                            return stopped_ || !jobs_.empty();
+                        });
 
-                    // check if there are any jobs left in the queue
-                    if (jobs_.empty())
-                        continue;
+                        // check if there actually are jobs left in the queue
+                        if (jobs_.empty())
+                            continue;
 
-                    // take job from the queue
-                    job = std::move(jobs_.front());
-                    jobs_.pop();
+                        // take job from the queue
+                        job = std::move(jobs_.front());
+                        jobs_.pop();
+                    }
 
-                    // signal that worker will be busy
-                    numBusy_++;
-                    cvBusy_.notify_one();
-                    lk.unlock();
-
-                    // execute job
-                    checkUserInterrupt();
-                    job();
-
-                    // signal that job is done
-                    lk.lock();
-                    numBusy_--;
-                    cvBusy_.notify_one();
+                    doJob(std::move(job));
                 }
             });
         }
@@ -114,7 +102,7 @@ public:
 
     ~ThreadPool()
     {
-        join();
+        this->join();
     }
 
     // assignment operators
@@ -130,11 +118,11 @@ public:
     template<class F, class... Args>
     auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     {
-        // create packaged task on the heap to avoid stack overlows.
-        alignas(128) auto job =
-            std::make_shared<std::packaged_task<decltype(f(args...))()>>(
-            [&f, args...] { return f(args...); }
-        );
+        // create packaged task on the heap
+        using jobPackage = std::packaged_task<decltype(f(args...))()>;
+        auto job = std::make_shared<jobPackage>([&f, args...] {
+            return f(args...);
+        });
 
         // if there are no workers, just do the job in the main thread
         if (workers_.size() == 0) {
@@ -234,24 +222,6 @@ public:
         this->parallelFor(0, size, f, nBatches);
     }
 
-
-    //! waits for all jobs to finish and checks for interruptions,
-    //! but does not join the threads.
-    void wait()
-    {
-        auto pred = [this] {return (numBusy_ == 0) && jobs_.empty();};
-        auto timeout = std::chrono::milliseconds(250);
-
-        while (!pred()) {
-            Rcout << "";
-            isInterrupted();
-            std::unique_lock<std::mutex> lk(m_);
-            cvBusy_.wait_for(lk, timeout, pred);
-        }
-        Rcout << "";
-        checkUserInterrupt();
-    }
-
     //! waits for all jobs to finish and joins all threads.
     void join()
     {
@@ -261,6 +231,7 @@ public:
             stopped_ = true;
         }
         cvTasks_.notify_all();
+        this->wait();
 
         // join threads if not done already
         if (workers_.size() > 0) {
@@ -271,7 +242,73 @@ public:
         }
     }
 
+    //! waits for all jobs to finish and checks for interruptions,
+    //! but does not join the threads.
+    void wait()
+    {
+        auto workLeft = [this] { return (numBusy_ == 0) && jobs_.empty(); };
+        auto timeout = std::chrono::milliseconds(250);
+
+        while (true) {
+            {
+                std::unique_lock<std::mutex> lk(m_);
+                cvBusy_.wait_for(lk, timeout, workLeft);
+            }
+            Rcout << "";
+            if ( isInterrupted() ) {
+                this->clear();
+                break;
+            }
+            if ( workLeft() ){
+                break;
+            }
+        }
+        Rcout << "";
+        checkUserInterrupt();
+    }
+
+    //! clears the pool from all open jobs.
+    void clear()
+    {
+        // remove all remaining jobs
+        std::lock_guard<std::mutex> lk(m_);
+        std::queue<std::function<void()>>().swap(jobs_);
+        cvTasks_.notify_all();
+    }
+
 private:
+    void announceBusy()
+    {
+        {
+            std::unique_lock<std::mutex> lk(m_);
+            ++numBusy_;
+        }
+        cvBusy_.notify_one();
+    }
+
+    void announceIdle()
+    {
+        {
+            std::unique_lock<std::mutex> lk(m_);
+            --numBusy_;
+        }
+        cvBusy_.notify_one();
+        std::this_thread::yield();
+    }
+
+    void doJob(std::function<void()>&& job)
+    {
+        checkUserInterrupt();
+        announceBusy();
+        try {
+            job();
+        } catch (const UserInterruptException& e) {
+            announceIdle();
+            throw e;
+        }
+        announceIdle();
+    }
+
     std::vector<Thread> workers_;             // worker threads in the pool
     std::queue<std::function<void()>> jobs_;  // the task queue
 
