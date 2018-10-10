@@ -1,5 +1,3 @@
-# RcppThread 0.4.0.9000
-
 # RcppThread 0.5.0.9000
 
 NEW FEATURES
