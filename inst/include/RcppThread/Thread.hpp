@@ -35,12 +35,6 @@ public:
         swap(other);
     }
 
-    ~Thread()
-    {
-        if (thread_.joinable())
-            thread_.join();
-    }
-
     template<class Function, class... Args> explicit
     Thread(Function&& f, Args&&... args)
     {
@@ -52,6 +46,8 @@ public:
         future_ = task.get_future();
         thread_ = std::thread(std::move(task));
     }
+
+    ~Thread() = default;
 
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&& other)
@@ -77,6 +73,8 @@ public:
     // computations have finished.
     void join()
     {
+        if (!joinable())
+            std::terminate();
         auto timeout = std::chrono::milliseconds(250);
         while (future_.wait_for(timeout) != std::future_status::ready) {
             Rcout << "";
@@ -97,7 +95,7 @@ public:
         return thread_.get_id();
     }
 
-    typedef __gthread_t native_handle_type;
+    using native_handle_type = __gthread_t;
     native_handle_type native_handle()
     {
         return thread_.native_handle();
