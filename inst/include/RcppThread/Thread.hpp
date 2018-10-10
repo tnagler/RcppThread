@@ -73,8 +73,6 @@ public:
     // computations have finished.
     void join()
     {
-        if (!joinable())
-            std::terminate();
         auto timeout = std::chrono::milliseconds(250);
         while (future_.wait_for(timeout) != std::future_status::ready) {
             Rcout << "";
@@ -82,7 +80,8 @@ public:
         }
         Rcout << "";
         checkUserInterrupt();
-        thread_.join();
+        if (thread_.joinable())
+            thread_.join();
     }
 
     void detach()
