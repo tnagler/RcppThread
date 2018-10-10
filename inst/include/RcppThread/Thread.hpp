@@ -21,7 +21,7 @@ namespace RcppThread {
 //! Instances of class `Thread` behave just like instances of `std::thread`,
 //! see http://en.cppreference.com/w/cpp/thread/thread for methods and examples.
 //! There is one difference exception: Whenever other threads are doing some
-//! work, the master thread  periodically synchronizes with R. When the user
+//! work, the main thread  periodically synchronizes with R. When the user
 //! interrupts a threaded computation, any thread will stop as soon as it
 //! encounters a `checkUserInterrupt()`.
 //!

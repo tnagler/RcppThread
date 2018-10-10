@@ -15,7 +15,7 @@ namespace RcppThread {
 class RPrinter {
 public:
 
-    //! prints `object` to R console íf called from master thread; otherwise
+    //! prints `object` to R console íf called from main thread; otherwise
     //! adds a printable version of `object` to a buffer for deferred printing.
     //! @param object a string (or coercible object) to print.
     //! @details Declared as a friend in `RMonitor`.
@@ -26,7 +26,7 @@ public:
         return *this;
     }
 
-    //! prints `object` to R console íf called from master thread; otherwise
+    //! prints `object` to R console íf called from main thread; otherwise
     //! adds a printable version of `object` to a buffer for deferred printing.
     //! @param object a string (or coercible object) to print.
     //! @details Declared as a friend in `RMonitor`.
@@ -37,7 +37,7 @@ public:
         return *this;
     }
 
-    //! prints `object` to R console íf called from master thread; otherwise
+    //! prints `object` to R console íf called from main thread; otherwise
     //! adds a printable version of `object` to a buffer for deferred printing.
     //! @param object a string (or coercible object) to print.
     //! @details Declared as a friend in `RMonitor`.
