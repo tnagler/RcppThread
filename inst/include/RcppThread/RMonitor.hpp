@@ -20,6 +20,13 @@ namespace RcppThread {
 //! global variable holding id of master thread-
 static std::thread::id masterThreadID = std::this_thread::get_id();
 
+class UserInterruptException : public std::exception {
+    const char* what() const throw ()
+    {
+        return "C++ call interrupted by the user.";
+    }
+};
+
 //! Singleton class for tracking threads and safe communication.
 class RMonitor {
     // user-facing functionality must be friends, so they can access
@@ -60,7 +67,7 @@ protected:
         if ( safelyIsInterrupted() ) {
             if ( iAmMaster() )
                 isInterrupted_ = false;  // reset for next call
-            throw std::runtime_error("C++ call interrupted by user");
+            throw UserInterruptException();
         }
     }
 
