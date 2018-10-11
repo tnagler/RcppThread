@@ -46,7 +46,7 @@ public:
                 while (!stopped_ | !jobs_.empty()) {
                     {
                         // must hold a lock while modifying shared variables
-                        std::unique_lock<std::mutex> lk(m_);
+                        std::unique_lock<std::mutex> lk(mTasks_);
 
                         // thread should wait when there is no job
                         cvTasks_.wait(lk, [this] {
@@ -106,9 +106,8 @@ public:
         }
 
         // add job to the queue
-
         {
-            std::unique_lock<std::mutex> lk(m_);
+            std::unique_lock<std::mutex> lk(mTasks_);
             if (stopped_)
                 throw std::runtime_error("cannot push to joined thread pool");
             jobs_.emplace([job] () { (*job)(); });
@@ -220,7 +219,7 @@ public:
 
         while (true) {
             {
-                std::unique_lock<std::mutex> lk(m_);
+                std::unique_lock<std::mutex> lk(mBusy_);
                 cvBusy_.wait_for(lk, timeout, workLeft);
             }
             Rcout << "";
@@ -240,7 +239,7 @@ public:
     void clear()
     {
         // remove all remaining jobs
-        std::lock_guard<std::mutex> lk(m_);
+        std::lock_guard<std::mutex> lk(mTasks_);
         std::queue<std::function<void()>>().swap(jobs_);
         cvTasks_.notify_all();
     }
@@ -264,7 +263,7 @@ private:
     void announceBusy()
     {
         {
-            std::unique_lock<std::mutex> lk(m_);
+            std::unique_lock<std::mutex> lk(mBusy_);
             ++numBusy_;
         }
         cvBusy_.notify_one();
@@ -274,7 +273,7 @@ private:
     void announceIdle()
     {
         {
-            std::unique_lock<std::mutex> lk(m_);
+            std::unique_lock<std::mutex> lk(mBusy_);
             --numBusy_;
         }
         cvBusy_.notify_one();
@@ -285,7 +284,7 @@ private:
     void announceStop()
     {
         {
-            std::unique_lock<std::mutex> lk(m_);
+            std::unique_lock<std::mutex> lk(mTasks_);
             stopped_ = true;
         }
         cvTasks_.notify_all();
@@ -306,7 +305,8 @@ private:
     std::queue<std::function<void()>> jobs_;  // the task queue
 
     // variables for synchronization between workers
-    std::mutex m_;
+    std::mutex mTasks_;
+    std::mutex mBusy_;
     std::condition_variable cvTasks_;
     std::condition_variable cvBusy_;
     size_t numBusy_{0};
