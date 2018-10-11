@@ -13,3 +13,15 @@ testThreadPoolPush <- function() {
     invisible(.Call('_RcppThread_testThreadPoolPush', PACKAGE = 'RcppThread'))
 }
 
+testThreadPoolMap <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolMap', PACKAGE = 'RcppThread'))
+}
+
+testThreadPoolParallelFor <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolParallelFor', PACKAGE = 'RcppThread'))
+}
+
+testThreadPoolForEach <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolForEach', PACKAGE = 'RcppThread'))
+}
+

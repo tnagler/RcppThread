@@ -16,23 +16,23 @@ context("Thread pool")
 test_that("push works", {
     expect_silent(RcppThread:::testThreadPoolPush())
 })
-#
-# test_that("push works", {
-#     expect_silent(RcppThread:::testThreadPoolPush())
-# })
-#
-# test_that("map works", {
-#     expect_silent(RcppThread:::testThreadPoolMap())
-# })
-#
-# test_that("parallelFor works", {
-#     expect_silent(RcppThread:::testThreadPoolParallelFor())
-# })
-#
-# test_that("forEach works", {
-#     expect_silent(RcppThread:::testThreadPoolForEach())
-# })
-#
+
+test_that("push works", {
+    expect_silent(RcppThread:::testThreadPoolPush())
+})
+
+test_that("map works", {
+    expect_silent(RcppThread:::testThreadPoolMap())
+})
+
+test_that("parallelFor works", {
+    expect_silent(RcppThread:::testThreadPoolParallelFor())
+})
+
+test_that("forEach works", {
+    expect_silent(RcppThread:::testThreadPoolForEach())
+})
+
 # test_that("works single threaded", {
 #     expect_silent(RcppThread:::testThreadPoolSingleThreaded())
 # })

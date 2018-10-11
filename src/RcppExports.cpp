@@ -33,11 +33,41 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// testThreadPoolMap
+void testThreadPoolMap();
+RcppExport SEXP _RcppThread_testThreadPoolMap() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testThreadPoolMap();
+    return R_NilValue;
+END_RCPP
+}
+// testThreadPoolParallelFor
+void testThreadPoolParallelFor();
+RcppExport SEXP _RcppThread_testThreadPoolParallelFor() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testThreadPoolParallelFor();
+    return R_NilValue;
+END_RCPP
+}
+// testThreadPoolForEach
+void testThreadPoolForEach();
+RcppExport SEXP _RcppThread_testThreadPoolForEach() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testThreadPoolForEach();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppThread_testMonitor", (DL_FUNC) &_RcppThread_testMonitor, 0},
     {"_RcppThread_testThreadClass", (DL_FUNC) &_RcppThread_testThreadClass, 0},
     {"_RcppThread_testThreadPoolPush", (DL_FUNC) &_RcppThread_testThreadPoolPush, 0},
+    {"_RcppThread_testThreadPoolMap", (DL_FUNC) &_RcppThread_testThreadPoolMap, 0},
+    {"_RcppThread_testThreadPoolParallelFor", (DL_FUNC) &_RcppThread_testThreadPoolParallelFor, 0},
+    {"_RcppThread_testThreadPoolForEach", (DL_FUNC) &_RcppThread_testThreadPoolForEach, 0},
     {NULL, NULL, 0}
 };
 
