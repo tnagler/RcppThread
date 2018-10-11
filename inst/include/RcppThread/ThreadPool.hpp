@@ -13,6 +13,7 @@
 #include <thread>
 #include <queue>
 #include <condition_variable>
+#include <future>
 #include <mutex>
 #include <atomic>
 #include <cstddef>
@@ -158,9 +159,9 @@ public:
 
     //! maps a function on a list of items, possibly running tasks in parallel.
     //! @param f function to be mapped.
-    //! @param items an objects containing the items on which `f` shall be mapped;
-    //!     must allow for `auto` loops (i.e., `std::begin(I)`/`std::end(I)` must be
-    //!     defined).
+    //! @param items an objects containing the items on which `f` shall be
+    //!   mapped; must allow for `auto` loops (i.e., `std::begin(I)`/
+    //!  `std::end(I)` must be defined).
     template<class F, class I>
     void map(F&& f, I &&items)
     {
