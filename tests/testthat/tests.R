@@ -33,11 +33,11 @@ test_that("forEach works", {
     expect_silent(RcppThread:::testThreadPoolForEach())
 })
 
-# test_that("works single threaded", {
-#     expect_silent(RcppThread:::testThreadPoolSingleThreaded())
-# })
-#
-#
+test_that("works single threaded", {
+    expect_silent(RcppThread:::testThreadPoolSingleThreaded())
+})
+
+
 # ## -------------------------------------------------------
 # context("Parallel for functions")
 # test_that("parallelFor works", {
