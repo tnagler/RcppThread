@@ -76,6 +76,7 @@ public:
         while (future_.wait_for(timeout) != std::future_status::ready) {
             Rcout << "";
             isInterrupted();
+            std::this_thread::yield();
         }
         Rcout << "";
         checkUserInterrupt();

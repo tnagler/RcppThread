@@ -230,6 +230,7 @@ public:
             if ( workLeft() ){
                 break;
             }
+            std::this_thread::yield();
         }
         Rcout << "";
         checkUserInterrupt();
