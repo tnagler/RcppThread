@@ -6,12 +6,15 @@
 
 #pragma once
 
-#include "RcppThread/Thread.hpp"
+#include "RcppThread/RMonitor.hpp"
+#include "RcppThread/Rcout.hpp"
 
 #include <vector>
+#include <thread>
 #include <queue>
 #include <condition_variable>
-#include <memory>
+#include <mutex>
+#include <atomic>
 #include <cstddef>
 #include <cmath>
 
@@ -104,7 +107,7 @@ public:
     {
         // destructors should never throw
         try {
-            this->join();
+            this->joinWorkers();
         } catch (...) {}
     }
 
@@ -119,21 +122,26 @@ public:
     //! @return an `std::shared_future`, where the user can get the result and
     //!   rethrow the catched exceptions.
     template<class F, class... Args>
-    auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
+    auto push(F&& f, Args&&... args) -> std::shared_future<decltype(f(args...))>
     {
+        using result_t = decltype(f(args...));
+        using jobPackage = std::packaged_task<result_t()>;
+
         // create packaged task on the heap
-        using jobPackage = std::packaged_task<decltype(f(args...))()>;
         auto job = std::make_shared<jobPackage>([&f, args...] {
             return f(args...);
         });
+        std::shared_future<result_t> sf(std::move(job->get_future()));
 
         // if there are no workers, just do the job in the main thread
         if (workers_.size() == 0) {
             (*job)();
-            return job->get_future();
+            sf.get();
+            return sf;
         }
 
         // add job to the queue
+
         {
             std::unique_lock<std::mutex> lk(m_);
             if (stopped_)
@@ -145,7 +153,7 @@ public:
         cvTasks_.notify_one();
 
         // return future result of the job
-        return job->get_future();
+        return sf;
     }
 
     //! maps a function on a list of items, possibly running tasks in parallel.
@@ -237,6 +245,11 @@ public:
     //! but does not join the threads.
     void wait()
     {
+        if (workers_.size() == 0) {
+            checkUserInterrupt();
+            return;
+        }
+
         auto workLeft = [this] { return (numBusy_ == 0) && jobs_.empty(); };
         auto timeout = std::chrono::milliseconds(250);
 
@@ -275,7 +288,7 @@ private:
         announceBusy();
         try {
             job();
-        } catch (const UserInterruptException& e) {
+        } catch (const std::exception& e) {
             announceIdle();
             throw e;
         }
@@ -331,8 +344,8 @@ private:
     std::mutex m_;
     std::condition_variable cvTasks_;
     std::condition_variable cvBusy_;
-    std::atomic_uint numBusy_{0};
-    std::atomic_bool stopped_{false};
+    size_t numBusy_{0};
+    bool stopped_{false};
 };
 
 }

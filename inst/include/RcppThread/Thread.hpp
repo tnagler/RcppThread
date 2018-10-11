@@ -11,7 +11,6 @@
 
 #include <thread>
 #include <future>
-#include <functional>
 
 //! `RcppThread` functionality
 namespace RcppThread {
