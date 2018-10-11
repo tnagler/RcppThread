@@ -29,3 +29,7 @@ testThreadPoolSingleThreaded <- function() {
     invisible(.Call('_RcppThread_testThreadPoolSingleThreaded', PACKAGE = 'RcppThread'))
 }
 
+testParallelFor <- function() {
+    invisible(.Call('_RcppThread_testParallelFor', PACKAGE = 'RcppThread'))
+}
+

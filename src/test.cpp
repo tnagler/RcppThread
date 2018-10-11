@@ -176,27 +176,27 @@ void testThreadPoolSingleThreaded()
 }
 
 
-// // [[Rcpp::export]]
-// void testParallelFor()
-// {
-//     std::vector<size_t> x(1000000, 1);
-//     auto dummy = [&] (size_t i) -> void {
-//         checkUserInterrupt();
-//         x[i] = 2 * x[i];
-//     };
-//
-//     parallelFor(0, x.size() / 2, dummy);
-//     parallelFor(0, x.size() / 2, dummy, 0);
-//
-//     size_t count_wrong = 0;
-//     for (int i = 0; i < x.size() / 2; i++)
-//         count_wrong += (x[i] != 4);
-//     for (int i = x.size() / 2 + 1; i < x.size(); i++)
-//         count_wrong += (x[i] != 1);
-//     if (count_wrong > 0)
-//         throw std::runtime_error("parallelFor gives wrong result");
-// }
-//
+// [[Rcpp::export]]
+void testParallelFor()
+{
+    std::vector<size_t> x(1000000, 1);
+    auto dummy = [&] (size_t i) -> void {
+        checkUserInterrupt();
+        x[i] = 2 * x[i];
+    };
+
+    parallelFor(0, x.size() / 2, dummy);
+    parallelFor(0, x.size() / 2, dummy, 0);
+
+    size_t count_wrong = 0;
+    for (int i = 0; i < x.size() / 2; i++)
+        count_wrong += (x[i] != 4);
+    for (int i = x.size() / 2 + 1; i < x.size(); i++)
+        count_wrong += (x[i] != 1);
+    if (count_wrong > 0)
+        throw std::runtime_error("parallelFor gives wrong result");
+}
+
 // // [[Rcpp::export]]
 // void testForEach()
 // {
