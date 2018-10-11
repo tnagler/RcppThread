@@ -14,6 +14,7 @@
 #include <mutex>
 #include <atomic>
 #include <stdexcept>
+#include <sstream>
 
 namespace RcppThread {
 
