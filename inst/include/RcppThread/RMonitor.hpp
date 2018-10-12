@@ -14,11 +14,19 @@
 #include <mutex>
 #include <atomic>
 #include <stdexcept>
+#include <sstream>
 
 namespace RcppThread {
 
-//! global variable holding id of master thread-
-static std::thread::id masterThreadID = std::this_thread::get_id();
+//! global variable holding id of main thread.
+static std::thread::id mainThreadID = std::this_thread::get_id();
+
+class UserInterruptException : public std::exception {
+    const char* what() const throw ()
+    {
+        return "C++ call interrupted by the user.";
+    }
+};
 
 //! Singleton class for tracking threads and safe communication.
 class RMonitor {
@@ -48,31 +56,31 @@ public:
 
 
 protected:
-    //! returns `true` only when called from master thread.
-    bool iAmMaster()
+    //! returns `true` only when called from main thread.
+    bool calledFromMainThread()
     {
-        return (masterThreadID == std::this_thread::get_id());
+        return (mainThreadID == std::this_thread::get_id());
     }
 
-    //! checks for user interruptions, but only if called from master thread.
+    //! checks for user interruptions, but only if called from main thread.
     void safelycheckUserInterrupt()
     {
         if ( safelyIsInterrupted() ) {
-            if ( iAmMaster() )
+            if ( calledFromMainThread() )
                 isInterrupted_ = false;  // reset for next call
-            throw std::runtime_error("C++ call interrupted by user");
+            throw UserInterruptException();
         }
     }
 
-    //! checks for user interruptions, but only if called from master thread.
+    //! checks for user interruptions, but only if called from main thread.
     bool safelyIsInterrupted()
     {
-        if (!isInterrupted_ &  iAmMaster())
+        if (!isInterrupted_ &  calledFromMainThread())
             isInterrupted_ = isInterrupted();
         return isInterrupted_;
     }
 
-    //! prints `object` to R console íf called from master thread; otherwise
+    //! prints `object` to R console íf called from main thread; otherwise
     //! adds a printable version of `object` to a buffer for deferred printing.
     //! @param object a string to print.
     template<class T>
@@ -80,7 +88,7 @@ protected:
     {
         std::lock_guard<std::mutex> lk(m_);
         msgs_ << object;
-        if ( iAmMaster() ) {
+        if ( calledFromMainThread() ) {
             // release messages in buffer
             Rcpp::Rcout << msgs_.str();
             // clear message buffer
@@ -111,7 +119,7 @@ private:
 };
 
 
-//! checks for user interruptions, but only if called from master thread.
+//! checks for user interruptions, but only if called from main thread.
 //! @param condition optional; a condition for the check to be executed.
 //! @details Declared as a friend in `RMonitor`.
 inline void checkUserInterrupt(bool condition = true)
@@ -120,7 +128,7 @@ inline void checkUserInterrupt(bool condition = true)
         RMonitor::instance().safelycheckUserInterrupt();
 }
 
-//! checks for user interruptions, but only if called from master thread
+//! checks for user interruptions, but only if called from main thread
 //! (otherwise returns `false`).
 //! @param condition optional; a condition for the check to be executed.
 //! @details Declared as a friend in `RMonitor`.

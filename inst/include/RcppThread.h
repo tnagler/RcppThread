@@ -7,7 +7,8 @@
 #pragma once
 
 #include "RcppThread/RMonitor.hpp"
+#include "RcppThread/Rcout.hpp"
 #include "RcppThread/Thread.hpp"
+#include "RcppThread/Batch.hpp"
 #include "RcppThread/ThreadPool.hpp"
 #include "RcppThread/parallelFor.hpp"
-#include "RcppThread/Rcout.hpp"

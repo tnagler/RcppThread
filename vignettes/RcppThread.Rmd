@@ -34,10 +34,10 @@ RcppThread relieves us of that burden.
 ## Thread safe communication with R
 
 It is not safe to call R's C API from multiple threads. It is safe, however,
-to call it from the master thread. That's the idea behind `RcppThread`'s
+to call it from the main thread. That's the idea behind `RcppThread`'s
 `checkUserInterrupt()` and `Rcout`. They behave almost like their 
 [Rcpp](https://github.com/RcppCore/Rcpp/blob/master/README.md) versions, but
-only communicate with R when called from the master thread. Here's an example
+only communicate with R when called from the main thread. Here's an example
 of their use with 
 [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread):
 
@@ -73,10 +73,10 @@ void pyjamaParty()
 
 `RcppThread::checkUserInterrupt()` and `RcppThread::Rcout` are thread safe, no 
 matter what threading framework is used. But be careful: they only communicate 
-with R from the master thread. When called from another thread,
+with R from the main thread. When called from another thread,
 
   * `checkUserInterrupt()` does nothing. This drastically limits its usefulness
-    if it is *only* called from non-master threads. This is usually not an issue
+    if it is *only* called from child threads. This is usually not an issue
      with [OpenMP](http://www.openmp.org/), but with many others like 
      [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread) or 
     [TinyThread](http://tinythreadpp.bitsnbites.eu/).
@@ -102,7 +102,7 @@ for executing code in parallel. RcppThread's `Thread` class is an R-friendly
 wrapper to `std::thread`. 
 
 Instances of class `Thread` behave just like instances of `std::thread`, with 
-one exception: Whenever other threads are doing some work, the master thread 
+one exception: Whenever other threads are doing some work, the main thread 
 periodically synchronizes with R. When the user interrupts a threaded 
 computation, any thread will stop as soon as it encounters a 
 `checkUserInterrupt()`.

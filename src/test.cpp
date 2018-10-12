@@ -14,7 +14,7 @@ using namespace RcppThread;
 void testMonitor()
 {
     auto checks = [] () -> void {
-        checkUserInterrupt();  // should have no effect since not master
+        checkUserInterrupt();  // should have no effect since not main
         Rcout << "RcppThread says hi!" << std::endl; // should print to R console
         if (isInterrupted())
             throw std::runtime_error("isInterrupted should not return 'true'");
@@ -138,7 +138,7 @@ void testThreadPoolForEach()
     for (size_t i = 0; i < ids.size(); i++)
         ids[i] = i;
     pool.forEach(ids, dummy);
-    pool.join();
+    pool.wait();
 
     size_t count_wrong = 0;
     for (int i = 0; i < x.size() / 2; i++)
@@ -147,13 +147,14 @@ void testThreadPoolForEach()
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
         throw std::runtime_error("forEach gives wrong result");
+    pool.join();
 }
 
 
 // [[Rcpp::export]]
 void testThreadPoolSingleThreaded()
 {
-    ThreadPool pool;
+    ThreadPool pool(0);
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
         checkUserInterrupt();
@@ -171,6 +172,7 @@ void testThreadPoolSingleThreaded()
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
         throw std::runtime_error("push gives wrong result");
+    pool.join();
 }
 
 
@@ -248,14 +250,14 @@ void testPoolInterruptJoin()
 // [[Rcpp::export]]
 void testPoolInterruptWait()
 {
-    ThreadPool pool;
+    ThreadPool pool(0);
     auto dummy = [] {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         checkUserInterrupt();
     };
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 20; i++) {
         pool.push(dummy);
-    pool.wait();
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    }
     pool.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 }

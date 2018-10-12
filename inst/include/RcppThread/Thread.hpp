@@ -11,7 +11,6 @@
 
 #include <thread>
 #include <future>
-#include <functional>
 
 //! `RcppThread` functionality
 namespace RcppThread {
@@ -21,7 +20,7 @@ namespace RcppThread {
 //! Instances of class `Thread` behave just like instances of `std::thread`,
 //! see http://en.cppreference.com/w/cpp/thread/thread for methods and examples.
 //! There is one difference exception: Whenever other threads are doing some
-//! work, the master thread  periodically synchronizes with R. When the user
+//! work, the main thread  periodically synchronizes with R. When the user
 //! interrupts a threaded computation, any thread will stop as soon as it
 //! encounters a `checkUserInterrupt()`.
 //!
@@ -35,12 +34,6 @@ public:
         swap(other);
     }
 
-    ~Thread()
-    {
-        if (thread_.joinable())
-            thread_.join();
-    }
-
     template<class Function, class... Args> explicit
     Thread(Function&& f, Args&&... args)
     {
@@ -52,6 +45,8 @@ public:
         future_ = task.get_future();
         thread_ = std::thread(std::move(task));
     }
+
+    ~Thread() = default;
 
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&& other)
@@ -81,10 +76,12 @@ public:
         while (future_.wait_for(timeout) != std::future_status::ready) {
             Rcout << "";
             isInterrupted();
+            std::this_thread::yield();
         }
         Rcout << "";
         checkUserInterrupt();
-        thread_.join();
+        if (thread_.joinable())
+            thread_.join();
     }
 
     void detach()
@@ -97,7 +94,7 @@ public:
         return thread_.get_id();
     }
 
-    typedef __gthread_t native_handle_type;
+    using native_handle_type = __gthread_t;
     native_handle_type native_handle()
     {
         return thread_.native_handle();
