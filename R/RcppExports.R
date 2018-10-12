@@ -37,3 +37,15 @@ testForEach <- function() {
     invisible(.Call('_RcppThread_testForEach', PACKAGE = 'RcppThread'))
 }
 
+testThreadInterrupt <- function() {
+    invisible(.Call('_RcppThread_testThreadInterrupt', PACKAGE = 'RcppThread'))
+}
+
+testPoolInterruptJoin <- function() {
+    invisible(.Call('_RcppThread_testPoolInterruptJoin', PACKAGE = 'RcppThread'))
+}
+
+testPoolInterruptWait <- function() {
+    invisible(.Call('_RcppThread_testPoolInterruptWait', PACKAGE = 'RcppThread'))
+}
+

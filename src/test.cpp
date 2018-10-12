@@ -221,43 +221,43 @@ void testForEach()
         throw std::runtime_error("forEach gives wrong result");
 }
 
-// // [[Rcpp::export]]
-// void testThreadInterrupt()
-// {
-//     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//         checkUserInterrupt();
-//     };
-//     Thread t(dummy);
-//     t.join();
-//     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-// }
-//
-// // [[Rcpp::export]]
-// void testPoolInterruptJoin()
-// {
-//     ThreadPool pool;
-//     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//         checkUserInterrupt();
-//     };
-//     for (size_t i = 0; i < 10; i++)
-//         pool.push(dummy);
-//     pool.join();
-//     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-// }
-//
-// // [[Rcpp::export]]
-// void testPoolInterruptWait()
-// {
-//     ThreadPool pool(0);
-//     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//         checkUserInterrupt();
-//     };
-//     for (size_t i = 0; i < 20; i++) {
-//         pool.push(dummy);
-//     }
-//     pool.join();
-//     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-// }
+// [[Rcpp::export]]
+void testThreadInterrupt()
+{
+    auto dummy = [] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        checkUserInterrupt();
+    };
+    Thread t(dummy);
+    t.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
+// [[Rcpp::export]]
+void testPoolInterruptJoin()
+{
+    ThreadPool pool;
+    auto dummy = [] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        checkUserInterrupt();
+    };
+    for (size_t i = 0; i < 10; i++)
+        pool.push(dummy);
+    pool.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
+// [[Rcpp::export]]
+void testPoolInterruptWait()
+{
+    ThreadPool pool(0);
+    auto dummy = [] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        checkUserInterrupt();
+    };
+    for (size_t i = 0; i < 20; i++) {
+        pool.push(dummy);
+    }
+    pool.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+}

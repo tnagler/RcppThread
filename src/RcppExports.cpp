@@ -87,6 +87,33 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// testThreadInterrupt
+void testThreadInterrupt();
+RcppExport SEXP _RcppThread_testThreadInterrupt() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testThreadInterrupt();
+    return R_NilValue;
+END_RCPP
+}
+// testPoolInterruptJoin
+void testPoolInterruptJoin();
+RcppExport SEXP _RcppThread_testPoolInterruptJoin() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testPoolInterruptJoin();
+    return R_NilValue;
+END_RCPP
+}
+// testPoolInterruptWait
+void testPoolInterruptWait();
+RcppExport SEXP _RcppThread_testPoolInterruptWait() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testPoolInterruptWait();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppThread_testMonitor", (DL_FUNC) &_RcppThread_testMonitor, 0},
@@ -98,6 +125,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppThread_testThreadPoolSingleThreaded", (DL_FUNC) &_RcppThread_testThreadPoolSingleThreaded, 0},
     {"_RcppThread_testParallelFor", (DL_FUNC) &_RcppThread_testParallelFor, 0},
     {"_RcppThread_testForEach", (DL_FUNC) &_RcppThread_testForEach, 0},
+    {"_RcppThread_testThreadInterrupt", (DL_FUNC) &_RcppThread_testThreadInterrupt, 0},
+    {"_RcppThread_testPoolInterruptJoin", (DL_FUNC) &_RcppThread_testPoolInterruptJoin, 0},
+    {"_RcppThread_testPoolInterruptWait", (DL_FUNC) &_RcppThread_testPoolInterruptWait, 0},
     {NULL, NULL, 0}
 };
 
