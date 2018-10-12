@@ -197,30 +197,30 @@ void testParallelFor()
         throw std::runtime_error("parallelFor gives wrong result");
 }
 
-// // [[Rcpp::export]]
-// void testForEach()
-// {
-//     std::vector<size_t> x(1000000, 1);
-//     auto dummy = [&] (size_t i) -> void {
-//         checkUserInterrupt();
-//         x[i] = 2 * x[i];
-//     };
-//
-//     auto ids = std::vector<size_t>(x.size() / 2);
-//     for (size_t i = 0; i < ids.size(); i++)
-//         ids[i] = i;
-//     parallelForEach(ids, dummy);
-//     parallelForEach(ids, dummy, 0);
-//
-//     size_t count_wrong = 0;
-//     for (int i = 0; i < x.size() / 2; i++)
-//         count_wrong += (x[i] != 4);
-//     for (int i = x.size() / 2 + 1; i < x.size(); i++)
-//         count_wrong += (x[i] != 1);
-//     if (count_wrong > 0)
-//         throw std::runtime_error("forEach gives wrong result");
-// }
-//
+// [[Rcpp::export]]
+void testForEach()
+{
+    std::vector<size_t> x(1000000, 1);
+    auto dummy = [&] (size_t i) -> void {
+        checkUserInterrupt();
+        x[i] = 2 * x[i];
+    };
+
+    auto ids = std::vector<size_t>(x.size() / 2);
+    for (size_t i = 0; i < ids.size(); i++)
+        ids[i] = i;
+    parallelForEach(ids, dummy);
+    parallelForEach(ids, dummy, 0);
+
+    size_t count_wrong = 0;
+    for (int i = 0; i < x.size() / 2; i++)
+        count_wrong += (x[i] != 4);
+    for (int i = x.size() / 2 + 1; i < x.size(); i++)
+        count_wrong += (x[i] != 1);
+    if (count_wrong > 0)
+        throw std::runtime_error("forEach gives wrong result");
+}
+
 // // [[Rcpp::export]]
 // void testThreadInterrupt()
 // {

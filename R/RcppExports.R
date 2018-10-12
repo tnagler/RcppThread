@@ -33,3 +33,7 @@ testParallelFor <- function() {
     invisible(.Call('_RcppThread_testParallelFor', PACKAGE = 'RcppThread'))
 }
 
+testForEach <- function() {
+    invisible(.Call('_RcppThread_testForEach', PACKAGE = 'RcppThread'))
+}
+

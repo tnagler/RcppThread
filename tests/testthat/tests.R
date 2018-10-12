@@ -44,6 +44,6 @@ test_that("parallelFor works", {
     expect_silent(RcppThread:::testParallelFor())
 })
 
-# test_that("parallelForEach works", {
-#     expect_silent(RcppThread:::testForEach())
-# })
+test_that("parallelForEach works", {
+    expect_silent(RcppThread:::testForEach())
+})
