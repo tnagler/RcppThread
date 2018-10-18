@@ -78,10 +78,10 @@ public:
             isInterrupted();
             std::this_thread::yield();
         }
-        Rcout << "";
-        checkUserInterrupt();
         if (thread_.joinable())
             thread_.join();
+        Rcout << "";
+        checkUserInterrupt();
     }
 
     void detach()
