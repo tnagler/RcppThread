@@ -107,7 +107,7 @@ public:
 
         // add job to the queue
         {
-            std::unique_lock<std::mutex> lk(mTasks_);
+            std::lock_guard<std::mutex> lk(mTasks_);
             if (stopped_)
                 throw std::runtime_error("cannot push to joined thread pool");
             jobs_.emplace([job] () { (*job)(); });
@@ -119,6 +119,7 @@ public:
         // return future result of the job
         return sf;
     }
+
 
     //! maps a function on a list of items, possibly running tasks in parallel.
     //! @param f function to be mapped.
@@ -159,13 +160,14 @@ public:
     inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
                             size_t nBatches = 0)
     {
-        static auto func = std::move(f);
-        auto doBatch = [&] (const Batch& b) {
+        auto doBatch = [f] (const Batch& b) {
             for (ptrdiff_t i = b.begin; i < b.end; i++)
-                func(i);
+                f(i);
         };
         auto batches = createBatches(begin, size, workers_.size(), nBatches);
-        this->map(doBatch, std::move(batches));
+        for (auto&& batch : batches) {
+            this->pushForJob(doBatch, batch);
+        }
     }
 
     //! computes a range-based for loop in parallel batches.
@@ -184,24 +186,30 @@ public:
     //! The parallel `ThreadPool` equivalent is
     //! ```
     //! ThreadPool pool(2);
-    //! pool.forEach(x, [&] (double& xx) {
+    //! pool.parallelForEach(x, [&] (double& xx) {
     //!     xx *= 2;
     //! });
     //! ```
     //! **Caution**: if the iterations are not independent from another,
     //! the tasks need to be synchronized manually (e.g., using mutexes).
     template<class F, class I>
-    inline void forEach(I&& items, F&& f, size_t nBatches = 0)
+    inline void parallelForEach(I& items, F&& f, size_t nBatches = 0)
     {
+        auto doBatch = [f, &items] (const Batch& b) {
+            for (ptrdiff_t i = b.begin; i < b.end; i++)
+                f(items[i]);
+        };
         size_t size = std::end(items) - std::begin(items);
-        this->parallelFor(0, size, f, nBatches);
+        auto batches = createBatches(0, size, workers_.size(), nBatches);
+        for (auto&& batch : batches)
+            this->pushForJob(doBatch, batch);
     }
 
     //! waits for all jobs to finish and joins all threads.
     void join()
     {
-        this->announceStop();
         this->wait();
+        this->announceStop();
         this->joinWorkers();
     }
 
@@ -219,7 +227,7 @@ public:
 
         while (true) {
             {
-                std::unique_lock<std::mutex> lk(mBusy_);
+                std::unique_lock<std::mutex> lk(mTasks_);
                 cvBusy_.wait_for(lk, timeout, workLeft);
             }
             Rcout << "";
@@ -260,11 +268,34 @@ private:
         announceIdle();
     }
 
+
+    //! lightweight push used in prallel for loops.
+    template<class F, class... Args>
+    void pushForJob(F&& f, Args&&... args)
+    {
+        // if there are no workers, just do the job in the main thread
+        if (workers_.size() == 0) {
+            f(args...);
+            return;
+        }
+
+        // add job to the queue
+        {
+            std::lock_guard<std::mutex> lk(mTasks_);
+            if (stopped_)
+                throw std::runtime_error("cannot push to joined thread pool");
+            jobs_.emplace([f, args...] () { f(args...); });
+        }
+
+        // signal a waiting worker that there's a new job
+        cvTasks_.notify_one();
+    }
+
     //! signals that the worker is busy.
     void announceBusy()
     {
         {
-            std::unique_lock<std::mutex> lk(mBusy_);
+            std::unique_lock<std::mutex> lk(mTasks_);
             ++numBusy_;
         }
         cvBusy_.notify_one();
@@ -274,7 +305,7 @@ private:
     void announceIdle()
     {
         {
-            std::unique_lock<std::mutex> lk(mBusy_);
+            std::unique_lock<std::mutex> lk(mTasks_);
             --numBusy_;
         }
         cvBusy_.notify_one();
@@ -303,11 +334,10 @@ private:
     }
 
     std::vector<std::thread> workers_;        // worker threads in the pool
-    std::queue<std::function<void()>> jobs_;  // the task queue
+    std::queue<std::function<void()>> jobs_;  // the task que
 
     // variables for synchronization between workers
     std::mutex mTasks_;
-    std::mutex mBusy_;
     std::condition_variable cvTasks_;
     std::condition_variable cvBusy_;
     size_t numBusy_{0};
