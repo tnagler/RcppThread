@@ -75,7 +75,8 @@ public:
         auto timeout = std::chrono::milliseconds(250);
         while (future_.wait_for(timeout) != std::future_status::ready) {
             Rcout << "";
-            isInterrupted();
+            if (isInterrupted())
+                break;
             std::this_thread::yield();
         }
         if (thread_.joinable())
