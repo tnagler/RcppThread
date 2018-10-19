@@ -29,9 +29,18 @@ test_that("parallelFor works", {
     expect_silent(RcppThread:::testThreadPoolParallelFor())
 })
 
-test_that("forEach works", {
-    expect_silent(RcppThread:::testThreadPoolForEach())
+test_that("nested parallelFor works", {
+    expect_silent(RcppThread:::testThreadPoolNestedParallelFor())
 })
+
+test_that("parallelForEach works", {
+    expect_silent(RcppThread:::testThreadPoolParallelForEach())
+})
+
+test_that("nested parallelForEach works", {
+    expect_silent(RcppThread:::testThreadPoolNestedParallelForEach())
+})
+
 
 test_that("works single threaded", {
     expect_silent(RcppThread:::testThreadPoolSingleThreaded())
@@ -44,6 +53,14 @@ test_that("parallelFor works", {
     expect_silent(RcppThread:::testParallelFor())
 })
 
+test_that("nested parallelFor works", {
+    expect_silent(RcppThread:::testNestedParallelFor())
+})
+
 test_that("parallelForEach works", {
-    expect_silent(RcppThread:::testForEach())
+    expect_silent(RcppThread:::testParallelForEach())
+})
+
+test_that("nested parallelForEach works", {
+    expect_silent(RcppThread:::testNestedParallelForEach())
 })

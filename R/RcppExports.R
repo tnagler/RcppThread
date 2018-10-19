@@ -21,8 +21,16 @@ testThreadPoolParallelFor <- function() {
     invisible(.Call('_RcppThread_testThreadPoolParallelFor', PACKAGE = 'RcppThread'))
 }
 
-testThreadPoolForEach <- function() {
-    invisible(.Call('_RcppThread_testThreadPoolForEach', PACKAGE = 'RcppThread'))
+testThreadPoolNestedParallelFor <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolNestedParallelFor', PACKAGE = 'RcppThread'))
+}
+
+testThreadPoolParallelForEach <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolParallelForEach', PACKAGE = 'RcppThread'))
+}
+
+testThreadPoolNestedParallelForEach <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolNestedParallelForEach', PACKAGE = 'RcppThread'))
 }
 
 testThreadPoolSingleThreaded <- function() {
@@ -33,19 +41,31 @@ testParallelFor <- function() {
     invisible(.Call('_RcppThread_testParallelFor', PACKAGE = 'RcppThread'))
 }
 
-testForEach <- function() {
-    invisible(.Call('_RcppThread_testForEach', PACKAGE = 'RcppThread'))
+testNestedParallelFor <- function() {
+    invisible(.Call('_RcppThread_testNestedParallelFor', PACKAGE = 'RcppThread'))
+}
+
+testParallelForEach <- function() {
+    invisible(.Call('_RcppThread_testParallelForEach', PACKAGE = 'RcppThread'))
+}
+
+testNestedParallelForEach <- function() {
+    invisible(.Call('_RcppThread_testNestedParallelForEach', PACKAGE = 'RcppThread'))
 }
 
 testThreadInterrupt <- function() {
     invisible(.Call('_RcppThread_testThreadInterrupt', PACKAGE = 'RcppThread'))
 }
 
-testPoolInterruptJoin <- function() {
-    invisible(.Call('_RcppThread_testPoolInterruptJoin', PACKAGE = 'RcppThread'))
+testThreadPoolInterruptJoin <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolInterruptJoin', PACKAGE = 'RcppThread'))
 }
 
-testPoolInterruptWait <- function() {
-    invisible(.Call('_RcppThread_testPoolInterruptWait', PACKAGE = 'RcppThread'))
+testThreadPoolInterruptWait <- function() {
+    invisible(.Call('_RcppThread_testThreadPoolInterruptWait', PACKAGE = 'RcppThread'))
+}
+
+test <- function() {
+    invisible(.Call('_RcppThread_test', PACKAGE = 'RcppThread'))
 }
 

@@ -78,12 +78,12 @@ inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class I, class F>
-inline void parallelForEach(I&& items, F&& f,
-                        size_t nThreads = std::thread::hardware_concurrency(),
-                        size_t nBatches = 0)
+inline void parallelForEach(I& items, F&& f,
+    size_t nThreads = std::thread::hardware_concurrency(),
+    size_t nBatches = 0)
 {
     ThreadPool pool(nThreads);
-    pool.forEach(items, f, nBatches);
+    pool.parallelForEach(items, f, nBatches);
     pool.join();
 }
 
