@@ -41,10 +41,14 @@ test_that("nested parallelForEach works", {
     expect_silent(RcppThread:::testThreadPoolNestedParallelForEach())
 })
 
-
 test_that("works single threaded", {
     expect_silent(RcppThread:::testThreadPoolSingleThreaded())
 })
+
+test_that("destructible without join", {
+    expect_silent(RcppThread:::testThreadPoolDestructWOJoin())
+})
+
 
 
 ## -------------------------------------------------------

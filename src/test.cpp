@@ -221,6 +221,12 @@ void testThreadPoolSingleThreaded()
     pool.join();
 }
 
+// [[Rcpp::export]]
+void testThreadPoolDestructWOJoin()
+{
+    ThreadPool pool;
+}
+
 
 // [[Rcpp::export]]
 void testParallelFor()
