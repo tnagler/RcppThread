@@ -87,6 +87,15 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// testThreadPoolDestructWOJoin
+void testThreadPoolDestructWOJoin();
+RcppExport SEXP _RcppThread_testThreadPoolDestructWOJoin() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testThreadPoolDestructWOJoin();
+    return R_NilValue;
+END_RCPP
+}
 // testParallelFor
 void testParallelFor();
 RcppExport SEXP _RcppThread_testParallelFor() {
@@ -170,6 +179,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppThread_testThreadPoolParallelForEach", (DL_FUNC) &_RcppThread_testThreadPoolParallelForEach, 0},
     {"_RcppThread_testThreadPoolNestedParallelForEach", (DL_FUNC) &_RcppThread_testThreadPoolNestedParallelForEach, 0},
     {"_RcppThread_testThreadPoolSingleThreaded", (DL_FUNC) &_RcppThread_testThreadPoolSingleThreaded, 0},
+    {"_RcppThread_testThreadPoolDestructWOJoin", (DL_FUNC) &_RcppThread_testThreadPoolDestructWOJoin, 0},
     {"_RcppThread_testParallelFor", (DL_FUNC) &_RcppThread_testParallelFor, 0},
     {"_RcppThread_testNestedParallelFor", (DL_FUNC) &_RcppThread_testNestedParallelFor, 0},
     {"_RcppThread_testParallelForEach", (DL_FUNC) &_RcppThread_testParallelForEach, 0},

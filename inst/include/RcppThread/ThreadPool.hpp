@@ -72,6 +72,7 @@ public:
     {
         // destructors should never throw
         try {
+            this->announceStop();
             this->joinWorkers();
         } catch (...) {}
     }
