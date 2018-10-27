@@ -115,15 +115,12 @@ private:
 
 // override std::thread to use RcppThread::Thread instead
 #ifndef RCPPTHREAD_OVERRIDE_THREAD
-#define RCPPTHREAD_OVERRIDE_THREAD 1
+    #define RCPPTHREAD_OVERRIDE_THREAD 0
 #endif
 
 #if RCPPTHREAD_OVERRIDE_THREAD
-    #define thread RcppThreadThreadThread
+    #define thread RcppThreadThread
     namespace std {
-        using RcppThreadThreadThread = RcppThread::Thread;
-    }
-    namespace ttread {
-        using RcppThreadThreadThread = RcppThread::Thread;
+        using RcppThreadThread = RcppThread::Thread;
     }
 #endif
