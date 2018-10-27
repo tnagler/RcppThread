@@ -56,7 +56,7 @@ static RPrinter Rcout = RPrinter();
 
 // override std::cout to use RcppThread::Rcout instead
 #ifndef RCPPTHREAD_OVERRIDE_COUT
-    #define RCPPTHREAD_OVERRIDE_COUT 1
+    #define RCPPTHREAD_OVERRIDE_COUT 0
 #endif
 
 #if RCPPTHREAD_OVERRIDE_COUT
