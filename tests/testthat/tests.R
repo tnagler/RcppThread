@@ -1,6 +1,6 @@
 ## -------------------------------------------------------
 context("Compile test functions")
-Rcpp::sourceCpp(file = "../test.cpp")
+Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
 ## -------------------------------------------------------
 context("R-monitor")
