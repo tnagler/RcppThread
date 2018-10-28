@@ -16,6 +16,8 @@ cache:
 platform:
   - x64
 
+environment:
+  USE_RTOOLS: true
 # Adapt as necessary starting from here
 
 build_script:
