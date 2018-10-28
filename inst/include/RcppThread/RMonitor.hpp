@@ -7,7 +7,9 @@
 #pragma once
 
 // R API
-#include <Rcpp.h>
+#define R_NO_REMAP
+#include "Rinternals.h"
+#include "R.h"
 
 // for tracking threads
 #include <thread>
@@ -21,6 +23,7 @@ namespace RcppThread {
 //! global variable holding id of main thread.
 static std::thread::id mainThreadID = std::this_thread::get_id();
 
+//! exception class for user interruptions.
 class UserInterruptException : public std::exception {
     const char* what() const throw ()
     {
@@ -68,14 +71,14 @@ protected:
         if ( safelyIsInterrupted() ) {
             if ( calledFromMainThread() )
                 isInterrupted_ = false;  // reset for next call
-            throw Rcpp::internal::InterruptedException();
+            throw UserInterruptException();
         }
     }
 
     //! checks for user interruptions, but only if called from main thread.
     bool safelyIsInterrupted()
     {
-        if (!isInterrupted_ &  calledFromMainThread())
+        if (!isInterrupted_ & calledFromMainThread())
             isInterrupted_ = isInterrupted();
         return isInterrupted_;
     }
