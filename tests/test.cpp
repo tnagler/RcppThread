@@ -1,13 +1,7 @@
-// Copyright © 2017 Thomas Nagler
-//
-// This file is part of the RcppThread and licensed under the terms of
-// the MIT license. For a copy, see the LICENSE.md file in the root directory of
-// RcppThread or https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
+// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(RcppThread)]]
 
 #include "RcppThread.h"
-
-#include <atomic>
-
 using namespace RcppThread;
 
 // [[Rcpp::export]]
@@ -360,23 +354,9 @@ void testThreadPoolInterruptWait()
 // [[Rcpp::export]]
 void test()
 {
-    ThreadPool pool;
-    std::vector<std::vector<double>> x(3);
-    for (auto &xx : x)
-        xx = std::vector<double>(3, 1.0);
-    pool.parallelFor(0, x.size(), [&] (int j) {
-        auto temp = x[j];
-        pool.parallelFor(0, temp.size(), [&temp] (int i) {
-            temp[i] *= 2;
-        });
-        x[j] = temp;
-        // xvec = std::vector<double>(10, 2.0);
-    });
-    pool.wait();
-    pool.join();
-    for (auto xvec : x) {
-        for (auto xx : xvec)
-            std::cout << xx << std::endl;
-        std::cout << std::endl;
-    }
+    Rcout << "test1";
+
+    Rcout << "test2" << "test3" << std::endl;
+    Rcout << "test4";
 }
+

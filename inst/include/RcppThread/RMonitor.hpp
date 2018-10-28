@@ -68,7 +68,7 @@ protected:
         if ( safelyIsInterrupted() ) {
             if ( calledFromMainThread() )
                 isInterrupted_ = false;  // reset for next call
-            throw UserInterruptException();
+            throw Rcpp::internal::InterruptedException();
         }
     }
 
@@ -90,7 +90,8 @@ protected:
         msgs_ << object;
         if ( calledFromMainThread() ) {
             // release messages in buffer
-            Rcpp::Rcout << msgs_.str();
+            Rprintf("%s", msgs_.str().c_str());
+            R_FlushConsole();
             // clear message buffer
             msgs_.str("");
         }
