@@ -68,8 +68,8 @@ public:
         return thread_.joinable();
     }
 
-    // checks for interrupt + msgs every 0.25 seconds and after
-    // computations have finished.
+    //! checks for interruptions and messages every 0.25 seconds and after
+    //! computations have finished.
     void join()
     {
         auto timeout = std::chrono::milliseconds(250);

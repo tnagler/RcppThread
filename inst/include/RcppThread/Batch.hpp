@@ -17,14 +17,12 @@ struct Batch {
     ptrdiff_t end;
 };
 
-
 inline size_t computeBatchSize(size_t nTasks, size_t nThreads)
 {
     if (nTasks < nThreads)
         return nTasks;
     return nThreads * (1 + std::floor(std::log(nTasks / nThreads)));
 }
-
 
 inline std::vector<Batch> createBatches(ptrdiff_t begin,
                                         size_t nTasks,

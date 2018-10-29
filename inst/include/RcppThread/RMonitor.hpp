@@ -57,12 +57,11 @@ public:
         return instance_;
     }
 
-
 protected:
     //! returns `true` only when called from main thread.
     bool calledFromMainThread()
     {
-        return (mainThreadID == std::this_thread::get_id());
+        return (std::this_thread::get_id() == mainThreadID);
     }
 
     //! checks for user interruptions, but only if called from main thread.
@@ -75,7 +74,8 @@ protected:
         }
     }
 
-    //! checks for user interruptions, but only if called from main thread.
+    //! checks for user interruptions, but only if called from main thread 
+    //! (otherwise last known state is returned).
     bool safelyIsInterrupted()
     {
         if (!isInterrupted_ & calledFromMainThread())
@@ -85,7 +85,7 @@ protected:
 
     //! prints `object` to R console íf called from main thread; otherwise
     //! adds a printable version of `object` to a buffer for deferred printing.
-    //! @param object a string to print.
+    //! @param object a string or coercible object to print.
     template<class T>
     void safelyPrint(const T& object)
     {
