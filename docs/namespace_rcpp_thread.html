@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">RcppThread 0.3.0</a>
+                    <a class="navbar-brand">RcppThread 0.5.0</a>
                 </div>
             </div>
         </nav>
@@ -108,6 +108,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_rcpp_thread_1_1_batch.html">Batch</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_r_monitor.html">RMonitor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Singleton class for tracking threads and safe communication.  <a href="class_rcpp_thread_1_1_r_monitor.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,9 +122,18 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html">ThreadPool</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implemenation of the thread pool pattern based on <code><a class="el" href="class_rcpp_thread_1_1_thread.html" title="R-friendly version of std::thread. ">Thread</a></code>.  <a href="class_rcpp_thread_1_1_thread_pool.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_user_interrupt_exception.html">UserInterruptException</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">exception class for user interruptions.  <a href="class_rcpp_thread_1_1_user_interrupt_exception.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a402346abe47508d529d731c3381dc0d5"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
+<tr class="memitem:a402346abe47508d529d731c3381dc0d5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#a402346abe47508d529d731c3381dc0d5">parallelFor</a> (ptrdiff_t begin, size_t size, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</td></tr>
+<tr class="separator:a402346abe47508d529d731c3381dc0d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c246ba8e53889c0cd5c1c24e8c6cc85"><td class="memTemplParams" colspan="2">template&lt;class I , class F &gt; </td></tr>
+<tr class="memitem:a1c246ba8e53889c0cd5c1c24e8c6cc85"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#a1c246ba8e53889c0cd5c1c24e8c6cc85">parallelForEach</a> (I &amp;items, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</td></tr>
+<tr class="separator:a1c246ba8e53889c0cd5c1c24e8c6cc85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae48d2e823f3ac43fb87a2795f242e3df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#ae48d2e823f3ac43fb87a2795f242e3df">checkUserInterrupt</a> (bool condition=true)</td></tr>
 <tr class="separator:ae48d2e823f3ac43fb87a2795f242e3df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2953566b926010e05a2d10586c72267c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#a2953566b926010e05a2d10586c72267c">isInterrupted</a> (bool condition=true)</td></tr>
@@ -152,7 +163,7 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>checks for user interruptions, but only if called from master thread. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>checks for user interruptions, but only if called from main thread. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>optional; a condition for the check to be executed.</td></tr>
   </table>
@@ -183,13 +194,138 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>checks for user interruptions, but only if called from master thread (otherwise returns <code>false</code>). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>checks for user interruptions, but only if called from main thread (otherwise returns <code>false</code>). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>optional; a condition for the check to be executed.</td></tr>
   </table>
   </dd>
 </dl>
 <p>Declared as a friend in <code><a class="el" href="class_rcpp_thread_1_1_r_monitor.html" title="Singleton class for tracking threads and safe communication. ">RMonitor</a></code>. </p>
+
+</div>
+</div>
+<a class="anchor" id="a402346abe47508d529d731c3381dc0d5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class F &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::parallelFor </td>
+          <td>(</td>
+          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramname"><em>begin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nThreads</em> = <code>std::thread::hardware_concurrency()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nBatches</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>computes an index-based for loop in parallel batches. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">begin</td><td>first index of the loop. </td></tr>
+    <tr><td class="paramname">size</td><td>the loop runs in the range <code>[begin, begin + size)</code>. </td></tr>
+    <tr><td class="paramname">f</td><td>a function (the 'loop body'). </td></tr>
+    <tr><td class="paramname">nThreads</td><td>the number of threads to use; the default uses the number of cores in the machine; if <code>nThreads = 0</code>, all work will be done in the main thread. </td></tr>
+    <tr><td class="paramname">nBatches</td><td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10);</div><div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; x.size(); i++) {</div><div class="line">    x[i] = i;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is </p><div class="fragment"><div class="line"><a class="code" href="namespace_rcpp_thread.html#a402346abe47508d529d731c3381dc0d5">parallelFor</a>(0, 10, [&amp;] (<span class="keywordtype">size_t</span> i) {</div><div class="line">    x[i] = i;</div><div class="line">});</div></div><!-- fragment --><p> The function sets up a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> yourself and using <code>ThreadPool::forEach()</code>.</p>
+<p><b>Caution</b>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </p>
+
+</div>
+</div>
+<a class="anchor" id="a1c246ba8e53889c0cd5c1c24e8c6cc85"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class I , class F &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::parallelForEach </td>
+          <td>(</td>
+          <td class="paramtype">I &amp;&#160;</td>
+          <td class="paramname"><em>items</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nThreads</em> = <code>std::thread::hardware_concurrency()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nBatches</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>computes a range-based for loop in parallel batches. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">items</td><td>an object allowing for <code>items.size()</code> and whose elements are accessed by the <code>[]</code> operator. </td></tr>
+    <tr><td class="paramname">f</td><td>a function (the 'loop body'). </td></tr>
+    <tr><td class="paramname">nThreads</td><td>the number of threads to use; the default uses the number of cores in the machine; if <code>nThreads = 0</code>, all work will be done in the main thread. </td></tr>
+    <tr><td class="paramname">nBatches</td><td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10, 1.0);</div><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; xx : x) {</div><div class="line">    xx *= 2;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is </p><div class="fragment"><div class="line"><a class="code" href="namespace_rcpp_thread.html#a402346abe47508d529d731c3381dc0d5">parallelFor</a>(x, [&amp;] (<span class="keywordtype">double</span>&amp; xx) {</div><div class="line">    xx *= 2;</div><div class="line">});</div></div><!-- fragment --><p> The function sets up a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> yourself and using <code>ThreadPool::forEach()</code>.</p>
+<p><b>Caution</b>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </p>
 
 </div>
 </div>
@@ -202,7 +338,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 12 2018 22:08:06 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 29 2018 13:28:54 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">RcppThread 0.3.0</a>
+                    <a class="navbar-brand">RcppThread 0.5.0</a>
                 </div>
             </div>
         </nav>
@@ -77,6 +77,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -101,6 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_rcpp_thread_1_1_thread-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">RcppThread::Thread Class Reference</div>  </div>
@@ -111,10 +113,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <a href="class_rcpp_thread_1_1_thread.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_thread_8hpp_source.html">Thread.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a3f6e519ee72e8a1a550fd2a56392a089"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread.html#a3f6e519ee72e8a1a550fd2a56392a089">join</a> ()</td></tr>
+<tr class="separator:a3f6e519ee72e8a1a550fd2a56392a089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>R-friendly version of <code>std::thread</code>. </p>
-<p>Instances of class <code><a class="el" href="class_rcpp_thread_1_1_thread.html" title="R-friendly version of std::thread. ">Thread</a></code> behave just like instances of <code>std::thread</code>, see <a href="http://en.cppreference.com/w/cpp/thread/thread">http://en.cppreference.com/w/cpp/thread/thread</a> for methods and examples. There is one difference exception: Whenever other threads are doing some work, the master thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a <code><a class="el" href="namespace_rcpp_thread.html#ae48d2e823f3ac43fb87a2795f242e3df">checkUserInterrupt()</a></code>. </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p>Instances of class <code><a class="el" href="class_rcpp_thread_1_1_thread.html" title="R-friendly version of std::thread. ">Thread</a></code> behave just like instances of <code>std::thread</code>, see <a href="http://en.cppreference.com/w/cpp/thread/thread">http://en.cppreference.com/w/cpp/thread/thread</a> for methods and examples. There is one difference exception: Whenever other threads are doing some work, the main thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a <code><a class="el" href="namespace_rcpp_thread.html#ae48d2e823f3ac43fb87a2795f242e3df">checkUserInterrupt()</a></code>. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a3f6e519ee72e8a1a550fd2a56392a089"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::Thread::join </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>checks for interruptions and messages every 0.25 seconds and after computations have finished. </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>RcppThread/inst/include/RcppThread/<a class="el" href="_thread_8hpp_source.html">Thread.hpp</a></li>
 </ul>
 </div><!-- contents -->
@@ -126,7 +159,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 12 2018 22:08:06 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 29 2018 13:28:54 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
