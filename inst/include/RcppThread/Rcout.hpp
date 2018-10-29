@@ -20,7 +20,7 @@ public:
     //! @param object a string (or coercible object) to print.
     //! @details Declared as a friend in `RMonitor`.
     template<class T>
-    RPrinter& operator << (T& object)
+    RPrinter& operator<< (T& object)
     {
         RMonitor::instance().safelyPrint(object);
         return *this;

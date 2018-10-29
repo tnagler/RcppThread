@@ -5,6 +5,4 @@
 #'
 #' @name RcppThread
 #' @docType package
-#' @useDynLib RcppThread
-#' @importFrom Rcpp sourceCpp
 NULL

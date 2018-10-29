@@ -1,70 +1,73 @@
 ## -------------------------------------------------------
+context("Compile test functions")
+Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
+
+## -------------------------------------------------------
 context("R-monitor")
 test_that("R-monitor works", {
-    expect_output(RcppThread:::testMonitor(), "RcppThread says hi!", fixed = TRUE)
+    expect_output(testMonitor(), "RcppThread says hi!", fixed = TRUE)
 })
 
 
 ## -------------------------------------------------------
 context("Thread class")
 test_that("Thread class works", {
-    expect_output(RcppThread:::testThreadClass())
+    expect_output(testThreadClass())
 })
 
 ## -------------------------------------------------------
 context("Thread pool")
 test_that("push works", {
-    expect_silent(RcppThread:::testThreadPoolPush())
+    expect_silent(testThreadPoolPush())
 })
 
 test_that("push works", {
-    expect_silent(RcppThread:::testThreadPoolPush())
+    expect_silent(testThreadPoolPush())
 })
 
 test_that("map works", {
-    expect_silent(RcppThread:::testThreadPoolMap())
+    expect_silent(testThreadPoolMap())
 })
 
 test_that("parallelFor works", {
-    expect_silent(RcppThread:::testThreadPoolParallelFor())
+    expect_silent(testThreadPoolParallelFor())
 })
 
 test_that("nested parallelFor works", {
-    expect_silent(RcppThread:::testThreadPoolNestedParallelFor())
+    expect_silent(testThreadPoolNestedParallelFor())
 })
 
 test_that("parallelForEach works", {
-    expect_silent(RcppThread:::testThreadPoolParallelForEach())
+    expect_silent(testThreadPoolParallelForEach())
 })
 
 test_that("nested parallelForEach works", {
-    expect_silent(RcppThread:::testThreadPoolNestedParallelForEach())
+    expect_silent(testThreadPoolNestedParallelForEach())
 })
 
 test_that("works single threaded", {
-    expect_silent(RcppThread:::testThreadPoolSingleThreaded())
+    expect_silent(testThreadPoolSingleThreaded())
 })
 
 test_that("destructible without join", {
-    expect_silent(RcppThread:::testThreadPoolDestructWOJoin())
+    expect_silent(testThreadPoolDestructWOJoin())
 })
-
 
 
 ## -------------------------------------------------------
 context("Parallel for functions")
 test_that("parallelFor works", {
-    expect_silent(RcppThread:::testParallelFor())
+    expect_silent(testParallelFor())
 })
 
 test_that("nested parallelFor works", {
-    expect_silent(RcppThread:::testNestedParallelFor())
+    expect_silent(testNestedParallelFor())
 })
 
 test_that("parallelForEach works", {
-    expect_silent(RcppThread:::testParallelForEach())
+    expect_silent(testParallelForEach())
 })
 
 test_that("nested parallelForEach works", {
-    expect_silent(RcppThread:::testNestedParallelForEach())
+    expect_silent(testNestedParallelForEach())
 })
