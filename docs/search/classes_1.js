@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['thread',['Thread',['../class_rcpp_thread_1_1_thread.html',1,'RcppThread']]],
-  ['threadpool',['ThreadPool',['../class_rcpp_thread_1_1_thread_pool.html',1,'RcppThread']]]
+  ['rmonitor',['RMonitor',['../class_rcpp_thread_1_1_r_monitor.html',1,'RcppThread']]],
+  ['rprinter',['RPrinter',['../class_rcpp_thread_1_1_r_printer.html',1,'RcppThread']]]
 ];

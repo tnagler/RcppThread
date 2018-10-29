@@ -27,7 +27,7 @@ namespace RcppThread {
 //!     x[i] = i;
 //! }
 //! ```
-//! The parallel equivalent is given by:
+//! The parallel equivalent is
 //! ```
 //! parallelFor(0, 10, [&] (size_t i) {
 //!     x[i] = i;
@@ -65,7 +65,7 @@ inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
 //!     xx *= 2;
 //! }
 //! ```
-//! The parallel `ThreadPool` equivalent is
+//! The parallel equivalent is
 //! ```
 //! parallelFor(x, [&] (double& xx) {
 //!     xx *= 2;

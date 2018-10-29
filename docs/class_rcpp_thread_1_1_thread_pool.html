@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">RcppThread 0.3.0</a>
+                    <a class="navbar-brand">RcppThread 0.5.0</a>
                 </div>
             </div>
         </nav>
@@ -77,6 +77,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -115,22 +116,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a66eb5407d41494582e7c456834e027b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66eb5407d41494582e7c456834e027b8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a66eb5407d41494582e7c456834e027b8">ThreadPool</a> ()</td></tr>
+<tr class="memdesc:a66eb5407d41494582e7c456834e027b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructs a thread pool with as many workers as there are cores. <br /></td></tr>
+<tr class="separator:a66eb5407d41494582e7c456834e027b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4526bfec0fe5afb4f0533d551c0b804d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a4526bfec0fe5afb4f0533d551c0b804d">ThreadPool</a> (size_t nThreads)</td></tr>
 <tr class="separator:a4526bfec0fe5afb4f0533d551c0b804d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37abc7774539bf217d307de601ce0d79"><td class="memTemplParams" colspan="2">template&lt;class F , class... Args&gt; </td></tr>
-<tr class="memitem:a37abc7774539bf217d307de601ce0d79"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a37abc7774539bf217d307de601ce0d79">push</a> (F &amp;&amp;f, Args &amp;&amp;...args) -&gt; std::future&lt; decltype(f(args...))&gt;</td></tr>
-<tr class="separator:a37abc7774539bf217d307de601ce0d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca522b3487e549852bbf73a41c4ed7cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca522b3487e549852bbf73a41c4ed7cd"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#aca522b3487e549852bbf73a41c4ed7cd">~ThreadPool</a> () noexcept</td></tr>
+<tr class="memdesc:aca522b3487e549852bbf73a41c4ed7cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">destructor joins all threads if possible. <br /></td></tr>
+<tr class="separator:aca522b3487e549852bbf73a41c4ed7cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5272d4781f49a9cb0bdb4c4b2585196"><td class="memTemplParams" colspan="2">template&lt;class F , class... Args&gt; </td></tr>
+<tr class="memitem:af5272d4781f49a9cb0bdb4c4b2585196"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#af5272d4781f49a9cb0bdb4c4b2585196">push</a> (F &amp;&amp;f, Args &amp;&amp;...args) -&gt; std::shared_future&lt; decltype(f(args...))&gt;</td></tr>
+<tr class="separator:af5272d4781f49a9cb0bdb4c4b2585196"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0f94dddc58d21857245ae5010b9d491"><td class="memTemplParams" colspan="2">template&lt;class F , class I &gt; </td></tr>
 <tr class="memitem:ac0f94dddc58d21857245ae5010b9d491"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#ac0f94dddc58d21857245ae5010b9d491">map</a> (F &amp;&amp;f, I &amp;&amp;items)</td></tr>
 <tr class="separator:ac0f94dddc58d21857245ae5010b9d491"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c93f9e84fadfdc1a3357770d47a738a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c93f9e84fadfdc1a3357770d47a738a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a6c93f9e84fadfdc1a3357770d47a738a">wait</a> ()</td></tr>
-<tr class="memdesc:a6c93f9e84fadfdc1a3357770d47a738a"><td class="mdescLeft">&#160;</td><td class="mdescRight">waits for all jobs to finish, but does not join the threads. <br /></td></tr>
+<tr class="memitem:a2712f7443ce5f097207628d7aff84482"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
+<tr class="memitem:a2712f7443ce5f097207628d7aff84482"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a2712f7443ce5f097207628d7aff84482">parallelFor</a> (ptrdiff_t begin, size_t size, F &amp;&amp;f, size_t nBatches=0)</td></tr>
+<tr class="separator:a2712f7443ce5f097207628d7aff84482"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44b177dbf1297cb38019eee3343b2319"><td class="memTemplParams" colspan="2">template&lt;class F , class I &gt; </td></tr>
+<tr class="memitem:a44b177dbf1297cb38019eee3343b2319"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a44b177dbf1297cb38019eee3343b2319">parallelForEach</a> (I &amp;items, F &amp;&amp;f, size_t nBatches=0)</td></tr>
+<tr class="separator:a44b177dbf1297cb38019eee3343b2319"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c93f9e84fadfdc1a3357770d47a738a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a6c93f9e84fadfdc1a3357770d47a738a">wait</a> ()</td></tr>
 <tr class="separator:a6c93f9e84fadfdc1a3357770d47a738a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ba95e4fe30c81e19c7980c865a8ce86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ba95e4fe30c81e19c7980c865a8ce86"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a1ba95e4fe30c81e19c7980c865a8ce86">join</a> ()</td></tr>
 <tr class="memdesc:a1ba95e4fe30c81e19c7980c865a8ce86"><td class="mdescLeft">&#160;</td><td class="mdescRight">waits for all jobs to finish and joins all threads. <br /></td></tr>
 <tr class="separator:a1ba95e4fe30c81e19c7980c865a8ce86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a26cfd27907154d54a76a2240940507"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a26cfd27907154d54a76a2240940507"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_rcpp_thread_1_1_thread_pool.html#a3a26cfd27907154d54a76a2240940507">clear</a> ()</td></tr>
+<tr class="memdesc:a3a26cfd27907154d54a76a2240940507"><td class="mdescLeft">&#160;</td><td class="mdescRight">clears the pool from all open jobs. <br /></td></tr>
+<tr class="separator:a3a26cfd27907154d54a76a2240940507"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implemenation of the thread pool pattern based on <code><a class="el" href="class_rcpp_thread_1_1_thread.html" title="R-friendly version of std::thread. ">Thread</a></code>. </p>
@@ -152,7 +169,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -171,9 +188,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class F , class I &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void RcppThread::ThreadPool::map </td>
@@ -193,30 +207,131 @@ template&lt;class F , class I &gt; </div>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <p>maps a function on a list of items, possibly running tasks in parallel. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">f</td><td>function to be mapped. </td></tr>
-    <tr><td class="paramname">items</td><td>an objects containing the items on which <code>f</code> shall be mapped; must allow for <code>auto</code> loops (i.e., <code>std::begin(I)</code>/<code>std::end(I)</code> must be defined). </td></tr>
+    <tr><td class="paramname">items</td><td>an objects containing the items on which <code>f</code> shall be mapped; must allow for <code>auto</code> loops (i.e., <code>std::begin(I)</code>/ <code>std::end(I)</code> must be defined). </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="a37abc7774539bf217d307de601ce0d79"></a>
+<a class="anchor" id="a2712f7443ce5f097207628d7aff84482"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class F &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::ThreadPool::parallelFor </td>
+          <td>(</td>
+          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramname"><em>begin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nBatches</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>computes an index-based for loop in parallel batches. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">begin</td><td>first index of the loop. </td></tr>
+    <tr><td class="paramname">size</td><td>the loop runs in the range <code>[begin, begin + size)</code>. </td></tr>
+    <tr><td class="paramname">f</td><td>an object callable as a function (the 'loop body'); typically a lambda. </td></tr>
+    <tr><td class="paramname">nBatches</td><td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the batch size.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10);</div><div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; x.size(); i++) {</div><div class="line">    x[i] = i;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is given by: </p><div class="fragment"><div class="line"><a class="code" href="class_rcpp_thread_1_1_thread_pool.html#a66eb5407d41494582e7c456834e027b8">ThreadPool</a> pool(2);</div><div class="line">pool.forIndex(0, 10, [&amp;] (<span class="keywordtype">size_t</span> i) {</div><div class="line">    x[i] = i;</div><div class="line">});</div></div><!-- fragment --><p> <b>Caution</b>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </p>
+
+</div>
+</div>
+<a class="anchor" id="a44b177dbf1297cb38019eee3343b2319"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class F , class I &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::ThreadPool::parallelForEach </td>
+          <td>(</td>
+          <td class="paramtype">I &amp;&#160;</td>
+          <td class="paramname"><em>items</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nBatches</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>computes a for-each loop in parallel batches. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">items</td><td>an object allowing for <code>std::begin()</code>/<code>std::end()</code> and whose elements can be accessed by the <code>[]</code> operator. </td></tr>
+    <tr><td class="paramname">f</td><td>a function (the 'loop body'). </td></tr>
+    <tr><td class="paramname">nBatches</td><td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10, 1.0);</div><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; xx : x) {</div><div class="line">    xx *= 2;</div><div class="line">}</div></div><!-- fragment --><p> The parallel <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> equivalent is </p><div class="fragment"><div class="line"><a class="code" href="class_rcpp_thread_1_1_thread_pool.html#a66eb5407d41494582e7c456834e027b8">ThreadPool</a> pool(2);</div><div class="line">pool.parallelForEach(x, [&amp;] (<span class="keywordtype">double</span>&amp; xx) {</div><div class="line">    xx *= 2;</div><div class="line">});</div></div><!-- fragment --><p> <b>Caution</b>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </p>
+
+</div>
+</div>
+<a class="anchor" id="af5272d4781f49a9cb0bdb4c4b2585196"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class F , class... Args&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">auto RcppThread::ThreadPool::push </td>
@@ -233,15 +348,9 @@ template&lt;class F , class... Args&gt; </div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> -&gt; std::future&lt;decltype(f(args...))&gt;
-    </td>
+          <td></td><td> -&gt; std::shared_future&lt;decltype(f(args...))&gt;</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <p>pushes new jobs to the thread pool. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -251,6 +360,30 @@ template&lt;class F , class... Args&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>an <code>std::shared_future</code>, where the user can get the result and rethrow the catched exceptions. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6c93f9e84fadfdc1a3357770d47a738a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RcppThread::ThreadPool::wait </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>waits for all jobs to finish and checks for interruptions, but does not join the threads. </p>
 
 </div>
 </div>
@@ -266,7 +399,7 @@ template&lt;class F , class... Args&gt; </div>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 12 2018 22:08:06 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 29 2018 13:28:54 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
