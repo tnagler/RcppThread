@@ -37,7 +37,11 @@ public:
     ThreadPool& operator=(ThreadPool&& other) = default;
 
     template<class F, class... Args>
-    auto push(F&& f, Args&&... args) -> std::shared_future<decltype(f(args...))>;
+    void push(F&& f, Args&&... args);
+
+    template<class F, class... Args>
+    auto pushReturn(F&& f, Args&&... args)
+        -> std::future<decltype(f(args...))>;
 
     template<class F, class I>
     void map(F&& f, I &&items);
@@ -53,10 +57,8 @@ public:
     void clear();
 
 private:
+    void startWorker();
     void doJob(std::function<void()>&& job);
-    template<class F, class... Args>
-    void pushForJob(F&& f, Args&&... args);
-
     void announceBusy();
     void announceIdle();
     void announceStop();
@@ -67,6 +69,7 @@ private:
 
     // variables for synchronization between workers
     std::mutex mTasks_;
+    std::mutex mBusy_;
     std::condition_variable cvTasks_;
     std::condition_variable cvBusy_;
     size_t numBusy_{0};
@@ -79,38 +82,14 @@ inline ThreadPool::ThreadPool() :
 {}
 
 //! constructs a thread pool with `nThreads` threads.
-//! @param nThreads number of threads to create; if `nThreads = 0`, all
+//! @param nWorkers number of worker threads to create; if `nThreads = 0`, all
 //!    work pushed to the pool will be done in the main thread.
-inline ThreadPool::ThreadPool(size_t nThreads)
+inline ThreadPool::ThreadPool(size_t nWorkers)
 {
-    for (size_t t = 0; t < nThreads; ++t) {
-        workers_.emplace_back([this] {
-            std::function<void()> job;
-            // observe thread pool; only stop after all jobs are done
-            while (!stopped_ | !jobs_.empty()) {
-                // must hold a lock while modifying shared variables
-                std::unique_lock<std::mutex> lk(mTasks_);
-
-                // thread should wait when there is no job
-                cvTasks_.wait(lk, [this] {
-                    return stopped_ || !jobs_.empty();
-                });
-
-                // queue can be empty if thread pool is stopped
-                if (jobs_.empty())
-                    continue;
-
-                // take job from the queue
-                job = std::move(jobs_.front());
-                jobs_.pop();
-
-                // lock can be released before starting work
-                lk.unlock();
-                this->doJob(std::move(job));
-            }
-        });
-    }
+    for (size_t w = 0; w < nWorkers; ++w)
+        this->startWorker();
 }
+
 
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
@@ -122,15 +101,41 @@ inline ThreadPool::~ThreadPool() noexcept
     } catch (...) {}
 }
 
-//! pushes new jobs to the thread pool.
+//! pushes jobs to the thread pool.
+//! @param f a function taking an arbitrary number of arguments.
+//! @param args a comma-seperated list of the other arguments that shall
+//!   be passed to `f`.
+//!
+//! The function returns void; if a job returns a result, use `pushReturn()`.
+template<class F, class... Args>
+void ThreadPool::push(F&& f, Args&&... args)
+{
+    if (workers_.size() == 0) {
+        // if there are no workers, just do the job in the main thread
+        f(args...);
+    } else {
+        // add job to the queue; must hold lock while modifying the shared queue
+        {
+            std::lock_guard<std::mutex> lk(mTasks_);
+            if (stopped_)
+                throw std::runtime_error("cannot push to joined thread pool");
+            jobs_.emplace([f, args...] { f(args...); });
+        }
+
+        // signal a waiting worker that there's a new job
+        cvTasks_.notify_one();
+    }
+}
+
+//! pushes jobs returning a value to the thread pool.
 //! @param f a function taking an arbitrary number of arguments.
 //! @param args a comma-seperated list of the other arguments that shall
 //!   be passed to `f`.
 //! @return an `std::shared_future`, where the user can get the result and
 //!   rethrow the catched exceptions.
 template<class F, class... Args>
-auto ThreadPool::push(F&& f, Args&&... args)
-    -> std::shared_future<decltype(f(args...))>
+auto ThreadPool::pushReturn(F&& f, Args&&... args)
+    -> std::future<decltype(f(args...))>
 {
     using result_t = decltype(f(args...));
     using jobPackage = std::packaged_task<result_t()>;
@@ -139,28 +144,25 @@ auto ThreadPool::push(F&& f, Args&&... args)
     auto job = std::make_shared<jobPackage>([&f, args...] {
         return f(args...);
     });
-    std::shared_future<result_t> sf(std::move(job->get_future()));
 
-    // if there are no workers, just do the job in the main thread
     if (workers_.size() == 0) {
+        // if there are no workers, just do the job in the main thread
         (*job)();
-        sf.get();
-        return sf;
-    }
+    } else {
+        // add job to the queue
+        {
+            std::lock_guard<std::mutex> lk(mTasks_);
+            if (stopped_)
+                throw std::runtime_error("cannot push to joined thread pool");
+            jobs_.emplace([job] { (*job)(); });
+        }
 
-    // add job to the queue
-    {
-        std::lock_guard<std::mutex> lk(mTasks_);
-        if (stopped_)
-            throw std::runtime_error("cannot push to joined thread pool");
-        jobs_.emplace([job] () { (*job)(); });
+        // signal a waiting worker that there's a new job
+        cvTasks_.notify_one();
     }
-
-    // signal a waiting worker that there's a new job
-    cvTasks_.notify_one();
 
     // return future result of the job
-    return sf;
+    return job->get_future();
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
@@ -207,8 +209,8 @@ inline void ThreadPool::parallelFor(ptrdiff_t begin, size_t size,
         for (ptrdiff_t i = b.begin; i < b.end; i++) f(i);
     };
     auto batches = createBatches(begin, size, workers_.size(), nBatches);
-    for (auto&& batch : batches) {
-        this->pushForJob(doBatch, batch);
+    for (const auto& batch : batches) {
+        this->push(doBatch, batch);
     }
 }
 
@@ -242,8 +244,8 @@ inline void ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
     };
     size_t size = std::end(items) - std::begin(items);
     auto batches = createBatches(0, size, workers_.size(), nBatches);
-    for (auto&& batch : batches)
-        this->pushForJob(doBatch, batch);
+    for (const auto& batch : batches)
+        this->push(doBatch, batch);
 }
 
 //! waits for all jobs to finish and checks for interruptions,
@@ -253,6 +255,7 @@ inline void ThreadPool::wait()
     if (workers_.size() == 0) {
         // all jobs have been executed in the main thread, no need to wait
         checkUserInterrupt();
+        Rcout << "";
         return;
     }
 
@@ -261,13 +264,10 @@ inline void ThreadPool::wait()
     while (true) {
         {
             // wait_for tries acquires lk when waking up
-            std::unique_lock<std::mutex> lk(mTasks_);
+            std::unique_lock<std::mutex> lk(mBusy_);
             cvBusy_.wait_for(lk, timeout, allJobsDone);
             // lk can be released immediately
         }
-
-        // relase messages stored by worker threads to the R console
-        Rcout << "";
 
         // check whether timeout was reached or another event caused wake-up
         if ( isInterrupted() ) {
@@ -278,6 +278,7 @@ inline void ThreadPool::wait()
         }
 
         // give other threads priority before waiting again
+        Rcout << "";
         std::this_thread::yield();
     }
 
@@ -303,53 +304,59 @@ inline void ThreadPool::clear()
     cvTasks_.notify_all();
 }
 
+//! spawns a worker thread waiting for jobs to arrive.
+inline void ThreadPool::startWorker()
+{
+    workers_.emplace_back([this] {
+        std::function<void()> job;
+        // observe thread pool; only stop after all jobs are done
+        while (!stopped_ | !jobs_.empty()) {
+            // must hold a lock while modifying shared variables
+            std::unique_lock<std::mutex> lk(mTasks_);
+
+            // thread should wait when there is no job
+            cvTasks_.wait(lk, [this] {
+                return stopped_ || !jobs_.empty();
+            });
+
+            // queue can be empty if thread pool is stopped
+            if (jobs_.empty())
+                continue;
+
+            // take job from the queue
+            job = std::move(jobs_.front());
+            jobs_.pop();
+
+            // lock can be released before starting work
+            lk.unlock();
+            this->doJob(std::move(job));
+        }
+    });
+}
+
 //! executes a job safely and let's pool know when it's busy.
 //! @param job job to be exectued.
 inline void ThreadPool::doJob(std::function<void()>&& job)
 {
     checkUserInterrupt();
-    announceBusy();
+    this->announceBusy();
     try {
         job();
     } catch (const std::exception& e) {
-        announceIdle();
+        this->announceIdle();
         throw e;
     } catch (...) {
-        announceIdle();
+        this->announceIdle();
         throw std::runtime_error("caught unknown C++ exception.");
     }
-    announceIdle();
-}
-
-//! lightweight push used in parallel for loops.
-//! @param f a function (the 'loop body').
-//! @param args... function arguments, evaluated as `f(args...)`.
-template<class F, class... Args>
-void ThreadPool::pushForJob(F&& f, Args&&... args)
-{
-    // if there are no workers, just do the job in the main thread
-    if (workers_.size() == 0) {
-        f(args...);
-        return;
-    }
-
-    // add job to the queue; must hold lock while modifying the shared queue
-    {
-        std::lock_guard<std::mutex> lk(mTasks_);
-        if (stopped_)
-            throw std::runtime_error("cannot push to joined thread pool");
-        jobs_.emplace([f, args...] () { f(args...); });
-    }
-
-    // signal a waiting worker that there's a new job
-    cvTasks_.notify_one();
+    this->announceIdle();
 }
 
 //! signals that a worker is busy.
 inline void ThreadPool::announceBusy()
 {
     {
-        std::unique_lock<std::mutex> lk(mTasks_);
+        std::lock_guard<std::mutex> lk(mBusy_);
         ++numBusy_;
     }
     cvBusy_.notify_one();
@@ -359,7 +366,7 @@ inline void ThreadPool::announceBusy()
 inline void ThreadPool::announceIdle()
 {
     {
-        std::unique_lock<std::mutex> lk(mTasks_);
+        std::lock_guard<std::mutex> lk(mBusy_);
         --numBusy_;
     }
     cvBusy_.notify_one();
