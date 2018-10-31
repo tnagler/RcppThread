@@ -179,7 +179,7 @@ void ThreadPool::map(F&& f, I &&items)
 
 //! computes an index-based for loop in parallel batches.
 //! @param begin first index of the loop.
-//! @param size the loop runs in the range `[begin, begin + size)`.
+//! @param end the loop runs in the range `[begin, end)`.
 //! @param f an object callable as a function (the 'loop body'); typically
 //!   a lambda.
 //! @param nBatches the number of batches to create; the default (0)
@@ -201,14 +201,16 @@ void ThreadPool::map(F&& f, I &&items)
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
-inline void ThreadPool::parallelFor(ptrdiff_t begin, size_t size,
+inline void ThreadPool::parallelFor(ptrdiff_t begin, size_t end,
                                     F&& f,
                                     size_t nBatches)
 {
+    if (end < begin)
+        throw std::range_error("end is less than begin; cannot run backward loops.");
     auto doBatch = [f] (const Batch& b) {
         for (ptrdiff_t i = b.begin; i < b.end; i++) f(i);
     };
-    auto batches = createBatches(begin, size, workers_.size(), nBatches);
+    auto batches = createBatches(begin, end - begin, workers_.size(), nBatches);
     for (const auto& batch : batches) {
         this->push(doBatch, batch);
     }
