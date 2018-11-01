@@ -69,7 +69,6 @@ private:
 
     // variables for synchronization between workers
     std::mutex mTasks_;
-    std::mutex mBusy_;
     std::condition_variable cvTasks_;
     std::condition_variable cvBusy_;
     size_t numBusy_{0};
@@ -266,7 +265,7 @@ inline void ThreadPool::wait()
     while (true) {
         {
             // wait_for tries acquires lk when waking up
-            std::unique_lock<std::mutex> lk(mBusy_);
+            std::unique_lock<std::mutex> lk(mTasks_);
             cvBusy_.wait_for(lk, timeout, allJobsDone);
             // lk can be released immediately
         }
@@ -358,7 +357,7 @@ inline void ThreadPool::doJob(std::function<void()>&& job)
 inline void ThreadPool::announceBusy()
 {
     {
-        std::lock_guard<std::mutex> lk(mBusy_);
+        std::lock_guard<std::mutex> lk(mTasks_);
         ++numBusy_;
     }
     cvBusy_.notify_one();
@@ -368,7 +367,7 @@ inline void ThreadPool::announceBusy()
 inline void ThreadPool::announceIdle()
 {
     {
-        std::lock_guard<std::mutex> lk(mBusy_);
+        std::lock_guard<std::mutex> lk(mTasks_);
         --numBusy_;
     }
     cvBusy_.notify_one();
