@@ -25,6 +25,10 @@ test_that("push works", {
     expect_silent(testThreadPoolPush())
 })
 
+test_that("pushReturn works", {
+    expect_silent(testThreadPoolPushReturn())
+})
+
 test_that("map works", {
     expect_silent(testThreadPoolMap())
 })

@@ -69,6 +69,32 @@ void testThreadPoolPush()
 }
 
 // [[Rcpp::export]]
+void testThreadPoolPushReturn()
+{
+    ThreadPool pool;
+    std::vector<size_t> x(1000000, 1);
+    auto dummy = [&] (size_t i)  {
+        checkUserInterrupt();
+        return 2 * x[i];
+    };
+
+    std::vector<std::future<size_t>> fut(x.size());
+    for (int i = 0; i < x.size() / 2; i++)
+       fut[i] = pool.pushReturn(dummy, i);
+    for (int i = 0; i < x.size() / 2; i++)
+        x[i] = fut[i].get();
+    pool.join();
+
+    size_t count_wrong = 0;
+    for (int i = 0; i < x.size() / 2; i++)
+        count_wrong += (x[i] != 2);
+    for (int i = x.size() / 2 + 1; i < x.size(); i++)
+        count_wrong += (x[i] != 1);
+    if (count_wrong > 0)
+        throw std::runtime_error("push gives wrong result");
+}
+
+// [[Rcpp::export]]
 void testThreadPoolMap()
 {
     ThreadPool pool;
