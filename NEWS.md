@@ -1,4 +1,9 @@
-# RcppThread 0.5.0.9000
+# RcppThread 0.5.0
+
+DEPENDENCIES
+
+* Rcpp is no longer a hard dependency, but only used for unit tests. This avoids
+  unneccessary compilation time upon installantion. 
 
 NEW FEATURES
 
@@ -6,11 +11,13 @@ NEW FEATURES
   with load balancing. Can also be called as method of a `ThreadPool`.
 
 * Options to override `std::thread` and `std::cout` with RcppThread equivalents 
-  (preprocessor variables `RCPPTHREAD_OVERRIDE_THREAD` and 
-  `RCPPTHREAD_OVERRIDE_COUT`). Both overrides are activated by default.
+  using preprocessor variables `RCPPTHREAD_OVERRIDE_THREAD` and 
+  `RCPPTHREAD_OVERRIDE_COUT`.
+  
+* Several minor performance optimizations.
 
 
-# RcppThread 0.4.0 (June 12, 2018)
+# RcppThread 0.4.0
 
 NEW FEATURE
 
@@ -41,7 +48,7 @@ BUG FIX
 * Don't check print ouptut of multi-threaded code b/c of random results.
 
 
-# RcppThread 0.1.2 (November 24, 2017)
+# RcppThread 0.1.2
 
 DEPENDS
 
