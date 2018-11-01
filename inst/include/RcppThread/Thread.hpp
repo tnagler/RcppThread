@@ -46,7 +46,11 @@ public:
         thread_ = std::thread(std::move(task));
     }
 
-    ~Thread() = default;
+    ~Thread()
+    {
+        if (thread_.joinable())
+            thread_.join();
+    }
 
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&& other)
