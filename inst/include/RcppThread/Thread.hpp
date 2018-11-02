@@ -46,10 +46,12 @@ public:
         thread_ = std::thread(std::move(task));
     }
 
-    ~Thread()
+    ~Thread() noexcept
     {
-        if (thread_.joinable())
-            thread_.join();
+        try {
+            if (thread_.joinable())
+                thread_.join();
+        } catch (...) {}
     }
 
     Thread& operator=(const Thread&) = delete;
