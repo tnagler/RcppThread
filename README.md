@@ -11,9 +11,9 @@ Provides R-friendly threading functionality:
     `checkUserInterrupt()` and `Rcout`,
   * an interruptible thread class that otherwise behaves like 
    [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread),
-  * a class implementing the [thread pool
-    pattern](https://en.wikipedia.org/wiki/Thread_pool) for easy and flexible
-    parallelism.
+  * classes for the [thread pool
+    pattern](https://en.wikipedia.org/wiki/Thread_pool) and parallel for loops
+    for easy and flexible parallelism.
 
 The library is header-only, platform-independent, and only 
 requires a 
@@ -22,7 +22,7 @@ requires a
 ## Functionality
 
 For a detailed description of its functionality and examples, see the 
-[vignette](https://github.com/tnagler/RcppThread/blob/master/vignettes/RcppThread.Rmd)
+[vignette](https://arxiv.org/abs/1811.00450)
 or the [API documentation](https://tnagler.github.io/RcppThread/).
 
 ## Installation
