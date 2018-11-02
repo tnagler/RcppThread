@@ -7,6 +7,8 @@ DEPENDENCIES
 
 NEW FEATURES
 
+* New vignette available, see `browseVignettes("RcppThread")`.
+
 * New functions `parallelFor()` and `ForEach()` allowing parallel `for` loops 
   with load balancing. Can also be called as method of a `ThreadPool`.
 
