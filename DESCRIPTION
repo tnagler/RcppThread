@@ -15,8 +15,6 @@ BugReports: https://github.com/tnagler/RcppThread/issues
 RoxygenNote: 6.1.0
 Suggests: 
     testthat,
-    knitr,
-    rmarkdown,
-    covr,
-    Rcpp
-VignetteBuilder: knitr
+    Rcpp,
+    R.rsp
+VignetteBuilder: R.rsp
