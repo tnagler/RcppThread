@@ -15,6 +15,7 @@ cache:
 
 platform:
   - x64
+  - x86
 
 environment:
   USE_RTOOLS: true

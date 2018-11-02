@@ -272,14 +272,15 @@ void testParallelFor()
 // [[Rcpp::export]]
 void testNestedParallelFor()
 {
-    std::vector<std::vector<double>> x(100);
+    std::vector<std::vector<double>> x(1);
     for (auto &xx : x)
-        xx = std::vector<double>(100, 1.0);
+        xx = std::vector<double>(2, 1.0);
+
     parallelFor(0, x.size(), [&x] (int i) {
         parallelFor(0, x[i].size(), [&x, i] (int j) {
             x[i][j] *= 2;
-        });
-    });
+        }, 1);
+    }, 1);
 
     size_t count_wrong = 0;
     for (auto xx : x) {
@@ -317,14 +318,17 @@ void testParallelForEach()
 // [[Rcpp::export]]
 void testNestedParallelForEach()
 {
-    std::vector<std::vector<double>> x(100);
+    std::vector<std::vector<double>> x(1);
     for (auto &xx : x)
-        xx = std::vector<double>(100, 1.0);
-    parallelForEach(x, [] (std::vector<double>& xx) {
-        parallelForEach(xx, [] (double& xxx) {
+        xx = std::vector<double>(2, 1.0);
+
+    ThreadPool pool;
+    pool.parallelForEach(x, [&] (std::vector<double>& xx) {
+        pool.parallelForEach(xx, [&] (double& xxx) {
             xxx *= 2;
-        });
-    });
+        }, 1);
+    }, 1);
+    pool.join();
 
     size_t count_wrong = 0;
     for (auto xx : x) {
