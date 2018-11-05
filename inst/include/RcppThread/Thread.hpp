@@ -101,8 +101,7 @@ public:
         return thread_.get_id();
     }
 
-    using native_handle_type = __gthread_t;
-    native_handle_type native_handle()
+    auto native_handle() -> decltype(std::thread().native_handle())
     {
         return thread_.native_handle();
     }
