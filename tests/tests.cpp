@@ -317,9 +317,9 @@ void testParallelForEach()
 // [[Rcpp::export]]
 void testNestedParallelForEach()
 {
-    std::vector<std::vector<double>> x(100);
+    std::vector<std::vector<double>> x(1);
     for (auto &xx : x)
-        xx = std::vector<double>(100, 1.0);
+        xx = std::vector<double>(2, 1.0);
 
     ThreadPool pool;
     pool.parallelForEach(x, [&] (std::vector<double>& xx) {
