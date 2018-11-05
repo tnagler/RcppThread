@@ -1,9 +1,20 @@
+# RcppThread 0.5.1
+
+BUG FIXES
+
+* Fix portability issues related to `native_handle_type`.
+
+* Fix signed/unsigned comparison in `parallelFor()`.
+
+* Fix signed/unsigned warnings in unit tests.
+
+
 # RcppThread 0.5.0
 
 DEPENDENCIES
 
 * Rcpp is no longer a hard dependency, but only used for unit tests. This avoids
-  unneccessary compilation time upon installantion. 
+  unneccessary compilation time during package installation. 
 
 NEW FEATURES
 
