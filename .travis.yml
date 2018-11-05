@@ -1,16 +1,26 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-dist: trusty
-sudo: required
-
 language: R
 warnings_are_errors: false
 
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      r: release
+    - os: linux
+      dist: trusty
+      sudo: required
+      r: devel
+    - os: osx
+      sudo: required
+      r: release
+
 before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo add-apt-repository ppa:marutter/c2d4u -y
-  - sudo apt-get update -q
-  - sudo apt-get install g++-4.9 -y
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 100
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update -q; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install g++-4.9 -y; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 100; fi
 
 r_packages:
   - Rcpp
@@ -22,8 +32,4 @@ r_packages:
 
 repos:
   CRAN: http://cran.rstudio.com
-
-r:
-  - release
-  - devel
 

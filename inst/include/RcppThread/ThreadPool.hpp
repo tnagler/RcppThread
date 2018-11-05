@@ -47,8 +47,9 @@ public:
     void map(F&& f, I &&items);
 
     template<class F>
-    inline void parallelFor(ptrdiff_t begin, size_t size, F&& f,
+    inline void parallelFor(ptrdiff_t begin, ptrdiff_t size, F&& f,
                             size_t nBatches = 0);
+
     template<class F, class I>
     inline void parallelForEach(I& items, F&& f, size_t nBatches = 0);
 
@@ -200,7 +201,7 @@ void ThreadPool::map(F&& f, I &&items)
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
-inline void ThreadPool::parallelFor(ptrdiff_t begin, size_t end,
+inline void ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end,
                                     F&& f,
                                     size_t nBatches)
 {
@@ -331,6 +332,7 @@ inline void ThreadPool::startWorker()
             // lock can be released before starting work
             lk.unlock();
             this->doJob(std::move(job));
+            std::this_thread::yield();
         }
     });
 }
@@ -371,7 +373,6 @@ inline void ThreadPool::announceIdle()
         --numBusy_;
     }
     cvBusy_.notify_one();
-    std::this_thread::yield();
 }
 
 //! signals threads that no more new work is coming.
