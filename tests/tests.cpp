@@ -273,7 +273,7 @@ void testNestedParallelFor()
 {
     std::vector<std::vector<double>> x(1);
     for (auto &xx : x)
-        xx = std::vector<double>(2, 1.0);
+        xx = std::vector<double>(1, 1.0);
 
     parallelFor(0, x.size(), [&x] (int i) {
         parallelFor(0, x[i].size(), [&x, i] (int j) {
@@ -325,8 +325,8 @@ void testNestedParallelForEach()
     pool.parallelForEach(x, [&] (std::vector<double>& xx) {
         pool.parallelForEach(xx, [&] (double& xxx) {
             xxx *= 2;
-        }, 1);
-    }, 1);
+        });
+    });
     pool.join();
 
     size_t count_wrong = 0;

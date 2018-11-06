@@ -128,9 +128,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a402346abe47508d529d731c3381dc0d5"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
-<tr class="memitem:a402346abe47508d529d731c3381dc0d5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#a402346abe47508d529d731c3381dc0d5">parallelFor</a> (ptrdiff_t begin, size_t size, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</td></tr>
-<tr class="separator:a402346abe47508d529d731c3381dc0d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3df09a8db84ae183abe663af8f928c1"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
+<tr class="memitem:aa3df09a8db84ae183abe663af8f928c1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#aa3df09a8db84ae183abe663af8f928c1">parallelFor</a> (ptrdiff_t begin, ptrdiff_t size, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</td></tr>
+<tr class="separator:aa3df09a8db84ae183abe663af8f928c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c246ba8e53889c0cd5c1c24e8c6cc85"><td class="memTemplParams" colspan="2">template&lt;class I , class F &gt; </td></tr>
 <tr class="memitem:a1c246ba8e53889c0cd5c1c24e8c6cc85"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_rcpp_thread.html#a1c246ba8e53889c0cd5c1c24e8c6cc85">parallelForEach</a> (I &amp;items, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</td></tr>
 <tr class="separator:a1c246ba8e53889c0cd5c1c24e8c6cc85"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,7 +204,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a402346abe47508d529d731c3381dc0d5"></a>
+<a class="anchor" id="aa3df09a8db84ae183abe663af8f928c1"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -222,7 +222,7 @@ template&lt;class F &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">ptrdiff_t&#160;</td>
           <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
@@ -265,7 +265,7 @@ template&lt;class F &gt; </div>
   </table>
   </dd>
 </dl>
-<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10);</div><div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; x.size(); i++) {</div><div class="line">    x[i] = i;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is </p><div class="fragment"><div class="line"><a class="code" href="namespace_rcpp_thread.html#a402346abe47508d529d731c3381dc0d5">parallelFor</a>(0, 10, [&amp;] (<span class="keywordtype">size_t</span> i) {</div><div class="line">    x[i] = i;</div><div class="line">});</div></div><!-- fragment --><p> The function sets up a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> yourself and using <code>ThreadPool::forEach()</code>.</p>
+<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10);</div><div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; x.size(); i++) {</div><div class="line">    x[i] = i;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is </p><div class="fragment"><div class="line"><a class="code" href="namespace_rcpp_thread.html#aa3df09a8db84ae183abe663af8f928c1">parallelFor</a>(0, 10, [&amp;] (<span class="keywordtype">size_t</span> i) {</div><div class="line">    x[i] = i;</div><div class="line">});</div></div><!-- fragment --><p> The function sets up a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> yourself and using <code>ThreadPool::forEach()</code>.</p>
 <p><b>Caution</b>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </p>
 
 </div>
@@ -324,7 +324,7 @@ template&lt;class I , class F &gt; </div>
   </table>
   </dd>
 </dl>
-<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10, 1.0);</div><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; xx : x) {</div><div class="line">    xx *= 2;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is </p><div class="fragment"><div class="line"><a class="code" href="namespace_rcpp_thread.html#a402346abe47508d529d731c3381dc0d5">parallelFor</a>(x, [&amp;] (<span class="keywordtype">double</span>&amp; xx) {</div><div class="line">    xx *= 2;</div><div class="line">});</div></div><!-- fragment --><p> The function sets up a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> yourself and using <code>ThreadPool::forEach()</code>.</p>
+<p>Consider the following code: </p><div class="fragment"><div class="line">std::vector&lt;double&gt; x(10, 1.0);</div><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; xx : x) {</div><div class="line">    xx *= 2;</div><div class="line">}</div></div><!-- fragment --><p> The parallel equivalent is </p><div class="fragment"><div class="line"><a class="code" href="namespace_rcpp_thread.html#aa3df09a8db84ae183abe663af8f928c1">parallelFor</a>(x, [&amp;] (<span class="keywordtype">double</span>&amp; xx) {</div><div class="line">    xx *= 2;</div><div class="line">});</div></div><!-- fragment --><p> The function sets up a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code><a class="el" href="class_rcpp_thread_1_1_thread_pool.html" title="Implemenation of the thread pool pattern based on Thread. ">ThreadPool</a></code> yourself and using <code>ThreadPool::forEach()</code>.</p>
 <p><b>Caution</b>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </p>
 
 </div>
@@ -338,7 +338,7 @@ template&lt;class I , class F &gt; </div>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 5 2018 13:32:06 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 5 2018 22:10:21 for RcppThread by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

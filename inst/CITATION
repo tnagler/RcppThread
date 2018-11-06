@@ -1,0 +1,9 @@
+bibentry(bibtype = "Article",
+         title        = "{R}-Friendly Multi-Threading in C++",
+         author       = person(given = "Thomas",
+                               family = "Nagler",
+                               email = "mail@tnagler.com"),
+         journal      = "arXiv:1811.00450",
+         year         = "2018",
+         header       = "To cite kdecopula in publications use:"
+)
