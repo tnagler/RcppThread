@@ -2,7 +2,7 @@
 
 * Limit number of threads in unit tests.
 
-* Updated vignette.
+* Fixed typos in package vignette.
 
 
 # RcppThread 0.5.1
