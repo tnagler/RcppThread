@@ -329,9 +329,13 @@ inline void ThreadPool::startWorker()
             job = std::move(jobs_.front());
             jobs_.pop();
 
-            // lock can be released before starting work
+            // lock can be released before starting work, but must signal
+            // that thread will be busy before (!) to avoid premature breaks
+            this->announceBusy();
             lk.unlock();
+
             this->doJob(std::move(job));
+            this->announceIdle();
             std::this_thread::yield();
         }
     });
@@ -342,7 +346,6 @@ inline void ThreadPool::startWorker()
 inline void ThreadPool::doJob(std::function<void()>&& job)
 {
     checkUserInterrupt();
-    this->announceBusy();
     try {
         job();
     } catch (const std::exception& e) {
@@ -352,16 +355,12 @@ inline void ThreadPool::doJob(std::function<void()>&& job)
         this->announceIdle();
         throw std::runtime_error("caught unknown C++ exception.");
     }
-    this->announceIdle();
 }
 
-//! signals that a worker is busy.
+//! signals that a worker is busy (must be called why locking mTasks).
 inline void ThreadPool::announceBusy()
 {
-    {
-        std::lock_guard<std::mutex> lk(mTasks_);
-        ++numBusy_;
-    }
+    ++numBusy_;
     cvBusy_.notify_one();
 }
 
