@@ -49,7 +49,7 @@ void testThreadClass()
 // [[Rcpp::export]]
 void testThreadPoolPush()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
         checkUserInterrupt();
@@ -71,7 +71,7 @@ void testThreadPoolPush()
 // [[Rcpp::export]]
 void testThreadPoolPushReturn()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i)  {
         checkUserInterrupt();
@@ -97,7 +97,7 @@ void testThreadPoolPushReturn()
 // [[Rcpp::export]]
 void testThreadPoolMap()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
 
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
@@ -123,7 +123,7 @@ void testThreadPoolMap()
 // [[Rcpp::export]]
 void testThreadPoolParallelFor()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
 
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
@@ -146,7 +146,7 @@ void testThreadPoolParallelFor()
 // [[Rcpp::export]]
 void testThreadPoolNestedParallelFor()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
     std::vector<std::vector<double>> x(100);
     for (auto &xx : x)
         xx = std::vector<double>(100, 1.0);
@@ -169,7 +169,7 @@ void testThreadPoolNestedParallelFor()
 // [[Rcpp::export]]
 void testThreadPoolParallelForEach()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
 
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
@@ -195,7 +195,7 @@ void testThreadPoolParallelForEach()
 // [[Rcpp::export]]
 void testThreadPoolNestedParallelForEach()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
 
     std::vector<std::vector<double>> x(100);
     for (auto &xx : x)
@@ -243,7 +243,7 @@ void testThreadPoolSingleThreaded()
 // [[Rcpp::export]]
 void testThreadPoolDestructWOJoin()
 {
-    ThreadPool pool;
+    ThreadPool pool(2);
 }
 
 
@@ -256,7 +256,7 @@ void testParallelFor()
         x[i] = 2 * x[i];
     };
 
-    parallelFor(0, x.size() / 2, dummy);
+    parallelFor(0, x.size() / 2, dummy, 2);
     parallelFor(0, x.size() / 2, dummy, 0);
 
     size_t count_wrong = 0;
@@ -302,7 +302,7 @@ void testParallelForEach()
     auto ids = std::vector<size_t>(x.size() / 2);
     for (size_t i = 0; i < ids.size(); i++)
         ids[i] = i;
-    parallelForEach(ids, dummy);
+    parallelForEach(ids, dummy, 2);
     parallelForEach(ids, dummy, 0);
 
     size_t count_wrong = 0;
@@ -319,15 +319,13 @@ void testNestedParallelForEach()
 {
     std::vector<std::vector<double>> x(1);
     for (auto &xx : x)
-        xx = std::vector<double>(2, 1.0);
+        xx = std::vector<double>(1, 1.0);
 
-    ThreadPool pool;
-    pool.parallelForEach(x, [&] (std::vector<double>& xx) {
-        pool.parallelForEach(xx, [&] (double& xxx) {
+    parallelForEach(x, [&] (std::vector<double>& xx) {
+        parallelForEach(xx, [&] (double& xxx) {
             xxx *= 2;
-        });
-    });
-    pool.join();
+        }, 1);
+    }, 1);
 
     size_t count_wrong = 0;
     for (auto xx : x) {
@@ -354,7 +352,7 @@ void testNestedParallelForEach()
 // // [[Rcpp::export]]
 // void testThreadPoolInterruptJoin()
 // {
-//     ThreadPool pool;
+//     ThreadPool pool(2);
 //     auto dummy = [] {
 //         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 //         checkUserInterrupt();
