@@ -44,21 +44,21 @@ devtools::install_github("tnagler/RcppThread")
 
 ###### with cppFunction
 
-1. Pass `"RcppThread"` to the `depends` argument and `"cpp11"` to the `plugins`
-   argument. For example:
-   ``` r
-   Rcpp::cppFunction('void func() { /* actual code here */ }', 
-                          depends = "RcppThread", plugins = "cpp11")
-   ```
+Pass `"RcppThread"` to the `depends` argument and `"cpp11"` to the `plugins`
+argument. For example:
+``` r
+Rcpp::cppFunction('void func() { /* actual code here */ }', 
+                       depends = "RcppThread", plugins = "cpp11")
+```
 
 ###### with sourceCpp
 
-1. Add 
-    ``` cpp
-    // [[Rcpp::plugins(cpp11)]]
-    // [[Rcpp::depends(RcppThread)]]
-    ```
-    before including any headers in your source code.
+Add 
+``` cpp
+// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(RcppThread)]]
+```
+before including any headers in your source code.
 
 ###### in another R package
 
