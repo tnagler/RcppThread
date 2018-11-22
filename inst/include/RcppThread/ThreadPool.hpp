@@ -65,6 +65,11 @@ private:
     void announceStop();
     void joinWorkers();
 
+    bool hasErrored();
+    bool allJobsDone();
+    bool waitForWakeUpEvent();
+    void rethrowExceptions();
+    
     std::vector<std::thread> workers_;        // worker threads in the pool
     std::queue<std::function<void()>> jobs_;  // the task que
 
@@ -74,6 +79,7 @@ private:
     std::condition_variable cvBusy_;
     size_t numBusy_{0};
     bool stopped_{false};
+    std::exception_ptr error_ptr_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -139,7 +145,7 @@ auto ThreadPool::pushReturn(F&& f, Args&&... args)
 {
     using result_t = decltype(f(args...));
     using jobPackage = std::packaged_task<result_t()>;
-
+    
     // create packaged task on the heap
     auto job = std::make_shared<jobPackage>([&f, args...] {
         return f(args...);
@@ -254,39 +260,21 @@ inline void ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 //! but does not join the threads.
 inline void ThreadPool::wait()
 {
-    if (workers_.size() == 0) {
-        // all jobs have been executed in the main thread, no need to wait
-        checkUserInterrupt();
-        Rcout << "";
-        return;
-    }
-
-    auto allJobsDone = [this] { return (numBusy_ == 0) && jobs_.empty(); };
-    auto timeout = std::chrono::milliseconds(250);
     while (true) {
-        {
-            // wait_for tries acquires lk when waking up
-            std::unique_lock<std::mutex> lk(mTasks_);
-            cvBusy_.wait_for(lk, timeout, allJobsDone);
-            // lk can be released immediately
+        if ( waitForWakeUpEvent() ) {
+            if ( !this->allJobsDone() ) {
+                this->clear();  // cancel all remaining jobs
+                continue;       // wait for currently running jobs
+            }
+            if ( this->hasErrored() | this->allJobsDone() | isInterrupted() )
+                break;
         }
-
-        // check whether timeout was reached or another event caused wake-up
-        if ( isInterrupted() ) {
-            this->clear();  // cancel all remaining jobs
-            break;
-        } else if ( allJobsDone() ) {
-            break;
-        }
-
-        // give other threads priority before waiting again
         Rcout << "";
         std::this_thread::yield();
     }
 
-    // synchronize one last time before continuing main thread
     Rcout << "";
-    checkUserInterrupt();
+    this->rethrowExceptions();
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -345,15 +333,12 @@ inline void ThreadPool::startWorker()
 //! @param job job to be exectued.
 inline void ThreadPool::doJob(std::function<void()>&& job)
 {
-    checkUserInterrupt();
+    // checkUserInterrupt();
     try {
         job();
-    } catch (const std::exception& e) {
-        this->announceIdle();
-        throw e;
     } catch (...) {
-        this->announceIdle();
-        throw std::runtime_error("caught unknown C++ exception.");
+        std::lock_guard<std::mutex> lk(mTasks_);
+        error_ptr_ = std::current_exception();
     }
 }
 
@@ -395,5 +380,37 @@ inline void ThreadPool::joinWorkers()
     }
 }
 
+//! checks if an error occured.
+inline bool ThreadPool::hasErrored()
+{
+    return static_cast<bool>(error_ptr_);
+}
+
+//! check whether all jobs are done
+inline bool ThreadPool::allJobsDone()
+{
+    return (numBusy_ == 0) && jobs_.empty();
+}
+
+//! checks whether wait() needs to wake up
+inline bool ThreadPool::waitForWakeUpEvent()
+{
+    static auto timeout = std::chrono::milliseconds(250);
+    auto isWakeUpEvent = [this] {
+        return this->allJobsDone() | this->hasErrored();
+    };
+    std::unique_lock<std::mutex> lk(mTasks_);
+    cvBusy_.wait_for(lk, timeout, isWakeUpEvent);
+    return isWakeUpEvent();
+}
+
+//! rethrows exceptions (exceptions from workers are caught and stored; the
+//! wait loop only checks, but does not throw for interruptions) 
+inline void ThreadPool::rethrowExceptions()
+{
+    checkUserInterrupt();
+    if ( this->hasErrored() )
+        std::rethrow_exception(error_ptr_);
+}
 
 }
