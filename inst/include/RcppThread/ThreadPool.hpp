@@ -117,20 +117,17 @@ template<class F, class... Args>
 void ThreadPool::push(F&& f, Args&&... args)
 {
     if (workers_.size() == 0) {
-        // if there are no workers, just do the job in the main thread
-        f(args...);
+        f(args...); // if there are no workers, do the job in the main thread
+        return;
     } else {
-        // add job to the queue; must hold lock while modifying the shared queue
-        {
-            std::lock_guard<std::mutex> lk(mTasks_);
-            if (stopped_)
-                throw std::runtime_error("cannot push to joined thread pool");
-            jobs_.emplace([f, args...] { f(args...); });
-        }
-
-        // signal a waiting worker that there's a new job
-        cvTasks_.notify_one();
+        // must hold lock while modifying the shared queue
+        std::lock_guard<std::mutex> lk(mTasks_);
+        if (stopped_)
+            throw std::runtime_error("cannot push to joined thread pool");
+        jobs_.emplace([f, args...] { f(args...); });
     }
+    // signal a waiting worker that there's a new job
+    cvTasks_.notify_one();
 }
 
 //! pushes jobs returning a value to the thread pool.
@@ -143,31 +140,12 @@ template<class F, class... Args>
 auto ThreadPool::pushReturn(F&& f, Args&&... args)
     -> std::future<decltype(f(args...))>
 {
-    using result_t = decltype(f(args...));
-    using jobPackage = std::packaged_task<result_t()>;
-    
-    // create packaged task on the heap
+    using jobPackage = std::packaged_task<decltype(f(args...))()>;
     auto job = std::make_shared<jobPackage>([&f, args...] {
         return f(args...);
     });
+    this->push([job] { (*job)(); });
 
-    if (workers_.size() == 0) {
-        // if there are no workers, just do the job in the main thread
-        (*job)();
-    } else {
-        // add job to the queue
-        {
-            std::lock_guard<std::mutex> lk(mTasks_);
-            if (stopped_)
-                throw std::runtime_error("cannot push to joined thread pool");
-            jobs_.emplace([job] { (*job)(); });
-        }
-
-        // signal a waiting worker that there's a new job
-        cvTasks_.notify_one();
-    }
-
-    // return future result of the job
     return job->get_future();
 }
 
@@ -217,9 +195,8 @@ inline void ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end,
         for (ptrdiff_t i = b.begin; i < b.end; i++) f(i);
     };
     auto batches = createBatches(begin, end - begin, workers_.size(), nBatches);
-    for (const auto& batch : batches) {
+    for (const auto& batch : batches)
         this->push(doBatch, batch);
-    }
 }
 
 //! computes a for-each loop in parallel batches.
