@@ -1,3 +1,8 @@
+# RcppThread 0.5.3
+
+* Improved handling of exceptions thrown from threads.
+
+
 # RcppThread 0.5.2
 
 * Limit number of threads in unit tests.
