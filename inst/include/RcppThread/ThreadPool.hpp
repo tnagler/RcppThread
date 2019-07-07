@@ -34,7 +34,7 @@ public:
     ~ThreadPool() noexcept;
 
     ThreadPool& operator=(const ThreadPool&) = delete;
-    ThreadPool& operator=(ThreadPool&& other) = default;
+    ThreadPool& operator=(ThreadPool&& other) = delete;
 
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
@@ -69,7 +69,7 @@ private:
     bool allJobsDone();
     bool waitForWakeUpEvent();
     void rethrowExceptions();
-    
+
     std::vector<std::thread> workers_;        // worker threads in the pool
     std::queue<std::function<void()>> jobs_;  // the task que
 
@@ -382,7 +382,7 @@ inline bool ThreadPool::waitForWakeUpEvent()
 }
 
 //! rethrows exceptions (exceptions from workers are caught and stored; the
-//! wait loop only checks, but does not throw for interruptions) 
+//! wait loop only checks, but does not throw for interruptions)
 inline void ThreadPool::rethrowExceptions()
 {
     checkUserInterrupt();

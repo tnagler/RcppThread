@@ -1,6 +1,6 @@
 Package: RcppThread
 Title: R-Friendly Threading in C++
-Version: 0.5.3
+Version: 0.5.4.9000
 Authors@R: 
     person("Thomas", "Nagler", email = "mail@tnagler.com", role = c("aut", "cre"))
 Description: Provides a C++11-style thread class and thread pool that can safely
@@ -12,7 +12,7 @@ LazyData: true
 SystemRequirements: C++11
 URL: https://github.com/tnagler/RcppThread
 BugReports: https://github.com/tnagler/RcppThread/issues
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: 
     testthat,
     R.rsp,
