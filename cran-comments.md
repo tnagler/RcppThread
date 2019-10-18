@@ -1,17 +1,16 @@
 ## Test environments
-* ubuntu 12.04 (release, devel)
-* win-builder (release, devel)
-* OSX on travis and r-hub
-* debian linux on r-hub
-* fedora on r-hub
+* ubuntu 14.04 (release, devel)
+* Windows server (devel)
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 notes
+0 errors | 0 warnings | 0 notes
 
 ## Reverse dependencies
 
-dtwclust:     0 errors | 0 warnings | 0 notes
+dtwclust:     0 errors | 0 warnings | 1 note
 rayrender:    0 errors | 0 warnings | 0 notes
-RcppAlgos:    0 errors | 0 warnings | 0 notes
-rvinecopulib: 0 errors | 0 warnings | 0 notes
+RcppAlgos:    0 errors | 0 warnings | 1 note
+rvinecopulib: 0 errors | 0 warnings | 1 note
+
+* Notes are not related to this package.
