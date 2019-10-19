@@ -1,3 +1,9 @@
+# RcppThread 0.5.4
+
+* Fixed warning for move constructor in ThreadPool (#35, #36, thanks @asardaes 
+  for noticing).
+
+
 # RcppThread 0.5.3
 
 * Improved handling of exceptions thrown from threads.
