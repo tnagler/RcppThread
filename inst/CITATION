@@ -5,5 +5,5 @@ bibentry(bibtype = "Article",
                                email = "mail@tnagler.com"),
          journal      = "arXiv:1811.00450",
          year         = "2018",
-         header       = "To cite kdecopula in publications use:"
+         header       = "To cite RcppThread in publications use:"
 )
