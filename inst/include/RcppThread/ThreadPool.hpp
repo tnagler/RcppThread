@@ -372,7 +372,7 @@ inline bool ThreadPool::allJobsDone()
 //! checks whether wait() needs to wake up
 inline bool ThreadPool::waitForWakeUpEvent()
 {
-    static auto timeout = std::chrono::milliseconds(250);
+    static auto timeout = std::chrono::milliseconds(50);
     auto isWakeUpEvent = [this] {
         return this->allJobsDone() | this->hasErrored();
     };
