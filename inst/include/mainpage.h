@@ -8,13 +8,13 @@
 *
 * This is the API documentation for the RcppThread C++ library. For a more
 * high-level overview see the
-* <a href="https://github.com/tnagler/RcppThread/blob/master/vignettes/RcppThread.Rmd">vignette</a>.
+* <a href="https://doi.org/10.18637/jss.v097.c01">vignette</a>.
 *
 * @section license License
 *
 * The MIT License (MIT)
 *
-* Copyright © 2018 Thomas Nagler
+* Copyright © 2021 Thomas Nagler
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
