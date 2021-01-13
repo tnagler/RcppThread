@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="mainpage_8h" kind="file" language="C++">
+    <compoundname>mainpage.h</compoundname>
+    <briefdescription>
+<para>api_docs </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/mainpage.h"/>
+  </compounddef>
+</doxygen>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RcppThread R-friendly
+  <title>RcppThread::Thread class | RcppThread R-friendly
 threading
 in
 C++</title>
@@ -50,26 +50,40 @@ C++</a>
   <div class="m-container m-container-inflatable">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <h1>Namespaces</h1>
-        <ul class="m-doc">
-          <li>namespace <a href="namespaceRcppThread.html" class="m-doc">RcppThread</a> <span class="m-doc"><code>RcppThread</code> functionality</span></li>
-        </ul>
-        <script>
-        function toggle(e) {
-            e.parentElement.className = e.parentElement.className == 'm-doc-collapsible' ?
-                'm-doc-expansible' : 'm-doc-collapsible';
-            return false;
-        }
-        /* Collapse all nodes marked as such. Doing it via JS instead of
-           directly in markup so disabling it doesn't harm usability. The list
-           is somehow regenerated on every iteration and shrinks as I change
-           the classes. It's not documented anywhere and I'm not sure if this
-           is the same across browsers, so I am going backwards in that list to
-           be sure. */
-        var collapsed = document.getElementsByClassName("collapsed");
-        for(var i = collapsed.length - 1; i >= 0; --i)
-            collapsed[i].className = 'm-doc-expansible';
-        </script>
+        <h1>
+          <span class="m-breadcrumb"><a href="namespaceRcppThread.html">RcppThread</a>::<wbr/></span>Thread <span class="m-thin">class</span>
+        </h1>
+        <p>R-friendly version of <code>std::thread</code>.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#pub-methods">Public functions</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<p>Instances of class <code>Thread</code> behave just like instances of <code>std::thread</code>, see <a href="http://en.cppreference.com/w/cpp/thread/thread">http:/<wbr />/<wbr />en.cppreference.com/<wbr />w/<wbr />cpp/<wbr />thread/<wbr />thread</a> for methods and examples. There is one difference exception: Whenever other threads are doing some work, the main thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a <code>checkUserInterrupt()</code>.</p>
+        <section id="pub-methods">
+          <h2><a href="#pub-methods">Public functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#a3f6e519ee72e8a1a550fd2a56392a089" class="m-doc">join</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a3f6e519ee72e8a1a550fd2a56392a089"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />Thread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a3f6e519ee72e8a1a550fd2a56392a089" class="m-doc-self">join</a>(</span><span class="m-doc-wrap">)</span></span>
+            </h3>
+<p>checks for interruptions and messages every 0.25 seconds and after computations have finished.</p>
+          </div></section>
+        </section>
       </div>
     </div>
   </div>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="parallelFor_8hpp" kind="file" language="C++">
+    <compoundname>parallelFor.hpp</compoundname>
+    <includes refid="ThreadPool_8hpp" local="yes">RcppThread/ThreadPool.hpp</includes>
+    <includes local="no">algorithm</includes>
+    <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp</label>
+        <link refid="parallelFor_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>algorithm</label>
+      </node>
+    </incdepgraph>
+    <innernamespace refid="namespaceRcppThread">RcppThread</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp"/>
+  </compounddef>
+</doxygen>

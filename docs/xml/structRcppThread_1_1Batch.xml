@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="structRcppThread_1_1Batch" kind="struct" language="C++" prot="public">
+    <compoundname>RcppThread::Batch</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structRcppThread_1_1Batch_1a761c98eb9a90c68c3b93cd87b1b74e02" prot="public" static="no" mutable="no">
+        <type>ptrdiff_t</type>
+        <definition>ptrdiff_t RcppThread::Batch::begin</definition>
+        <argsstring></argsstring>
+        <name>begin</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" line="16" column="15" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" bodystart="16" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structRcppThread_1_1Batch_1a3f0da7f5d6b152a3bb3ce310a6405ce0" prot="public" static="no" mutable="no">
+        <type>ptrdiff_t</type>
+        <definition>ptrdiff_t RcppThread::Batch::end</definition>
+        <argsstring></argsstring>
+        <name>end</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" line="17" column="15" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" bodystart="17" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" line="15" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" bodystart="15" bodyend="18"/>
+    <listofallmembers>
+      <member refid="structRcppThread_1_1Batch_1a761c98eb9a90c68c3b93cd87b1b74e02" prot="public" virt="non-virtual"><scope>RcppThread::Batch</scope><name>begin</name></member>
+      <member refid="structRcppThread_1_1Batch_1a3f0da7f5d6b152a3bb3ce310a6405ce0" prot="public" virt="non-virtual"><scope>RcppThread::Batch</scope><name>end</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

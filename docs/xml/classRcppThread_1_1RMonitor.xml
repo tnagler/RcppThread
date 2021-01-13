@@ -1,0 +1,358 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classRcppThread_1_1RMonitor" kind="class" language="C++" prot="public">
+    <compoundname>RcppThread::RMonitor</compoundname>
+    <includes local="no">RMonitor.hpp</includes>
+      <sectiondef kind="friend">
+      <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1a9ccf6a0d51bcb0b83334683b2dbd70c7" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>friend class</type>
+        <definition>friend class RPrinter</definition>
+        <argsstring></argsstring>
+        <name>RPrinter</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="38" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="38" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1ad81d4d6402e7bfe7f254b2d5388fb97b" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>friend void</type>
+        <definition>void checkUserInterrupt</definition>
+        <argsstring>(bool condition)</argsstring>
+        <name>checkUserInterrupt</name>
+        <param>
+          <type>bool</type>
+          <declname>condition</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>checks for user interruptions, but only if called from main thread. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>condition</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>optional; a condition for the check to be executed.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="39" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="129" bodyend="133"/>
+      </memberdef>
+      <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1a3cf8caa9587760e532e08c2718089597" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>friend bool</type>
+        <definition>bool isInterrupted</definition>
+        <argsstring>(bool condition)</argsstring>
+        <name>isInterrupted</name>
+        <param>
+          <type>bool</type>
+          <declname>condition</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>checks for user interruptions, but only if called from main thread (otherwise returns <computeroutput>false</computeroutput>). <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>condition</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>optional; a condition for the check to be executed.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="40" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="139" bodyend="144"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classRcppThread_1_1RMonitor_1a02796f0b72a9228164f23a3e0d311001" prot="private" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex RcppThread::RMonitor::m_</definition>
+        <argsstring></argsstring>
+        <name>m_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="120" column="16" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="120" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRcppThread_1_1RMonitor_1a17e4abb37b2c72343ca9c20f50ba1420" prot="private" static="no" mutable="no">
+        <type>std::stringstream</type>
+        <definition>std::stringstream RcppThread::RMonitor::msgs_</definition>
+        <argsstring></argsstring>
+        <name>msgs_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="121" column="23" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="121" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRcppThread_1_1RMonitor_1aa93358324924efde10cb3a13c6f6b7ab" prot="private" static="no" mutable="no">
+        <type>std::atomic_bool</type>
+        <definition>std::atomic_bool RcppThread::RMonitor::isInterrupted_</definition>
+        <argsstring></argsstring>
+        <name>isInterrupted_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="122" column="22" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="122" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a1abaa58edc53dba7d12773c5dee58651" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>RcppThread::RMonitor::RMonitor</definition>
+        <argsstring>(RMonitor const &amp;)=delete</argsstring>
+        <name>RMonitor</name>
+        <param>
+          <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> const &amp;</type>
+        </param>
+        <briefdescription>
+<para>copy constructor (forbidden) </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="44" column="5"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1ab9baec1f5dbfe8a3349695bd6d9863e8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>RcppThread::RMonitor::RMonitor</definition>
+        <argsstring>(RMonitor &amp;&amp;)=delete</argsstring>
+        <name>RMonitor</name>
+        <param>
+          <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+<para>move constructor (forbidden) </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="46" column="5"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a2073f46ded6bb67799d967faff17cd42" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;</type>
+        <definition>RMonitor&amp; RcppThread::RMonitor::operator=</definition>
+        <argsstring>(RMonitor const &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <param>
+          <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> const &amp;</type>
+        </param>
+        <briefdescription>
+<para>copy assignment (forbidden) </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="48" column="14"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a4677bdda0a35abaf288e66cf9dcd6032" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;</type>
+        <definition>RMonitor&amp; RcppThread::RMonitor::operator=</definition>
+        <argsstring>(RMonitor &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <param>
+          <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+<para>move assignment (forbidden) </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="50" column="14"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a7a995dd9bfd3387fdb6b696e758b04c6" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;</type>
+        <definition>static RMonitor&amp; RcppThread::RMonitor::instance</definition>
+        <argsstring>()</argsstring>
+        <name>instance</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>constructs the instance when called for the first time, returns ref to instance. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="54" column="21" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="54" bodyend="58"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a5e763c7ad671fbed5fcfb3dc45a87978" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool RcppThread::RMonitor::calledFromMainThread</definition>
+        <argsstring>()</argsstring>
+        <name>calledFromMainThread</name>
+        <briefdescription>
+<para>returns <computeroutput>true</computeroutput> only when called from main thread. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="62" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="62" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a97096ce3bac37573f36a20954891c1f2" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void RcppThread::RMonitor::safelycheckUserInterrupt</definition>
+        <argsstring>()</argsstring>
+        <name>safelycheckUserInterrupt</name>
+        <briefdescription>
+<para>checks for user interruptions, but only if called from main thread. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="68" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="68" bodyend="75"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1ac38e054f6e63dfa2be582dfb606b129f" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool RcppThread::RMonitor::safelyIsInterrupted</definition>
+        <argsstring>()</argsstring>
+        <name>safelyIsInterrupted</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>checks for user interruptions, but only if called from main thread (otherwise last known state is returned). </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="79" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="79" bodyend="84"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a98b81ed3996a37a51b5cdb8dbed89712" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void RcppThread::RMonitor::safelyPrint</definition>
+        <argsstring>(const T &amp;object)</argsstring>
+        <name>safelyPrint</name>
+        <param>
+          <type>const T &amp;</type>
+          <declname>object</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>prints <computeroutput>object</computeroutput> to R console íf called from main thread; otherwise adds a printable version of <computeroutput>object</computeroutput> to a buffer for deferred printing. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>object</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a string or coercible object to print. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="90" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="90" bodyend="101"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1ac098c6d99a0946cae3c326033ddb8000" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>RcppThread::RMonitor::RMonitor</definition>
+        <argsstring>(void)</argsstring>
+        <name>RMonitor</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>Ctors declared private, to instantiate class use <computeroutput>instance()</computeroutput>. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="105" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="105" bodyend="105"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1af36b6c5eaede6e3b4af7e7cf3b8666c9" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool RcppThread::RMonitor::isInterrupted</definition>
+        <argsstring>()</argsstring>
+        <name>isInterrupted</name>
+        <briefdescription>
+<para>checks for R user interruptions in top level context. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="116" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="116" bodyend="118"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classRcppThread_1_1RMonitor_1ab1e76b3676907a75912fb28ca1a44972" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void RcppThread::RMonitor::callRCheck</definition>
+        <argsstring>(void *dummy)</argsstring>
+        <name>callRCheck</name>
+        <param>
+          <type>void *</type>
+          <declname>dummy</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>calls R&apos;s API to check for user interrupt.</para>
+<para>Since the R API is not thread safe, it must be called in top-level context to avoid long-jumping out of the current context. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="111" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="111" bodyend="113"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Singleton class for tracking threads and safe communication. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="35" column="15" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="35" bodyend="123"/>
+    <listofallmembers>
+      <member refid="classRcppThread_1_1RMonitor_1a5e763c7ad671fbed5fcfb3dc45a87978" prot="protected" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>calledFromMainThread</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1ab1e76b3676907a75912fb28ca1a44972" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>callRCheck</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1ad81d4d6402e7bfe7f254b2d5388fb97b" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>checkUserInterrupt</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a7a995dd9bfd3387fdb6b696e758b04c6" prot="public" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>instance</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a3cf8caa9587760e532e08c2718089597" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>isInterrupted</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1af36b6c5eaede6e3b4af7e7cf3b8666c9" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>isInterrupted</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1aa93358324924efde10cb3a13c6f6b7ab" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>isInterrupted_</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a02796f0b72a9228164f23a3e0d311001" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>m_</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a17e4abb37b2c72343ca9c20f50ba1420" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>msgs_</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a2073f46ded6bb67799d967faff17cd42" prot="public" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>operator=</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a4677bdda0a35abaf288e66cf9dcd6032" prot="public" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>operator=</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a1abaa58edc53dba7d12773c5dee58651" prot="public" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>RMonitor</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1ab9baec1f5dbfe8a3349695bd6d9863e8" prot="public" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>RMonitor</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1ac098c6d99a0946cae3c326033ddb8000" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>RMonitor</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a97096ce3bac37573f36a20954891c1f2" prot="protected" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>safelycheckUserInterrupt</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1ac38e054f6e63dfa2be582dfb606b129f" prot="protected" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>safelyIsInterrupted</name></member>
+      <member refid="classRcppThread_1_1RMonitor_1a98b81ed3996a37a51b5cdb8dbed89712" prot="protected" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>safelyPrint</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

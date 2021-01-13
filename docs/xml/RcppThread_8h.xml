@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="RcppThread_8h" kind="file" language="C++">
+    <compoundname>RcppThread.h</compoundname>
+    <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
+    <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
+    <includes refid="Thread_8hpp" local="yes">RcppThread/Thread.hpp</includes>
+    <includes refid="Batch_8hpp" local="yes">RcppThread/Batch.hpp</includes>
+    <includes refid="ThreadPool_8hpp" local="yes">RcppThread/ThreadPool.hpp</includes>
+    <includes refid="parallelFor_8hpp" local="yes">RcppThread/parallelFor.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread.h"/>
+  </compounddef>
+</doxygen>

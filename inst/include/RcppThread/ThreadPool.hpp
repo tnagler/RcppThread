@@ -29,7 +29,7 @@ public:
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool();
-    explicit ThreadPool(size_t nThreads);
+    explicit ThreadPool(size_t nWorkers);
 
     ~ThreadPool() noexcept;
 
@@ -47,7 +47,9 @@ public:
     void map(F&& f, I &&items);
 
     template<class F>
-    inline void parallelFor(ptrdiff_t begin, ptrdiff_t size, F&& f,
+    inline void parallelFor(ptrdiff_t begin,
+                            ptrdiff_t end,
+                            F&& f,
                             size_t nBatches = 0);
 
     template<class F, class I>
@@ -87,13 +89,13 @@ inline ThreadPool::ThreadPool() :
     ThreadPool(std::thread::hardware_concurrency())
 {}
 
-//! constructs a thread pool with `nThreads` threads.
-//! @param nWorkers number of worker threads to create; if `nThreads = 0`, all
+//! constructs a thread pool with `nWorkers` threads.
+//! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
 {
-    for (size_t w = 0; w < nWorkers; ++w)
-        this->startWorker();
+  for (size_t w = 0; w < nWorkers; ++w)
+    this->startWorker();
 }
 
 

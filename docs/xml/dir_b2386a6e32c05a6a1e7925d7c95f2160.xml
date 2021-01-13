@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="dir_b2386a6e32c05a6a1e7925d7c95f2160" kind="dir">
+    <compoundname>/data/dev/r/RcppThread/inst/include/RcppThread</compoundname>
+    <innerfile refid="Batch_8hpp">Batch.hpp</innerfile>
+    <innerfile refid="parallelFor_8hpp">parallelFor.hpp</innerfile>
+    <innerfile refid="Rcout_8hpp">Rcout.hpp</innerfile>
+    <innerfile refid="RMonitor_8hpp">RMonitor.hpp</innerfile>
+    <innerfile refid="Thread_8hpp">Thread.hpp</innerfile>
+    <innerfile refid="ThreadPool_8hpp">ThreadPool.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/"/>
+  </compounddef>
+</doxygen>

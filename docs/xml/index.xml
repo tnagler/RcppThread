@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="structRcppThread_1_1Batch" kind="struct"><name>RcppThread::Batch</name>
+    <member refid="structRcppThread_1_1Batch_1a761c98eb9a90c68c3b93cd87b1b74e02" kind="variable"><name>begin</name></member>
+    <member refid="structRcppThread_1_1Batch_1a3f0da7f5d6b152a3bb3ce310a6405ce0" kind="variable"><name>end</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1RMonitor" kind="class"><name>RcppThread::RMonitor</name>
+    <member refid="classRcppThread_1_1RMonitor_1a9ccf6a0d51bcb0b83334683b2dbd70c7" kind="friend"><name>RPrinter</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1ad81d4d6402e7bfe7f254b2d5388fb97b" kind="friend"><name>checkUserInterrupt</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a3cf8caa9587760e532e08c2718089597" kind="friend"><name>isInterrupted</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a02796f0b72a9228164f23a3e0d311001" kind="variable"><name>m_</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a17e4abb37b2c72343ca9c20f50ba1420" kind="variable"><name>msgs_</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1aa93358324924efde10cb3a13c6f6b7ab" kind="variable"><name>isInterrupted_</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a1abaa58edc53dba7d12773c5dee58651" kind="function"><name>RMonitor</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1ab9baec1f5dbfe8a3349695bd6d9863e8" kind="function"><name>RMonitor</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a2073f46ded6bb67799d967faff17cd42" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a4677bdda0a35abaf288e66cf9dcd6032" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a7a995dd9bfd3387fdb6b696e758b04c6" kind="function"><name>instance</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a5e763c7ad671fbed5fcfb3dc45a87978" kind="function"><name>calledFromMainThread</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a97096ce3bac37573f36a20954891c1f2" kind="function"><name>safelycheckUserInterrupt</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1ac38e054f6e63dfa2be582dfb606b129f" kind="function"><name>safelyIsInterrupted</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a98b81ed3996a37a51b5cdb8dbed89712" kind="function"><name>safelyPrint</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1ac098c6d99a0946cae3c326033ddb8000" kind="function"><name>RMonitor</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1af36b6c5eaede6e3b4af7e7cf3b8666c9" kind="function"><name>isInterrupted</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1ab1e76b3676907a75912fb28ca1a44972" kind="function"><name>callRCheck</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1RPrinter" kind="class"><name>RcppThread::RPrinter</name>
+    <member refid="classRcppThread_1_1RPrinter_1aeea190c50570dc8f857c8f58716f8418" kind="function"><name>operator&lt;&lt;</name></member>
+    <member refid="classRcppThread_1_1RPrinter_1a14488ec1ba0121b3e34cc2291edeaef7" kind="function"><name>operator&lt;&lt;</name></member>
+    <member refid="classRcppThread_1_1RPrinter_1a1f4bfba8cc5853c021816ffce7714601" kind="function"><name>operator&lt;&lt;</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1Thread" kind="class"><name>RcppThread::Thread</name>
+    <member refid="classRcppThread_1_1Thread_1acf3a7c21ae46e748f055462cc630f8cb" kind="variable"><name>thread_</name></member>
+    <member refid="classRcppThread_1_1Thread_1a40bf2b02e180210b2e2ba3eaf1ce76b8" kind="variable"><name>future_</name></member>
+    <member refid="classRcppThread_1_1Thread_1acee002e81ed70c518004c028539133e8" kind="function"><name>Thread</name></member>
+    <member refid="classRcppThread_1_1Thread_1aefb2e287e1d97ad640b8b9fc639b20b9" kind="function"><name>Thread</name></member>
+    <member refid="classRcppThread_1_1Thread_1ae78324ca523ddc81b025bbfa73197691" kind="function"><name>Thread</name></member>
+    <member refid="classRcppThread_1_1Thread_1a9e3c55afbbea5be13e98156f61ef86c7" kind="function"><name>Thread</name></member>
+    <member refid="classRcppThread_1_1Thread_1acaffb3618c381a88b4770ae25779150c" kind="function"><name>Thread</name></member>
+    <member refid="classRcppThread_1_1Thread_1af1e261c271914383cd566b61ac6b27cc" kind="function"><name>~Thread</name></member>
+    <member refid="classRcppThread_1_1Thread_1a8d7c04538a8595d8072e61e6829144ad" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1Thread_1a528edd9f049af759ed19c8ba22eb6f5e" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1Thread_1af8ecfc8b7fd960c14e2b7bb841bea919" kind="function"><name>swap</name></member>
+    <member refid="classRcppThread_1_1Thread_1a633c55ca748eb91b617e9fc588ab5a44" kind="function"><name>joinable</name></member>
+    <member refid="classRcppThread_1_1Thread_1a3f6e519ee72e8a1a550fd2a56392a089" kind="function"><name>join</name></member>
+    <member refid="classRcppThread_1_1Thread_1af4cf8104541e00ff8c6d8a37234e67e6" kind="function"><name>detach</name></member>
+    <member refid="classRcppThread_1_1Thread_1a163ddb0a744f6aaea8db79021caf167f" kind="function"><name>get_id</name></member>
+    <member refid="classRcppThread_1_1Thread_1a6bf0eba662eabb65caf34839dd28a2f5" kind="function"><name>native_handle</name></member>
+    <member refid="classRcppThread_1_1Thread_1a1ae92afcef21111e10a96cf5f4c8c8f0" kind="function"><name>hardware_concurrency</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1ThreadPool" kind="class"><name>RcppThread::ThreadPool</name>
+    <member refid="classRcppThread_1_1ThreadPool_1a55d6e5030c0839bafdf5c5e9e8e3c337" kind="variable"><name>workers_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a0efb263e964ced3a2be703f22f1e3570" kind="variable"><name>jobs_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a507494fa1f21eba961e5c4653bb6a775" kind="variable"><name>mTasks_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1ac4949df637a14266642c7d281f0f4ce5" kind="variable"><name>cvTasks_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aa5daa0ce1eff4f4ef12cfab8610b552f" kind="variable"><name>cvBusy_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a4094307905b107a2cb6fd6404cf10b96" kind="variable"><name>numBusy_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a36ee13f08546e744c4f6b0cc6b518570" kind="variable"><name>stopped_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1adbd304006a38ab2956fd59f5b00fd94c" kind="variable"><name>error_ptr_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a83ffe33d4d776b62baf312a1c4965c08" kind="function"><name>ThreadPool</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a524ee4a9d217cba6cbdfd3405515376b" kind="function"><name>ThreadPool</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a66eb5407d41494582e7c456834e027b8" kind="function"><name>ThreadPool</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1af12763cf29f5d75331a7dafb3bae1750" kind="function"><name>ThreadPool</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aca522b3487e549852bbf73a41c4ed7cd" kind="function"><name>~ThreadPool</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a4cda48aa1b12efd9e84302f2e3f463a7" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a6f3c66741b4c18ab9c096ec0f04da289" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1af1c8048954f42b41d19bd8fa9133490a" kind="function"><name>push</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" kind="function"><name>pushReturn</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" kind="function"><name>map</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a946dd59f3522eac8cd0debcfc949db8f" kind="function"><name>parallelFor</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a44b177dbf1297cb38019eee3343b2319" kind="function"><name>parallelForEach</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a6c93f9e84fadfdc1a3357770d47a738a" kind="function"><name>wait</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" kind="function"><name>join</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a3a26cfd27907154d54a76a2240940507" kind="function"><name>clear</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a130abac3b6307c8a517f78c10dd52a7c" kind="function"><name>startWorker</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a36e68a3c995cdf2c313f0b6845484b79" kind="function"><name>doJob</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1adeea0955eb9f408c8376c659d35f7366" kind="function"><name>announceBusy</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1ab5b25ba269ebadd36f53776aa0340e83" kind="function"><name>announceIdle</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aa8a6a3a664ef27a2f2f0e9acefb67dee" kind="function"><name>announceStop</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a6ce441827ce6f4d052ad43a28b46b46b" kind="function"><name>joinWorkers</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aa5555816eda1a61f6f5a15f849095e5a" kind="function"><name>hasErrored</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a57fe5a82081ae1f82500e585a9d47ceb" kind="function"><name>allJobsDone</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aef73d422c232ac1a32a5b9bc121e9a52" kind="function"><name>waitForWakeUpEvent</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aef8066d337853b6d45c5db42de73f040" kind="function"><name>rethrowExceptions</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1UserInterruptException" kind="class"><name>RcppThread::UserInterruptException</name>
+    <member refid="classRcppThread_1_1UserInterruptException_1a5e4c038748d820773fa3e20e3620e8dc" kind="function"><name>what</name></member>
+  </compound>
+  <compound refid="namespaceRcppThread" kind="namespace"><name>RcppThread</name>
+    <member refid="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" kind="variable"><name>Rcout</name></member>
+    <member refid="namespaceRcppThread_1ada4c397edb2f1f4150f8dc1ab899d324" kind="variable"><name>mainThreadID</name></member>
+    <member refid="namespaceRcppThread_1ab95c1b8b94eb8abeadb3cdbded8850b4" kind="function"><name>computeNumBatches</name></member>
+    <member refid="namespaceRcppThread_1a16a83d2a319af49dbc181906abbb7f11" kind="function"><name>createBatches</name></member>
+    <member refid="namespaceRcppThread_1aa3df09a8db84ae183abe663af8f928c1" kind="function"><name>parallelFor</name></member>
+    <member refid="namespaceRcppThread_1a1c246ba8e53889c0cd5c1c24e8c6cc85" kind="function"><name>parallelForEach</name></member>
+    <member refid="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" kind="function"><name>checkUserInterrupt</name></member>
+    <member refid="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" kind="function"><name>isInterrupted</name></member>
+  </compound>
+  <compound refid="additional-features_8dox" kind="file"><name>additional-features.dox</name>
+  </compound>
+  <compound refid="mainpage_8h" kind="file"><name>mainpage.h</name>
+  </compound>
+  <compound refid="RcppThread_8h" kind="file"><name>RcppThread.h</name>
+  </compound>
+  <compound refid="Batch_8hpp" kind="file"><name>Batch.hpp</name>
+  </compound>
+  <compound refid="parallelFor_8hpp" kind="file"><name>parallelFor.hpp</name>
+  </compound>
+  <compound refid="Rcout_8hpp" kind="file"><name>Rcout.hpp</name>
+    <member refid="Rcout_8hpp_1a85b8de01431b2a45e5f280faa971e51b" kind="define"><name>RCPPTHREAD_OVERRIDE_COUT</name></member>
+  </compound>
+  <compound refid="RMonitor_8hpp" kind="file"><name>RMonitor.hpp</name>
+    <member refid="RMonitor_8hpp_1a367e747a6abc54938d838483bb3c97ee" kind="define"><name>R_NO_REMAP</name></member>
+  </compound>
+  <compound refid="Thread_8hpp" kind="file"><name>Thread.hpp</name>
+    <member refid="Thread_8hpp_1a1351fd152dbc25ac91b5d3ea8c3abdff" kind="define"><name>RCPPTHREAD_OVERRIDE_THREAD</name></member>
+  </compound>
+  <compound refid="ThreadPool_8hpp" kind="file"><name>ThreadPool.hpp</name>
+  </compound>
+  <compound refid="overrides" kind="page"><name>overrides</name>
+  </compound>
+  <compound refid="dir_2b5d1a398a9eec011391d543f21db223" kind="dir"><name>/data/dev/r/RcppThread/inst/include</name>
+  </compound>
+  <compound refid="dir_920884c6b3b2f0be94e27d51660adee5" kind="dir"><name>/data/dev/r/RcppThread/inst</name>
+  </compound>
+  <compound refid="dir_b2386a6e32c05a6a1e7925d7c95f2160" kind="dir"><name>/data/dev/r/RcppThread/inst/include/RcppThread</name>
+  </compound>
+  <compound refid="indexpage" kind="page"><name>index</name>
+  </compound>
+</doxygenindex>

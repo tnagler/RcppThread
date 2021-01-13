@@ -3,3 +3,4 @@
 .RData
 inst/doc
 revdep
+__pycache__

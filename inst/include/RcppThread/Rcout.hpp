@@ -46,7 +46,6 @@ public:
         RMonitor::instance().safelyPrint(object);
         return *this;
     }
-    //! @}
 };
 
 //! global `RPrinter` instance called 'Rcout' (as in Rcpp).

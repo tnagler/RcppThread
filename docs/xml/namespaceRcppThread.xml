@@ -1,0 +1,333 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespaceRcppThread" kind="namespace" language="C++">
+    <compoundname>RcppThread</compoundname>
+    <innerclass refid="structRcppThread_1_1Batch" prot="public">RcppThread::Batch</innerclass>
+    <innerclass refid="classRcppThread_1_1RMonitor" prot="public">RcppThread::RMonitor</innerclass>
+    <innerclass refid="classRcppThread_1_1RPrinter" prot="public">RcppThread::RPrinter</innerclass>
+    <innerclass refid="classRcppThread_1_1Thread" prot="public">RcppThread::Thread</innerclass>
+    <innerclass refid="classRcppThread_1_1ThreadPool" prot="public">RcppThread::ThreadPool</innerclass>
+    <innerclass refid="classRcppThread_1_1UserInterruptException" prot="public">RcppThread::UserInterruptException</innerclass>
+      <sectiondef kind="var">
+      <memberdef kind="variable" id="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" prot="public" static="yes" mutable="no">
+        <type><ref refid="classRcppThread_1_1RPrinter" kindref="compound">RPrinter</ref></type>
+        <definition>RPrinter RcppThread::Rcout</definition>
+        <argsstring></argsstring>
+        <name>Rcout</name>
+        <initializer>= <ref refid="classRcppThread_1_1RPrinter" kindref="compound">RPrinter</ref>()</initializer>
+        <briefdescription>
+<para>global <computeroutput>RPrinter</computeroutput> instance called &apos;Rcout&apos; (as in Rcpp). </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp" line="52" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp" bodystart="52" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="namespaceRcppThread_1ada4c397edb2f1f4150f8dc1ab899d324" prot="public" static="yes" mutable="no">
+        <type>std::thread::id</type>
+        <definition>std::thread::id RcppThread::mainThreadID</definition>
+        <argsstring></argsstring>
+        <name>mainThreadID</name>
+        <initializer>= std::this_thread::get_id()</initializer>
+        <briefdescription>
+<para>global variable holding id of main thread. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="24" column="24" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="namespaceRcppThread_1ab95c1b8b94eb8abeadb3cdbded8850b4" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t RcppThread::computeNumBatches</definition>
+        <argsstring>(size_t nTasks, size_t nThreads)</argsstring>
+        <name>computeNumBatches</name>
+        <param>
+          <type>size_t</type>
+          <declname>nTasks</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nThreads</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" line="20" column="15" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" bodystart="20" bodyend="25"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceRcppThread_1a16a83d2a319af49dbc181906abbb7f11" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="structRcppThread_1_1Batch" kindref="compound">Batch</ref> &gt;</type>
+        <definition>std::vector&lt;Batch&gt; RcppThread::createBatches</definition>
+        <argsstring>(ptrdiff_t begin, size_t nTasks, size_t nThreads, size_t nBatches)</argsstring>
+        <name>createBatches</name>
+        <param>
+          <type>ptrdiff_t</type>
+          <declname>begin</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nTasks</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nThreads</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nBatches</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" line="27" column="20" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" bodystart="27" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceRcppThread_1aa3df09a8db84ae183abe663af8f928c1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class F</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void RcppThread::parallelFor</definition>
+        <argsstring>(ptrdiff_t begin, ptrdiff_t size, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</argsstring>
+        <name>parallelFor</name>
+        <param>
+          <type>ptrdiff_t</type>
+          <declname>begin</declname>
+        </param>
+        <param>
+          <type>ptrdiff_t</type>
+          <declname>size</declname>
+        </param>
+        <param>
+          <type>F &amp;&amp;</type>
+          <declname>f</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nThreads</declname>
+          <defval>std::thread::hardware_concurrency()</defval>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nBatches</declname>
+          <defval>0</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>computes an index-based for loop in parallel batches. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>begin</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>first index of the loop. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the loop runs in the range <computeroutput>[begin, begin + size)</computeroutput>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>f</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a function (the &apos;loop body&apos;). </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nThreads</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the number of threads to use; the default uses the number of cores in the machine; if <computeroutput>nThreads = 0</computeroutput>, all work will be done in the main thread. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nBatches</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Consider the following code: <programlisting><codeline><highlight class="normal">std::vector&lt;double&gt;<sp/>x(10);</highlight></codeline>
+<codeline><highlight class="normal">for<sp/>(size_t<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>x.size();<sp/>i++)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>x[i]<sp/>=<sp/>i;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting></para>
+<para>The parallel equivalent is <programlisting><codeline><highlight class="normal">parallelFor(0,<sp/>10,<sp/>[&amp;]<sp/>(size_t<sp/>i)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>x[i]<sp/>=<sp/>i;</highlight></codeline>
+<codeline><highlight class="normal">});</highlight></codeline>
+</programlisting></para>
+<para>The function sets up a <computeroutput>ThreadPool</computeroutput> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <computeroutput>ThreadPool</computeroutput> yourself and using <computeroutput>ThreadPool::forEach()</computeroutput>.</para>
+<para><bold>Caution</bold>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="43" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="43" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceRcppThread_1a1c246ba8e53889c0cd5c1c24e8c6cc85" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class I</type>
+          </param>
+          <param>
+            <type>class F</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void RcppThread::parallelForEach</definition>
+        <argsstring>(I &amp;items, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</argsstring>
+        <name>parallelForEach</name>
+        <param>
+          <type>I &amp;</type>
+          <declname>items</declname>
+        </param>
+        <param>
+          <type>F &amp;&amp;</type>
+          <declname>f</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nThreads</declname>
+          <defval>std::thread::hardware_concurrency()</defval>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nBatches</declname>
+          <defval>0</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>computes a range-based for loop in parallel batches. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>items</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an object allowing for <computeroutput>items.size()</computeroutput> and whose elements are accessed by the <computeroutput>[]</computeroutput> operator. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>f</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a function (the &apos;loop body&apos;). </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nThreads</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the number of threads to use; the default uses the number of cores in the machine; if <computeroutput>nThreads = 0</computeroutput>, all work will be done in the main thread. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nBatches</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Consider the following code: <programlisting><codeline><highlight class="normal">std::vector&lt;double&gt;<sp/>x(10,<sp/>1.0);</highlight></codeline>
+<codeline><highlight class="normal">for<sp/>(auto&amp;<sp/>xx<sp/>:<sp/>x)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>xx<sp/>*=<sp/>2;</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting></para>
+<para>The parallel equivalent is <programlisting><codeline><highlight class="normal">parallelFor(x,<sp/>[&amp;]<sp/>(double&amp;<sp/>xx)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>xx<sp/>*=<sp/>2;</highlight></codeline>
+<codeline><highlight class="normal">});</highlight></codeline>
+</programlisting></para>
+<para>The function sets up a <computeroutput>ThreadPool</computeroutput> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <computeroutput>ThreadPool</computeroutput> yourself and using <computeroutput>ThreadPool::forEach()</computeroutput>.</para>
+<para><bold>Caution</bold>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="81" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="81" bodyend="88"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void RcppThread::checkUserInterrupt</definition>
+        <argsstring>(bool condition=true)</argsstring>
+        <name>checkUserInterrupt</name>
+        <param>
+          <type>bool</type>
+          <declname>condition</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>checks for user interruptions, but only if called from main thread. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>condition</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>optional; a condition for the check to be executed.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="129" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="129" bodyend="133"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool RcppThread::isInterrupted</definition>
+        <argsstring>(bool condition=true)</argsstring>
+        <name>isInterrupted</name>
+        <param>
+          <type>bool</type>
+          <declname>condition</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>checks for user interruptions, but only if called from main thread (otherwise returns <computeroutput>false</computeroutput>). <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>condition</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>optional; a condition for the check to be executed.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="139" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="139" bodyend="144"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para><computeroutput>RcppThread</computeroutput> functionality </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Batch.hpp" line="13" column="20"/>
+  </compounddef>
+</doxygen>

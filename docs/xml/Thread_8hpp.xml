@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="Thread_8hpp" kind="file" language="C++">
+    <compoundname>Thread.hpp</compoundname>
+    <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
+    <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
+    <includes local="no">thread</includes>
+    <includes local="no">future</includes>
+    <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp</label>
+        <link refid="Thread_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>future</label>
+      </node>
+      <node id="2">
+        <label>thread</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="classRcppThread_1_1Thread" prot="public">RcppThread::Thread</innerclass>
+    <innernamespace refid="namespaceRcppThread">RcppThread</innernamespace>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="Thread_8hpp_1a1351fd152dbc25ac91b5d3ea8c3abdff" prot="public" static="no">
+        <name>RCPPTHREAD_OVERRIDE_THREAD</name>
+        <initializer>0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="123" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="123" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp"/>
+  </compounddef>
+</doxygen>

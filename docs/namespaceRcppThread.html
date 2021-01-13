@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RcppThread namespace | RcppThread R-friendly
+threading
+in
+C++</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
+        <a href="https://github.com/tnagler/RcppThread">RcppThread</a> <span class="m-breadcrumb">|</span> <a href="index.html" class="m-thin">R-friendly
+threading
+in
+C++</a>
+      </span>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="namespaceRcppThread.html" id="m-navbar-current">RcppThread</a></li>
+            <li><a href="overrides.html">Automatic overrides</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a href="https://github.com/tnagler/RcppThread">GitHub</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          RcppThread <span class="m-thin">namespace</span>
+        </h1>
+        <p><code>RcppThread</code> functionality</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#nested-classes">Classes</a></li>
+                <li><a href="#func-members">Functions</a></li>
+                <li><a href="#var-members">Variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a href="classRcppThread_1_1RMonitor.html" class="m-doc">RMonitor</a>
+            </dt>
+            <dd>Singleton class for tracking threads and safe communication.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1RPrinter.html" class="m-doc">RPrinter</a>
+            </dt>
+            <dd>Safely printing to the R console from threaded code.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1Thread.html" class="m-doc">Thread</a>
+            </dt>
+            <dd>R-friendly version of <code>std::thread</code>.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1ThreadPool.html" class="m-doc">ThreadPool</a>
+            </dt>
+            <dd>Implemenation of the thread pool pattern based on <code>Thread</code>.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1UserInterruptException.html" class="m-doc">UserInterruptException</a>
+            </dt>
+            <dd>exception class for user interruptions.</dd>
+          </dl>
+        </section>
+        <section id="func-members">
+          <h2><a href="#func-members">Functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template&lt;class F&gt;</div>
+              <span class="m-doc-wrap-bumper">void <a href="#aa3df09a8db84ae183abe663af8f928c1" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">ptrdiff_t begin,
+              ptrdiff_t size,
+              F&amp;&amp; f,
+              size_t nThreads = std::thread::hardware_concurrency(),
+              size_t nBatches = 0)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class I, class F&gt;</div>
+              <span class="m-doc-wrap-bumper">void <a href="#a1c246ba8e53889c0cd5c1c24e8c6cc85" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F&amp;&amp; f,
+              size_t nThreads = std::thread::hardware_concurrency(),
+              size_t nBatches = 0)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#ae48d2e823f3ac43fb87a2795f242e3df" class="m-doc">checkUserInterrupt</a>(</span><span class="m-doc-wrap">bool condition = true)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a2953566b926010e05a2d10586c72267c" class="m-doc">isInterrupted</a>(</span><span class="m-doc-wrap">bool condition = true) -&gt; bool</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="var-members">
+          <h2><a href="#var-members">Variables</a></h2>
+          <dl class="m-doc">
+            <dt id="a314d0d8e34b9799f4dda1b4d5da36ed0">
+              static <a href="classRcppThread_1_1RPrinter.html" class="m-doc">RPrinter</a> <a href="#a314d0d8e34b9799f4dda1b4d5da36ed0" class="m-doc-self">Rcout</a>
+            </dt>
+            <dd>global <code>RPrinter</code> instance called &#x27;Rcout&#x27; (as in Rcpp).</dd>
+            <dt id="ada4c397edb2f1f4150f8dc1ab899d324">
+              static std::thread::id <a href="#ada4c397edb2f1f4150f8dc1ab899d324" class="m-doc-self">mainThreadID</a>
+            </dt>
+            <dd>global variable holding id of main thread.</dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="aa3df09a8db84ae183abe663af8f928c1"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class F&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aa3df09a8db84ae183abe663af8f928c1" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">ptrdiff_t begin,
+              ptrdiff_t size,
+              F&amp;&amp; f,
+              size_t nThreads = std::thread::hardware_concurrency(),
+              size_t nBatches = 0)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">begin</td>
+                  <td>first index of the loop.</td>
+                </tr>
+                <tr>
+                  <td>size</td>
+                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
+                </tr>
+                <tr>
+                  <td>f</td>
+                  <td>a function (the &#x27;loop body&#x27;).</td>
+                </tr>
+                <tr>
+                  <td>nThreads</td>
+                  <td>the number of threads to use; the default uses the number of cores in the machine; if <code>nThreads = 0</code>, all work will be done in the main thread.</td>
+                </tr>
+                <tr>
+                  <td>nBatches</td>
+                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>computes an index-based for loop in parallel batches. 
+Consider the following code:</p><pre class="m-code"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">x</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">});</span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+          </div></section>
+          <section class="m-doc-details" id="a1c246ba8e53889c0cd5c1c24e8c6cc85"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class I, class F&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a1c246ba8e53889c0cd5c1c24e8c6cc85" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F&amp;&amp; f,
+              size_t nThreads = std::thread::hardware_concurrency(),
+              size_t nBatches = 0)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">items</td>
+                  <td>an object allowing for <code>items.size()</code> and whose elements are accessed by the <code>[]</code> operator.</td>
+                </tr>
+                <tr>
+                  <td>f</td>
+                  <td>a function (the &#x27;loop body&#x27;).</td>
+                </tr>
+                <tr>
+                  <td>nThreads</td>
+                  <td>the number of threads to use; the default uses the number of cores in the machine; if <code>nThreads = 0</code>, all work will be done in the main thread.</td>
+                </tr>
+                <tr>
+                  <td>nBatches</td>
+                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>computes a range-based for loop in parallel batches. 
+Consider the following code:</p><pre class="m-code"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">x</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">xx</span> <span class="p">:</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">xx</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">(</span><span class="kt">double</span><span class="o">&amp;</span> <span class="n">xx</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">xx</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">});</span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+          </div></section>
+          <section class="m-doc-details" id="ae48d2e823f3ac43fb87a2795f242e3df"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae48d2e823f3ac43fb87a2795f242e3df" class="m-doc-self">checkUserInterrupt</a>(</span><span class="m-doc-wrap">bool condition = true)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">condition</td>
+                  <td>optional; a condition for the check to be executed.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>checks for user interruptions, but only if called from main thread. 
+Declared as a friend in <code>RMonitor</code>.</p>
+          </div></section>
+          <section class="m-doc-details" id="a2953566b926010e05a2d10586c72267c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2953566b926010e05a2d10586c72267c" class="m-doc-self">isInterrupted</a>(</span><span class="m-doc-wrap">bool condition = true)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">condition</td>
+                  <td>optional; a condition for the check to be executed.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>checks for user interruptions, but only if called from main thread (otherwise returns <code>false</code>). 
+Declared as a friend in <code>RMonitor</code>.</p>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages, OpenGL, GLSL, Vulkan and OpenAL APIs. You can omit any prefix from the symbol or file path; adding a <code>:</code> or <code>/</code> suffix lists all members of given symbol or directory.</p> <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span> / <span class="m-label m-dim">&uarr;</span> to navigate through the list, <span class="m-label m-dim">Enter</span> to go. <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script src="searchdata-v1.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>RcppThread docs. copyright © <a href="http://tnagler.com/">Thomas Nagler</a> 2021.<br />Generated by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>. Contact the author via <a href="https://github.com/tnagler/RcppThread">GitHub</a> or  <a href="mailto:mail@tnagler.com">e-mail</a>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>
