@@ -79,4 +79,6 @@ before including the RcppThread headers.
 
 ## References
 
-Nagler, T. (2021). R-friendly threading in C++. *Journal of Statistical Software, Volume 97, Code Snippet 1* [doi](https://doi.org/10.18637/jss.v097.c01)
+Nagler, T. (2021). "R-Friendly Multi-Threading in C++." _Journal of Statistical
+Software, Code Snippets_, *97*(1), 1-18. [doi: 10.18637/jss.v097.c01](https://doi.org/10.18637/jss.v097.c01)
+

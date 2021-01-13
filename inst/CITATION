@@ -1,9 +1,15 @@
 bibentry(bibtype = "Article",
-         title        = "{R}-Friendly Multi-Threading in C++",
-         author       = person(given = "Thomas",
-                               family = "Nagler",
-                               email = "mail@tnagler.com"),
-         journal      = "arXiv:1811.00450",
-         year         = "2018",
-         header       = "To cite RcppThread in publications use:"
+  title        = "{R}-Friendly Multi-Threading in {C++}",
+  author       = person(given = "Thomas",
+                        family = "Nagler",
+                        email = "mail@tnagler.com"),
+  journal      = "Journal of Statistical Software, Code Snippets",
+  year         = "2021",
+  volume       = "97",
+  number       = "1",
+  pages        = "1--18",
+  doi          = "10.18637/jss.v097.c01",
+
+  header       = "To cite RcppThread in publications use:"
 )
+

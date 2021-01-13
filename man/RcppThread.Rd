@@ -3,9 +3,13 @@
 \docType{package}
 \name{RcppThread}
 \alias{RcppThread}
-\alias{RcppThread-package}
 \title{R-friendly C++11 threads}
 \description{
 Provides a C++11-style thread class and thread pool that can safely be
 interrupted from R.
+}
+\references{
+Nagler, T. (2021). “R-Friendly Multi-Threading in C++.”
+\emph{Journal of Statistical Software, Code Snippets}, \emph{97}(1), 1-18.
+\href{https://doi.org/10.18637/jss.v097.c01}{doi: 10.18637/jss.v097.c01}.
 }
