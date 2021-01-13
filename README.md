@@ -21,8 +21,8 @@ requires a
 
 ## Functionality
 
-For a detailed description of its functionality and examples, see the 
-[vignette](https://arxiv.org/abs/1811.00450)
+For a detailed description of its functionality and examples, see the associated
+[JSS paper](https://doi.org/10.18637/jss.v097.c01)
 or the [API documentation](https://tnagler.github.io/RcppThread/).
 
 ## Installation
@@ -75,3 +75,8 @@ There are preprocessor options to replace all occurences of `std::cout` and
 #define RCPPTHREAD_OVERRIDE_THREAD 1  // std::thread override
 ```
 before including the RcppThread headers.
+
+
+## References
+
+Nagler, T. (2021). R-friendly threading in C++. *Journal of Statistical Software, Volume 97, Code Snippet 1* [doi](https://doi.org/10.18637/jss.v097.c01)
