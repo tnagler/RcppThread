@@ -1,3 +1,8 @@
+# RcppThread 1.0.0
+
+* Release for JSS publication <doi:10.18637/jss.v097.c01>.
+
+
 # RcppThread 0.5.4
 
 * Fixed warning for move constructor in ThreadPool (#35, #36, thanks @asardaes 
@@ -31,8 +36,7 @@ BUG FIXES
 
 DEPENDENCIES
 
-* Rcpp is no longer a hard dependency, but only used for unit tests. This avoids
-  unneccessary compilation time during package installation. 
+* Rcpp is no longer a hard dependency, but only used for unit tests. This avoids unnecessary compilation time during package installation. 
 
 NEW FEATURES
 
@@ -59,7 +63,7 @@ NEW FEATURE
 
 NEW FEATURE
 
-* A `ThreadPool` can now be intantiated with zero threads in the pool. It
+* A `ThreadPool` can now be instantiated with zero threads in the pool. It
   will then do all work pushed to it in the main thread.
 
 
@@ -76,7 +80,7 @@ NEW FEATURE
 
 BUG FIX
 
-* Don't check print ouptut of multi-threaded code b/c of random results.
+* Don't check print output of multi-threaded code b/c of random results.
 
 
 # RcppThread 0.1.2
@@ -100,4 +104,4 @@ BUG FIX
 
 # RcppThread 0.1.0
 
-* Intial release.
+* Initial release.

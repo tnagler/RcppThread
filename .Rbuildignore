@@ -11,3 +11,4 @@ inst/include/mainpage.h
 ^cran-comments\.md$
 revdep
 ^\.github$
+^CRAN-RELEASE$

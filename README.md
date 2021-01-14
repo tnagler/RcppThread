@@ -68,7 +68,7 @@ before including any headers in your source code.
 
 ## Automatic override of `std::cout` and `std::thread`
 
-There are preprocessor options to replace all occurences of `std::cout` and 
+There are preprocessor options to replace all occurrences of `std::cout` and 
 `std::thread` with calls to `RcppThread::Rcout` and `RcppThread::Thread` 
 (provided that the RcppThread headers are included first). To enable this, use 
 ```
