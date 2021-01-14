@@ -5,7 +5,7 @@
 #'
 #' @references Nagler, T. (2021). "R-Friendly Multi-Threading in C++."
 #' _Journal of Statistical Software, Code Snippets_, *97*(1), 1-18.
-#' [doi: 10.18637/jss.v097.c01](https://doi.org/10.18637/jss.v097.c01).
+#' \doi{10.18637/jss.v097.c01}.
 #'
 #' @name RcppThread
 #' @docType package

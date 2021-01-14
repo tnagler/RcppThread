@@ -1,6 +1,6 @@
 # RcppThread 1.0.0
 
-* Release for JSS publication <doi:10.18637/jss.v097.c01>.
+* Release for JSS publication https://doi.org/10.18637/jss.v097.c01.
 
 
 # RcppThread 0.5.4

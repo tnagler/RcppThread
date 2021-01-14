@@ -1,4 +1,7 @@
+Fixed URL/DOI formatting required by Uwe Ligges via mail.
+
 The DOI in the CITATION, DESCRIPTION, and documentation is for a new JSS publication that will be registered after publication on CRAN.
+
 
 ## Test environments
 * ubuntu 16.04 (devel, release, old-rel)
