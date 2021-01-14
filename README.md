@@ -1,9 +1,10 @@
 # RcppThread
 
-[![Travis-CI Build Status](https://travis-ci.org/tnagler/RcppThread.svg?branch=master)](https://travis-ci.org/tnagler/RcppThread) 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tnagler/RcppThread?branch=master&svg=true)](https://ci.appveyor.com/project/tnagler/RcppThread)
+<!-- badges: start -->
+[![R build status](https://github.com/tnagler/RcppThread/workflows/R-CMD-check/badge.svg)](https://github.com/tnagler/RcppThread/actions)
 [![CRAN version](http://www.r-pkg.org/badges/version/RcppThread)](https://cran.r-project.org/package=RcppThread) 
 [![CRAN downloads](http://cranlogs.r-pkg.org/badges/RcppThread)](https://cran.r-project.org/package=RcppThread)
+<!-- badges: end -->
 
 Provides R-friendly threading functionality: 
 

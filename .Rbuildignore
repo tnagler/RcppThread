@@ -10,3 +10,4 @@ inst/include/mainpage.h
 ^codecov\.yml$
 ^cran-comments\.md$
 revdep
+^\.github$
