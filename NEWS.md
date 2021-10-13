@@ -1,3 +1,8 @@
+# RcppThread 1.1.0
+
+* Add R function `detectCores()` (#48).
+
+
 # RcppThread 1.0.0
 
 * Release for JSS publication https://doi.org/10.18637/jss.v097.c01.
