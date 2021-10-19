@@ -88,15 +88,24 @@ protected:
         constexpr size_t minute = 60;
         constexpr size_t hour = 60 * minute;
         constexpr size_t day = 24 * hour;
+        int numUnits = 0;
         if (secs / day > 0) {
-            msg << secs / day << "days";
-        } else if (secs / hour > 0) {
-            msg << secs / hour << "hours";
-        } else if (secs / minute > 0) {
-            msg << secs / minute << "min";
-        } else {
-            msg << secs << "sec";
+            msg << secs / day << "d";
+            secs = secs % day;
+            numUnits++;
         }
+        if (secs / hour > 0) {
+            msg << secs / hour << "h";
+            secs = secs % hour;
+            numUnits++;
+        }
+        if ((secs / minute > 0) && (numUnits < 2)) {
+            msg << secs / minute << "m";
+            secs = secs % minute;
+            numUnits++;
+        }
+        if (numUnits < 2)
+            msg << secs << "s";
         return msg.str();
     }
 
