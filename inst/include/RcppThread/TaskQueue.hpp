@@ -4,6 +4,9 @@
 // the MIT license. For a copy, see the LICENSE.md file in the root directory of
 // RcppThread or https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
 
+// The following is heavily inspired by 
+// https://github.com/ConorWilliams/ConcurrentDeque.
+
 #pragma once
 
 #include <atomic>
@@ -88,9 +91,6 @@ public:
   //! steals an item from the top of the queue.
   Task steal();
 
-  //! destructs the queue.
-  ~TaskQueue();
-
 private:
   alignas(64) std::atomic_size_t top_{0};
   alignas(64) std::atomic_size_t bottom_{0};
@@ -105,6 +105,101 @@ private:
   static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
 };
 
+TaskQueue::TaskQueue(size_t capacity)
+{
+  buffers_.emplace_back(capacity);
+}
 
+size_t
+TaskQueue::size() const
+{
+  size_t b = bottom_.load(m_relaxed);
+  size_t t = top_.load(m_relaxed);
+  return static_cast<size_t>(b >= t ? b - t : 0);
+}
+
+size_t
+TaskQueue::capacity() const
+{
+  return buffers_[bufferIndex_].capacity();
+}
+
+bool
+TaskQueue::empty() const
+{
+  return (this->size() == 0);
+}
+
+void
+TaskQueue::push(Task&& task)
+{
+  size_t b = bottom_.load(m_relaxed);
+  size_t t = top_.load(m_acquire);
+
+  if (buffers_[bufferIndex_].capacity() < (b - t) + 1) {
+    // capacity reached, create copy with double size
+    buffers_.push_back(buffers_[bufferIndex_++].enlarge(b, t));
+  }
+  buffers_[bufferIndex_].store(b, std::move(task));
+
+  std::atomic_thread_fence(m_release);
+  bottom_.store(b + 1, m_relaxed);
+}
+
+std::function<void()>
+TaskQueue::pop()
+{
+  size_t b = bottom_.load(m_relaxed) - 1;
+  // stealers can still steal the task
+  bottom_.store(b, m_relaxed); 
+  // stealers can no longer steal this task
+  std::atomic_thread_fence(m_seq_cst);
+  size_t t = top_.load(m_relaxed);
+
+  if (t <= b) {
+    if (t == b) {
+      if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
+        bottom_.store(b + 1, m_relaxed);
+      } else {
+        // task was stolen
+        bottom_.store(b + 1, m_relaxed);
+        return Task();
+      }
+      bottom_.store(b + 1, m_relaxed);
+    }
+
+    return buffers_[bufferIndex_].load(b);
+  }
+
+  // queue is empty
+  bottom_.store(b + 1, m_relaxed);
+  return Task();
+}
+
+std::function<void()>
+TaskQueue::steal()
+{
+  size_t t = top_.load(m_acquire);
+  std::atomic_thread_fence(m_seq_cst);
+  size_t b = bottom_.load(m_acquire);
+
+  if (t < b) {
+    // Must load *before* acquiring the slot as slot may be overwritten
+    // immediately after acquiring. This load is NOT required to be atomic
+    // even-though it may race with an overrite as we only return the value if
+    // we win the race below garanteeing we had no race during our read. If we
+    // loose the race then 'x' could be corrupt due to read-during-write race
+    // but as T is trivially destructible this does not matter.
+    auto task = buffers_[bufferIndex_].load(t);
+
+    if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
+      return task;
+    } else {
+      return Task();  // lost race for this task
+    }
+  } else {
+    return Task();  // queue is empty
+  }
+}
 
 } // end namespace RcppThread
