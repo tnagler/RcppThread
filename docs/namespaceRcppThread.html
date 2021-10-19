@@ -71,6 +71,18 @@ C++</a>
           <h2><a href="#nested-classes">Classes</a></h2>
           <dl class="m-doc">
             <dt>
+              class <a href="classRcppThread_1_1ProgressBar.html" class="m-doc">ProgressBar</a>
+            </dt>
+            <dd>A progress bar showing progress in percent.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1ProgressCounter.html" class="m-doc">ProgressCounter</a>
+            </dt>
+            <dd>A counter showing progress in percent.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1ProgressPrinter.html" class="m-doc">ProgressPrinter</a>
+            </dt>
+            <dd>Abstract class for printing progress.</dd>
+            <dt>
               class <a href="classRcppThread_1_1RMonitor.html" class="m-doc">RMonitor</a>
             </dt>
             <dd>Singleton class for tracking threads and safe communication.</dd>
@@ -176,12 +188,12 @@ C++</a>
               </tbody>
             </table>
 <p>computes an index-based for loop in parallel batches. 
-Consider the following code:</p><pre class="m-code"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">x</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-<span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-<span class="p">}</span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-<span class="p">});</span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+Consider the following code:</p><pre class="m-code"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
           <section class="m-doc-details" id="a1c246ba8e53889c0cd5c1c24e8c6cc85"><div>
             <h3>
@@ -217,12 +229,12 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
               </tbody>
             </table>
 <p>computes a range-based for loop in parallel batches. 
-Consider the following code:</p><pre class="m-code"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">x</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">xx</span> <span class="p">:</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">xx</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="p">}</span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">(</span><span class="kt">double</span><span class="o">&amp;</span> <span class="n">xx</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">xx</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="p">});</span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+Consider the following code:</p><pre class="m-code"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="nl">xx</span> <span class="p">:</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="o">&amp;</span><span class="w"> </span><span class="n">xx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
           <section class="m-doc-details" id="ae48d2e823f3ac43fb87a2795f242e3df"><div>
             <h3>

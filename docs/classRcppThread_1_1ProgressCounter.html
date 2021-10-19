@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RcppThread: R-friendly threading in C++ | RcppThread R-friendly
+  <title>RcppThread::ProgressCounter class | RcppThread R-friendly
 threading
 in
 C++</title>
@@ -51,9 +51,82 @@ C++</a>
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
-          RcppThread: R-friendly threading in C++
+          <span class="m-breadcrumb"><a href="namespaceRcppThread.html">RcppThread</a>::<wbr/></span>ProgressCounter <span class="m-thin">class</span>
         </h1>
-<aside class="m-note m-default"><h4>Authors</h4><p>Thomas Nagler</p></aside><p>This is the API documentation for the RcppThread C++ library. For a more high-level overview see the <a href="https://doi.org/10.18637/jss.v097.c01">vignette</a> and <a href="https://github.com/tnagler/RcppThread/blob/main/README.md">README</a>.</p><section id="license"><h2><a href="#license">License</a></h2><p>The MIT License (MIT)</p><p>Copyright © 2021 Thomas Nagler</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></section>
+        <p>A counter showing progress in percent.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#base-classes">Base classes</a></li>
+                <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+                <li><a href="#pri-methods">Private functions</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<p>Prints to the R console in a thread safe manner using <code>Rcout</code> (an instance of <code>RcppThread::Rprinter</code>).</p>
+        <section id="base-classes">
+          <h2><a href="#base-classes">Base classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a href="classRcppThread_1_1ProgressPrinter.html" class="m-doc">ProgressPrinter</a>
+            </dt>
+            <dd>Abstract class for printing progress.</dd>
+          </dl>
+        </section>
+        <section id="typeless-methods">
+          <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a185ef604ccad91a26d4db1a1d04b0b9c" class="m-doc">ProgressCounter</a>(</span><span class="m-doc-wrap">size_t numIt,
+              size_t printEvery)</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="pri-methods">
+          <h2><a href="#pri-methods">Private functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#af0ab5e21bb89fd8fd499f7ac6443a10d" class="m-doc">printProgress</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-warning">virtual</span></span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a185ef604ccad91a26d4db1a1d04b0b9c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> RcppThread::<wbr />ProgressCounter::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a185ef604ccad91a26d4db1a1d04b0b9c" class="m-doc-self">ProgressCounter</a>(</span><span class="m-doc-wrap">size_t numIt,
+              size_t printEvery)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">numIt</td>
+                  <td>total number of iterations.</td>
+                </tr>
+                <tr>
+                  <td>printEvery</td>
+                  <td>how regularly to print updates (in seconds).</td>
+                </tr>
+              </tbody>
+            </table>
+<p>constructs a progress counter.</p>
+          </div></section>
+          <section class="m-doc-details" id="af0ab5e21bb89fd8fd499f7ac6443a10d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ProgressCounter::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#af0ab5e21bb89fd8fd499f7ac6443a10d" class="m-doc-self">printProgress</a>(</span><span class="m-doc-wrap">) <span class="m-label m-warning">virtual</span> <span class="m-label m-danger">private</span></span></span>
+            </h3>
+<p>prints progress in percent to the R console (+ an estimate of remaining time).</p>
+          </div></section>
+        </section>
       </div>
     </div>
   </div>

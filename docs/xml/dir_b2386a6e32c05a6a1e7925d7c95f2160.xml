@@ -4,6 +4,7 @@
     <compoundname>/data/dev/r/RcppThread/inst/include/RcppThread</compoundname>
     <innerfile refid="Batch_8hpp">Batch.hpp</innerfile>
     <innerfile refid="parallelFor_8hpp">parallelFor.hpp</innerfile>
+    <innerfile refid="Progress_8hpp">Progress.hpp</innerfile>
     <innerfile refid="Rcout_8hpp">Rcout.hpp</innerfile>
     <innerfile refid="RMonitor_8hpp">RMonitor.hpp</innerfile>
     <innerfile refid="Thread_8hpp">Thread.hpp</innerfile>

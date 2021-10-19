@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classRcppThread_1_1ProgressCounter" kind="class" language="C++" prot="public">
+    <compoundname>RcppThread::ProgressCounter</compoundname>
+    <basecompoundref refid="classRcppThread_1_1ProgressPrinter" prot="public" virt="non-virtual">RcppThread::ProgressPrinter</basecompoundref>
+    <includes local="no">Progress.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>RcppThread::ProgressCounter::ProgressCounter</definition>
+        <argsstring>(size_t numIt, size_t printEvery)</argsstring>
+        <name>ProgressCounter</name>
+        <param>
+          <type>size_t</type>
+          <declname>numIt</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>printEvery</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>constructs a progress counter. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>numIt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>total number of iterations. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>printEvery</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>how regularly to print updates (in seconds). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="126" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="126" bodyend="128"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classRcppThread_1_1ProgressCounter_1af0ab5e21bb89fd8fd499f7ac6443a10d" prot="private" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void RcppThread::ProgressCounter::printProgress</definition>
+        <argsstring>()</argsstring>
+        <name>printProgress</name>
+        <reimplements refid="classRcppThread_1_1ProgressPrinter_1a9fbe8e4d867cf9e03dd7e67ab3240419">printProgress</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>prints progress in percent to the R console (+ an estimate of remaining time). </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="133" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="133" bodyend="142"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>A counter showing progress in percent. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>Prints to the R console in a thread safe manner using <computeroutput>Rcout</computeroutput> (an instance of <computeroutput>RcppThread::Rprinter</computeroutput>). </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>RcppThread::ProgressPrinter</label>
+        <link refid="classRcppThread_1_1ProgressPrinter"/>
+      </node>
+      <node id="1">
+        <label>RcppThread::ProgressCounter</label>
+        <link refid="classRcppThread_1_1ProgressCounter"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>RcppThread::ProgressPrinter</label>
+        <link refid="classRcppThread_1_1ProgressPrinter"/>
+      </node>
+      <node id="1">
+        <label>RcppThread::ProgressCounter</label>
+        <link refid="classRcppThread_1_1ProgressCounter"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="120" column="45" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="120" bodyend="143"/>
+    <listofallmembers>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>formatTime</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>isDone_</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a28e410b643798f36a59bcef22b9d1dbd" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>it_</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a4158cf794e210d88200676e308828008" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>needsPrint</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a9529bc02365f45586db36b903b4f1e9f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>numIt_</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a1aa7189b1a757bc6089966886443b49d" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>numUpdates_</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a9b92bd795df45b246a578e66d10e2d50" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>operator++</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a2d7146dd49c3df81a45d0537489826c3" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>operator++</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a9a0af32f5d66762e6b3993e085b90cf7" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>printEvery_</name></member>
+      <member refid="classRcppThread_1_1ProgressCounter_1af0ab5e21bb89fd8fd499f7ac6443a10d" prot="private" virt="virtual"><scope>RcppThread::ProgressCounter</scope><name>printProgress</name></member>
+      <member refid="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressCounter</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a71e9e5034d220b4fc75648545554b401" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressPrinter</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a851b2b836517eab09fd15c0933e92e9c" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>remaingTimeString</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1a0fac2a44d886424a2693e4b9d7fb4d58" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>remainingSecs</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1abb8c055119f7a19bf2672e6614b04f14" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>startTime_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

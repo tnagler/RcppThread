@@ -8,6 +8,7 @@
     <includes refid="Batch_8hpp" local="yes">RcppThread/Batch.hpp</includes>
     <includes refid="ThreadPool_8hpp" local="yes">RcppThread/ThreadPool.hpp</includes>
     <includes refid="parallelFor_8hpp" local="yes">RcppThread/parallelFor.hpp</includes>
+    <includes refid="Progress_8hpp" local="yes">RcppThread/Progress.hpp</includes>
     <briefdescription>
     </briefdescription>
     <detaileddescription>

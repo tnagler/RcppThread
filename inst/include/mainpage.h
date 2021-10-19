@@ -8,7 +8,8 @@
 *
 * This is the API documentation for the RcppThread C++ library. For a more
 * high-level overview see the
-* <a href="https://doi.org/10.18637/jss.v097.c01">vignette</a>.
+* <a href="https://doi.org/10.18637/jss.v097.c01">vignette</a> and
+* <a href="https://github.com/tnagler/RcppThread/blob/main/README.md">README</a>.
 *
 * @section license License
 *
