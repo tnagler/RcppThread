@@ -377,3 +377,24 @@ void testNestedParallelForEach()
 //     pool.join();
 //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 // }
+
+
+// [[Rcpp::export]]
+void testProgressCounter()
+{
+    RcppThread::ProgressCounter cntr(20, 1);
+    RcppThread::parallelFor(0, 20, [&] (int i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        cntr++;
+    });
+}
+
+// [[Rcpp::export]]
+void testProgressBar()
+{
+    RcppThread::ProgressBar bar(20, 1);
+    RcppThread::parallelFor(0, 20, [&] (int i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        ++bar;
+    });
+}

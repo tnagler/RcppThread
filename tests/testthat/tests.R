@@ -75,3 +75,14 @@ test_that("parallelForEach works", {
 test_that("nested parallelForEach works", {
     expect_silent(testNestedParallelForEach())
 })
+
+
+## ------------------------------------------------------
+context("Progress tracking")
+test_that("ProgressCounter works", {
+    expect_output(testProgressCounter(), "100% \\(done\\)")
+})
+
+test_that("ProgressBar works", {
+    expect_output(testProgressBar(),"100% \\(done\\)")
+})

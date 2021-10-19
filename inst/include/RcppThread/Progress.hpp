@@ -133,7 +133,7 @@ private:
         double pct = std::round(it_ * 100.0 / numIt_);
         std::ostringstream msg;
         msg << "\rComputing: " << pct << "% " << remaingTimeString();
-        if (!isDone_) {
+        if (!isDone_) {  // make sure the final print is not overwritten
             if (it_ == numIt_)
                 isDone_ = true;
             Rcout << msg.str();
@@ -163,7 +163,7 @@ private:
         std::ostringstream msg;
         msg << "\rComputing: ";
         msg << makeBar(pct) << pct << "% " << remaingTimeString();
-        if (!isDone_) {
+        if (!isDone_) {  // make sure the final print is not overwritten
             if (it_ == numIt_)
                 isDone_ = true;
             Rcout << msg.str();
