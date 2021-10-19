@@ -70,12 +70,13 @@ protected:
     }
 
     //! prints either remaining time or that the computation is done.
-    std::string remaingTimeString() {
+    std::string progressString() {
         std::ostringstream msg;
         if (it_ == numIt_) {
-            msg << "(done)                         \n";
+            msg << "100% (done)                         \n";
         } else {
-            msg << "(~" << formatTime(remainingSecs()) << " remaining)       ";
+            double pct = std::round(it_ * 100.0 / numIt_);
+            msg << pct << "%  (~" << formatTime(remainingSecs()) << " remaining)       ";
         }
         return msg.str();
     }
@@ -127,15 +128,13 @@ private:
     //! prints progress in percent to the R console (+ an estimate of remaining
     //! time).
     void printProgress() {
+        if (isDone_)
+            return;
+        if (it_ == numIt_)
+            isDone_ = true;
         std::ostringstream msg;
-        auto end = remaingTimeString();
-        double pct = std::round(it_ * 100.0 / numIt_);
-        msg << "\rComputing: " << pct << "% " << end;
-        if (!isDone_) {  // make sure the final print is not overwritten
-            if (it_ == numIt_)
-                isDone_ = true;
-            Rcout << msg.str();
-        }
+        msg << "\rComputing: " << progressString();
+        Rcout << msg.str();
     }
 };
 
@@ -157,15 +156,14 @@ private:
     //! prints a progress bar to the R console (+ an estimate of remaining
     //! time).
     void printProgress() {
+        if (isDone_)
+            return;
+        if (it_ == numIt_)
+            isDone_ = true;
+        double pct = std::round(it_ * 100.0 / numIt_);
         std::ostringstream msg;
-        auto end = remaingTimeString();
-        size_t pct = it_ * 100 / numIt_;
-        msg << "\rComputing: " << makeBar(pct) << pct << "% " << end;
-        if (!isDone_) {  // make sure the final print is not overwritten
-            if (it_ == numIt_)
-                isDone_ = true;
-            Rcout << msg.str();
-        }
+        msg << "\rComputing: " << makeBar(pct) << progressString();
+        Rcout << msg.str();
     }
 
     //! constructs the progress bar.
