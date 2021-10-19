@@ -56,4 +56,56 @@ private:
 
 } // end namespace RcppThread::detail
 
+
+class TaskQueue
+{
+  using Task = std::function<void()>;
+  
+public:
+  //! constructs the que with a given capacity.
+  //! @param capacity must be a power of two.
+  TaskQueue(size_t capacity = 1024);
+
+  // move/Copy is not supported
+  TaskQueue(TaskQueue const& other) = delete;
+  TaskQueue& operator=(TaskQueue const& other) = delete;
+
+  //! queries the size.
+  std::size_t size() const;
+
+  //! queries the capacity.
+  int64_t capacity() const;
+
+  //! checks if queue is empty.
+  bool empty() const;
+
+  //! pushes a task to the bottom of the queue; enlarges the queue if full.
+  void push(Task&&);
+
+  //! pops a task from the bottom of the queue. Only the owner thread should
+  //! pop.
+  Task pop();
+
+  //! steals an item from the top of the queue.
+  Task steal();
+
+  //! destructs the queue.
+  ~TaskQueue();
+
+private:
+  alignas(64) std::atomic_size_t top_;
+  alignas(64) std::atomic_size_t bottom_;
+  alignas(64) detail::RingBuffer buffer_;
+
+  std::unique_ptr<detail::RingBuffer> garbage_; // used while enlarging
+
+  // convenience aliases
+  static constexpr std::memory_order mem_relaxed = std::memory_order_relaxed;
+  static constexpr std::memory_order mem_consume = std::memory_order_consume;
+  static constexpr std::memory_order mem_acquire = std::memory_order_acquire;
+  static constexpr std::memory_order mem_release = std::memory_order_release;
+  static constexpr std::memory_order mem_seq_cst = std::memory_order_seq_cst;
+};
+
+
 } // end namespace RcppThread

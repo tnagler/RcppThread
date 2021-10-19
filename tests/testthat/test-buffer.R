@@ -9,6 +9,7 @@ Rcpp::sourceCpp(code = {
 void testThreadClass()
 {
     RcppThread::detail::RingBuffer buff(2);
+    RcppThread::TaskQueue queue;
 }
 "
 })
