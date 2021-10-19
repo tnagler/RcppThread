@@ -88,18 +88,14 @@ protected:
         constexpr size_t hour = 60 * minute;
         constexpr size_t day = 24 * hour;
         if (secs / day > 0) {
-            msg << secs / day << "d";
-            secs = secs % day;
+            msg << secs / day << "days";
+        } else if (secs / hour > 0) {
+            msg << secs / hour << "hours";
+        } else if (secs / minute > 0) {
+            msg << secs / minute << "min";
+        } else {
+            msg << secs << "sec";
         }
-        if (secs / hour > 0) {
-            msg << secs / hour << "h";
-            secs = secs % hour;
-        }
-        if (secs / minute > 0) {
-            msg << secs / minute << "m";
-            secs = secs % minute;
-        }
-        msg << secs << "s";
         return msg.str();
     }
 
@@ -131,9 +127,10 @@ private:
     //! prints progress in percent to the R console (+ an estimate of remaining
     //! time).
     void printProgress() {
-        double pct = std::round(it_ * 100.0 / numIt_);
         std::ostringstream msg;
-        msg << "\rComputing: " << pct << "% " << remaingTimeString();
+        auto end = remaingTimeString();
+        double pct = std::round(it_ * 100.0 / numIt_);
+        msg << "\rComputing: " << pct << "% " << end;
         if (!isDone_) {  // make sure the final print is not overwritten
             if (it_ == numIt_)
                 isDone_ = true;
@@ -160,10 +157,10 @@ private:
     //! prints a progress bar to the R console (+ an estimate of remaining
     //! time).
     void printProgress() {
-        size_t pct = it_ * 100 / numIt_;
         std::ostringstream msg;
-        msg << "\rComputing: ";
-        msg << makeBar(pct) << pct << "% " << remaingTimeString();
+        auto end = remaingTimeString();
+        size_t pct = it_ * 100 / numIt_;
+        msg << "\rComputing: " << makeBar(pct) << pct << "% " << end;
         if (!isDone_) {  // make sure the final print is not overwritten
             if (it_ == numIt_)
                 isDone_ = true;
