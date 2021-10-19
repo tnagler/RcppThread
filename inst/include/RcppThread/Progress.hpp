@@ -14,44 +14,54 @@
 
 namespace RcppThread {
 
+//! @brief Abstract class for printing progress.
+//!
+//! This class contains most of the logic for tracking progress in a parallel
+//! loop. Child classes must define a method `void printProgress()` that is
+//! called whenever an update is required.
 class ProgressPrinter {
 public:
+    //! Constructor for abstract class `ProgressPrinter`.
+    //! @param numIt total number of iterations.
+    //! @param printEvery how regularly to print updates (in seconds).
     ProgressPrinter(size_t numIt, size_t printEvery = 1)
         : numIt_(numIt)
         , printEvery_(printEvery)
         , startTime_(std::chrono::steady_clock::now())
     {}
 
-    // need to be defined in child classes
-    virtual void printProgress(size_t it) = 0;
+    //! prints progress whenever an update is necessary.
+    virtual void printProgress() = 0;
 
-    // pre-increment operator
+    //! pre-increment operator
     size_t operator++ () {
         size_t it = it_++;
-        if (this->needsPrint())
-            this->printProgress(it);
+        if (needsPrint())
+            printProgress();
         return it + 1;
     }
 
-    // post-increment operator
+    //! post-increment operator
     size_t operator++ (int) {
         size_t it = it_++;
-        if (this->needsPrint())
-            this->printProgress(it);
+        if (needsPrint())
+            printProgress();
         return it;
     }
 
 protected:
+    //! checks whether it's time for an update.
     bool needsPrint() {
         using namespace std::chrono;
         auto passed = duration<float>(steady_clock::now() - startTime_).count();
-        bool print =
-            (passed / printEvery_ > numUpdates_ + 1) || (it_ == numIt_);
-        if (print)
+        bool needsUpdate = (passed / printEvery_ > numUpdates_ + 1);
+        needsUpdate = needsUpdate || (it_ == numIt_); // always print when done
+        if (needsUpdate)
             numUpdates_++;
-        return print;
+        return needsUpdate;
     }
 
+    //! estimates the remaining time in seconds.
     size_t remainingSecs() {
         using namespace std::chrono;
         auto diff = duration<float>(steady_clock::now() - startTime_).count();
@@ -59,9 +69,10 @@ protected:
         return static_cast<size_t>(remaining);
     }
 
-    std::string remaingTimeString(size_t it) {
+    //! prints either remaining time or that the computation is done.
+    std::string remaingTimeString() {
         std::ostringstream msg;
-        if (it + 1 == numIt_) {
+        if (it_ == numIt_) {
             msg << "(done)                         \n";
         } else {
             msg << "(~" << formatTime(remainingSecs()) << " remaining)       ";
@@ -69,6 +80,8 @@ protected:
         return msg.str();
     }
 
+    //! formats time into {days}d{hours}h{minutes}m{seconds}s.
+    //! @param secs in seconds.
     std::string formatTime(size_t secs) {
         std::ostringstream msg;
         constexpr size_t minute = 60;
@@ -99,47 +112,67 @@ protected:
 };
 
 
+//! @brief A counter showing progress in percent.
+//!
+//! Prints to the R console in a thread safe manner using `Rcout`
+//! (an instance of `RcppThread::Rprinter`).
 class ProgressCounter : public ProgressPrinter {
 
 public:
+    //! constructs a progress counter.
+    //! @param numIt total number of iterations.
+    //! @param printEvery how regularly to print updates (in seconds).
     ProgressCounter(size_t numIt, size_t printEvery) :
         ProgressPrinter(numIt, printEvery)
     {}
 
 private:
-    void printProgress(size_t it) {
-        double pct = std::round((it + 1) * 100.0 / numIt_);
+    //! prints progress in percent to the R console (+ an estimate of remaining
+    //! time).
+    void printProgress() {
+        double pct = std::round(it_ * 100.0 / numIt_);
         std::ostringstream msg;
-        msg << "\rCalculating: " << pct << "% " << remaingTimeString(it);
+        msg << "\rComputing: " << pct << "% " << remaingTimeString();
         if (!isDone_) {
-            if (it + 1 == numIt_)
+            if (it_ == numIt_)
                 isDone_ = true;
             Rcout << msg.str();
         }
     }
 };
 
+//! @brief A progress bar showing progress in percent.
+//!
+//! Prints to the R console in a thread safe manner using `Rcout`
+//! (an instance of `RcppThread::Rprinter`).
 class ProgressBar : public ProgressPrinter {
 
 public:
+    //! constructs a progress bar.
+    //! @param numIt total number of iterations.
+    //! @param printEvery how regularly to print updates (in seconds).
     ProgressBar(size_t numIt, size_t printEvery) :
         ProgressPrinter(numIt, printEvery)
     {}
 
 private:
-    void printProgress(size_t it) {
-        size_t pct = (it + 1) * 100 / numIt_;
+    //! prints a progress bar to the R console (+ an estimate of remaining
+    //! time).
+    void printProgress() {
+        size_t pct = it_ * 100 / numIt_;
         std::ostringstream msg;
-        msg << "\rCalculating: " <<
-            makeBar(pct) << pct << "% " <<
-            remaingTimeString(it);
+        msg << "\rComputing: ";
+        msg << makeBar(pct) << pct << "% " << remaingTimeString();
         if (!isDone_) {
-            if (it + 1 == numIt_)
+            if (it_ == numIt_)
                 isDone_ = true;
             Rcout << msg.str();
         }
     }
 
+    //! constructs the progress bar.
+    //! @param pct progress in percent.
+    //! @param numBars bar is split into `numBars` units.
     std::string makeBar(size_t pct, size_t numBars = 40) {
         std::ostringstream msg;
         msg << "[";
