@@ -103,11 +103,12 @@ protected:
         return msg.str();
     }
 
-    std::atomic_size_t it_{0};
-    std::atomic_size_t numUpdates_{0};
-    std::atomic_bool isDone_{false};
-    size_t numIt_;
-    size_t printEvery_;
+    std::atomic_size_t it_{0};          //!< iteration counter
+    std::atomic_size_t numUpdates_{0};  //!< counter for the number of updates
+    std::atomic_bool isDone_{false};    //!< flag indicating end of iterations
+    size_t numIt_;                      //!< total number of iterations
+    size_t printEvery_;                 //!< update frequency
+    //! time at start
     std::chrono::time_point<std::chrono::steady_clock> startTime_;
 };
 

@@ -8,7 +8,7 @@
     <detaileddescription>
 <para><simplesect kind="authors"><para>Thomas Nagler</para>
 </simplesect>
-This is the API documentation for the RcppThread C++ library. For a more high-level overview see the <ulink url="https://doi.org/10.18637/jss.v097.c01">vignette</ulink>.</para>
+This is the API documentation for the RcppThread C++ library. For a more high-level overview see the <ulink url="https://doi.org/10.18637/jss.v097.c01">vignette</ulink> and <ulink url="https://github.com/tnagler/RcppThread/blob/main/README.md">README</ulink>.</para>
 <sect1 id="index_1license">
 <title>License</title>
 <para>The MIT License (MIT)</para>

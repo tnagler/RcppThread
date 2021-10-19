@@ -4,6 +4,31 @@
     <member refid="structRcppThread_1_1Batch_1a761c98eb9a90c68c3b93cd87b1b74e02" kind="variable"><name>begin</name></member>
     <member refid="structRcppThread_1_1Batch_1a3f0da7f5d6b152a3bb3ce310a6405ce0" kind="variable"><name>end</name></member>
   </compound>
+  <compound refid="classRcppThread_1_1ProgressBar" kind="class"><name>RcppThread::ProgressBar</name>
+    <member refid="classRcppThread_1_1ProgressBar_1a09bdaf2e551442af08b10b7ef19ab7ba" kind="function"><name>ProgressBar</name></member>
+    <member refid="classRcppThread_1_1ProgressBar_1a39f9b31c61cd22cc7548abea097336ce" kind="function"><name>printProgress</name></member>
+    <member refid="classRcppThread_1_1ProgressBar_1ab2369495912d2c12ab5dbd810048e3de" kind="function"><name>makeBar</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1ProgressCounter" kind="class"><name>RcppThread::ProgressCounter</name>
+    <member refid="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" kind="function"><name>ProgressCounter</name></member>
+    <member refid="classRcppThread_1_1ProgressCounter_1af0ab5e21bb89fd8fd499f7ac6443a10d" kind="function"><name>printProgress</name></member>
+  </compound>
+  <compound refid="classRcppThread_1_1ProgressPrinter" kind="class"><name>RcppThread::ProgressPrinter</name>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a28e410b643798f36a59bcef22b9d1dbd" kind="variable"><name>it_</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a1aa7189b1a757bc6089966886443b49d" kind="variable"><name>numUpdates_</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" kind="variable"><name>isDone_</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a9529bc02365f45586db36b903b4f1e9f" kind="variable"><name>numIt_</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a9a0af32f5d66762e6b3993e085b90cf7" kind="variable"><name>printEvery_</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1abb8c055119f7a19bf2672e6614b04f14" kind="variable"><name>startTime_</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a71e9e5034d220b4fc75648545554b401" kind="function"><name>ProgressPrinter</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a9fbe8e4d867cf9e03dd7e67ab3240419" kind="function"><name>printProgress</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a9b92bd795df45b246a578e66d10e2d50" kind="function"><name>operator++</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a2d7146dd49c3df81a45d0537489826c3" kind="function"><name>operator++</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a4158cf794e210d88200676e308828008" kind="function"><name>needsPrint</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a0fac2a44d886424a2693e4b9d7fb4d58" kind="function"><name>remainingSecs</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a851b2b836517eab09fd15c0933e92e9c" kind="function"><name>remaingTimeString</name></member>
+    <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" kind="function"><name>formatTime</name></member>
+  </compound>
   <compound refid="classRcppThread_1_1RMonitor" kind="class"><name>RcppThread::RMonitor</name>
     <member refid="classRcppThread_1_1RMonitor_1a9ccf6a0d51bcb0b83334683b2dbd70c7" kind="friend"><name>RPrinter</name></member>
     <member refid="classRcppThread_1_1RMonitor_1ad81d4d6402e7bfe7f254b2d5388fb97b" kind="friend"><name>checkUserInterrupt</name></member>
@@ -105,6 +130,8 @@
   <compound refid="Batch_8hpp" kind="file"><name>Batch.hpp</name>
   </compound>
   <compound refid="parallelFor_8hpp" kind="file"><name>parallelFor.hpp</name>
+  </compound>
+  <compound refid="Progress_8hpp" kind="file"><name>Progress.hpp</name>
   </compound>
   <compound refid="Rcout_8hpp" kind="file"><name>Rcout.hpp</name>
     <member refid="Rcout_8hpp_1a85b8de01431b2a45e5f280faa971e51b" kind="define"><name>RCPPTHREAD_OVERRIDE_COUT</name></member>

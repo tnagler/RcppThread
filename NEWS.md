@@ -2,6 +2,9 @@
 
 * Add R function `detectCores()` (#48).
 
+* Add classes `ProgressCounter` and `ProgressBar` for tracking progress in long-
+  running loops (#49).
+
 
 # RcppThread 1.0.0
 

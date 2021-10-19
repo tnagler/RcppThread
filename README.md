@@ -14,7 +14,8 @@ Provides R-friendly threading functionality:
    [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread),
   * classes for the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) and parallel for loops
-    for easy and flexible parallelism.
+    for easy and flexible parallelism,
+  * thread safe progress tracking.
 
 The library is header-only, platform-independent, and only 
 requires a 
@@ -25,6 +26,30 @@ requires a
 For a detailed description of its functionality and examples, see the associated
 [JSS paper](https://doi.org/10.18637/jss.v097.c01)
 or the [API documentation](https://tnagler.github.io/RcppThread/).
+
+Since then, the following features have been added:
+
+- An R function `RcppThread::detectCores()` to determine the number of (logical)
+  cores on your machine.
+
+- C++ classes `ProgressCounter` and `ProgressBar` for tracking progress in 
+  long-running loops.  
+  **Example usage:**
+  ``` cpp
+    // 20 iterations in loop, update progress every 1 sec
+    RcppThread::ProgressBar bar(20, 1);
+    RcppThread::parallelFor(0, 20, [&] (int i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        bar++;
+    });
+  ```
+  **Output:** (just one line that is continuously updated)
+  ``` 
+  ...
+  Computing: [==========================              ] 65% (~1s remaining)       
+  ...
+  Computing: [========================================] 100% (done) 
+  ```
 
 ## Installation
 

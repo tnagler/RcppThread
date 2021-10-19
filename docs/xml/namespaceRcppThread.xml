@@ -3,6 +3,9 @@
   <compounddef id="namespaceRcppThread" kind="namespace" language="C++">
     <compoundname>RcppThread</compoundname>
     <innerclass refid="structRcppThread_1_1Batch" prot="public">RcppThread::Batch</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressBar" prot="public">RcppThread::ProgressBar</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressCounter" prot="public">RcppThread::ProgressCounter</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressPrinter" prot="public">RcppThread::ProgressPrinter</innerclass>
     <innerclass refid="classRcppThread_1_1RMonitor" prot="public">RcppThread::RMonitor</innerclass>
     <innerclass refid="classRcppThread_1_1RPrinter" prot="public">RcppThread::RPrinter</innerclass>
     <innerclass refid="classRcppThread_1_1Thread" prot="public">RcppThread::Thread</innerclass>

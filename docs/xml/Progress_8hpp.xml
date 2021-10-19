@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="Progress_8hpp" kind="file" language="C++">
+    <compoundname>Progress.hpp</compoundname>
+    <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
+    <includes local="no">atomic</includes>
+    <includes local="no">chrono</includes>
+    <includes local="no">sstream</includes>
+    <includes local="no">cmath</includes>
+    <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
+    <incdepgraph>
+      <node id="2">
+        <label>atomic</label>
+      </node>
+      <node id="5">
+        <label>cmath</label>
+      </node>
+      <node id="4">
+        <label>sstream</label>
+      </node>
+      <node id="1">
+        <label>/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp</label>
+        <link refid="Progress_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>chrono</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="classRcppThread_1_1ProgressPrinter" prot="public">RcppThread::ProgressPrinter</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressCounter" prot="public">RcppThread::ProgressCounter</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressBar" prot="public">RcppThread::ProgressBar</innerclass>
+    <innernamespace refid="namespaceRcppThread">RcppThread</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RcppThread::ProgressPrinter class | RcppThread R-friendly
+threading
+in
+C++</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
+        <a href="https://github.com/tnagler/RcppThread">RcppThread</a> <span class="m-breadcrumb">|</span> <a href="index.html" class="m-thin">R-friendly
+threading
+in
+C++</a>
+      </span>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="namespaceRcppThread.html">RcppThread</a></li>
+            <li><a href="overrides.html">Automatic overrides</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a href="https://github.com/tnagler/RcppThread">GitHub</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespaceRcppThread.html">RcppThread</a>::<wbr/></span>ProgressPrinter <span class="m-thin">class</span>
+        </h1>
+        <p>Abstract class for printing progress.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#derived-classes">Derived classes</a></li>
+                <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+                <li><a href="#pub-methods">Public functions</a></li>
+                <li><a href="#pro-methods">Protected functions</a></li>
+                <li><a href="#pro-attribs">Protected variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<p>This class contains most of the logic for tracking progress in a parallel loop. Child classes must define a method <code>void printProgress()</code> that is called whenever an update is required.</p>
+        <section id="derived-classes">
+          <h2><a href="#derived-classes">Derived classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a href="classRcppThread_1_1ProgressBar.html" class="m-doc">ProgressBar</a>
+            </dt>
+            <dd>A progress bar showing progress in percent.</dd>
+            <dt>
+              class <a href="classRcppThread_1_1ProgressCounter.html" class="m-doc">ProgressCounter</a>
+            </dt>
+            <dd>A counter showing progress in percent.</dd>
+          </dl>
+        </section>
+        <section id="typeless-methods">
+          <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a71e9e5034d220b4fc75648545554b401" class="m-doc">ProgressPrinter</a>(</span><span class="m-doc-wrap">size_t numIt,
+              size_t printEvery = 1)</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="pub-methods">
+          <h2><a href="#pub-methods">Public functions</a></h2>
+          <dl class="m-doc">
+            <dt id="a9fbe8e4d867cf9e03dd7e67ab3240419">
+              <span class="m-doc-wrap-bumper">void <a href="#a9fbe8e4d867cf9e03dd7e67ab3240419" class="m-doc-self">printProgress</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-warning">pure virtual</span></span>
+            </dt>
+            <dd>prints progress whenever an update is necessary.</dd>
+            <dt id="a9b92bd795df45b246a578e66d10e2d50">
+              <span class="m-doc-wrap-bumper">auto <a href="#a9b92bd795df45b246a578e66d10e2d50" class="m-doc-self">operator++</a>(</span><span class="m-doc-wrap">) -&gt; size_t</span>
+            </dt>
+            <dd>pre-increment operator</dd>
+            <dt id="a2d7146dd49c3df81a45d0537489826c3">
+              <span class="m-doc-wrap-bumper">auto <a href="#a2d7146dd49c3df81a45d0537489826c3" class="m-doc-self">operator++</a>(</span><span class="m-doc-wrap">int) -&gt; size_t</span>
+            </dt>
+            <dd>post-increment operator</dd>
+          </dl>
+        </section>
+        <section id="pro-methods">
+          <h2><a href="#pro-methods">Protected functions</a></h2>
+          <dl class="m-doc">
+            <dt id="a4158cf794e210d88200676e308828008">
+              <span class="m-doc-wrap-bumper">auto <a href="#a4158cf794e210d88200676e308828008" class="m-doc-self">needsPrint</a>(</span><span class="m-doc-wrap">) -&gt; bool</span>
+            </dt>
+            <dd>checks whether it&#x27;s time for an update.</dd>
+            <dt id="a0fac2a44d886424a2693e4b9d7fb4d58">
+              <span class="m-doc-wrap-bumper">auto <a href="#a0fac2a44d886424a2693e4b9d7fb4d58" class="m-doc-self">remainingSecs</a>(</span><span class="m-doc-wrap">) -&gt; size_t</span>
+            </dt>
+            <dd>estimates the remaining time in seconds.</dd>
+            <dt id="a851b2b836517eab09fd15c0933e92e9c">
+              <span class="m-doc-wrap-bumper">auto <a href="#a851b2b836517eab09fd15c0933e92e9c" class="m-doc-self">remaingTimeString</a>(</span><span class="m-doc-wrap">) -&gt; std::string</span>
+            </dt>
+            <dd>prints either remaining time or that the computation is done.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a7a8c8d7b7ea582dd260768a47893c19f" class="m-doc">formatTime</a>(</span><span class="m-doc-wrap">size_t secs) -&gt; std::string</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="pro-attribs">
+          <h2><a href="#pro-attribs">Protected variables</a></h2>
+          <dl class="m-doc">
+            <dt id="a28e410b643798f36a59bcef22b9d1dbd">
+              std::atomic_size_t <a href="#a28e410b643798f36a59bcef22b9d1dbd" class="m-doc-self">it_</a>
+            </dt>
+            <dd>iteration counter</dd>
+            <dt id="a1aa7189b1a757bc6089966886443b49d">
+              std::atomic_size_t <a href="#a1aa7189b1a757bc6089966886443b49d" class="m-doc-self">numUpdates_</a>
+            </dt>
+            <dd>counter for the number of updates</dd>
+            <dt id="aacbd938eed528c3cd165b1b9277e7892">
+              std::atomic_bool <a href="#aacbd938eed528c3cd165b1b9277e7892" class="m-doc-self">isDone_</a>
+            </dt>
+            <dd>flag indicating end of iterations</dd>
+            <dt id="a9529bc02365f45586db36b903b4f1e9f">
+              size_t <a href="#a9529bc02365f45586db36b903b4f1e9f" class="m-doc-self">numIt_</a>
+            </dt>
+            <dd>total number of iterations</dd>
+            <dt>
+              size_t <a href="#a9a0af32f5d66762e6b3993e085b90cf7" class="m-doc">printEvery_</a>
+            </dt>
+            <dd></dd>
+            <dt id="abb8c055119f7a19bf2672e6614b04f14">
+              std::chrono::time_point&lt;std::chrono::steady_clock&gt; <a href="#abb8c055119f7a19bf2672e6614b04f14" class="m-doc-self">startTime_</a>
+            </dt>
+            <dd>time at start</dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a71e9e5034d220b4fc75648545554b401"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> RcppThread::<wbr />ProgressPrinter::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a71e9e5034d220b4fc75648545554b401" class="m-doc-self">ProgressPrinter</a>(</span><span class="m-doc-wrap">size_t numIt,
+              size_t printEvery = 1)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">numIt</td>
+                  <td>total number of iterations.</td>
+                </tr>
+                <tr>
+                  <td>printEvery</td>
+                  <td>how regularly to print updates (in seconds).</td>
+                </tr>
+              </tbody>
+            </table>
+<p>Constructor for abstract class <code>ProgressPrinter</code>.</p>
+          </div></section>
+          <section class="m-doc-details" id="a7a8c8d7b7ea582dd260768a47893c19f"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">std::string RcppThread::<wbr />ProgressPrinter::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a7a8c8d7b7ea582dd260768a47893c19f" class="m-doc-self">formatTime</a>(</span><span class="m-doc-wrap">size_t secs) <span class="m-label m-warning">protected</span></span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">secs</td>
+                  <td>in seconds.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>formats time into {days}d{hours}h{minutes}m{seconds}s.</p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Variable documentation</h2>
+          <section class="m-doc-details" id="a9a0af32f5d66762e6b3993e085b90cf7"><div>
+            <h3>
+              size_t RcppThread::<wbr />ProgressPrinter::<wbr /><a href="#a9a0af32f5d66762e6b3993e085b90cf7" class="m-doc-self">printEvery_</a> <span class="m-label m-warning">protected</span>
+            </h3>
+<p>update frequency</p>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages, OpenGL, GLSL, Vulkan and OpenAL APIs. You can omit any prefix from the symbol or file path; adding a <code>:</code> or <code>/</code> suffix lists all members of given symbol or directory.</p> <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span> / <span class="m-label m-dim">&uarr;</span> to navigate through the list, <span class="m-label m-dim">Enter</span> to go. <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script src="searchdata-v1.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>RcppThread docs. copyright © <a href="http://tnagler.com/">Thomas Nagler</a> 2021.<br />Generated by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>. Contact the author via <a href="https://github.com/tnagler/RcppThread">GitHub</a> or  <a href="mailto:mail@tnagler.com">e-mail</a>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>
