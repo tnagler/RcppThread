@@ -19,6 +19,7 @@ public:
     ProgressPrinter(size_t numIt, size_t printEvery)
         : numIt_(numIt)
         , printEvery_(printEvery)
+        , startTime_(std::chrono::steady_clock::now())
     {}
 
     // need to be defined in child classes
@@ -27,10 +28,10 @@ public:
 
     // pre-increment operator
     size_t operator++ () {
-        size_t it = ++it_;
+        size_t it = it_++;
         if (this->needsPrint(it))
             this->printProgress(it);
-        return it;
+        return it + 1;
     }
 
     // post-increment operator
@@ -42,33 +43,51 @@ public:
     }
 
 protected:
-    float remainingSecs() {
+    size_t remainingSecs() {
         using namespace std::chrono;
-        duration<float> timeDiff = system_clock::now() - startTime_;
-        auto secs = (numIt_ - it_) * timeDiff.count() / it_;
-        return std::floor(secs);
+        auto diff = duration<float>(steady_clock::now() - startTime_).count();
+        auto remaining = (numIt_ - it_) * diff / it_;
+        return static_cast<size_t>(remaining);
     }
 
     std::string remaingTimeString(size_t it) {
-        std::stringstream msg;
+        std::ostringstream msg;
         if (it == 0) {
-            startTime_ = std::chrono::system_clock::now();
+            startTime_ = std::chrono::steady_clock::now();
         } else if (it + 1 == numIt_) {
             msg << "(done)                         \n";
         } else {
-            std::chrono::duration<float> timeDiff =
-                std::chrono::system_clock::now() - startTime_;
-            auto secs = (numIt_ - it_) * timeDiff.count() / it_;
-            msg << "(~" << std::floor(secs) << "s remaining)       ";
+            msg << "(~" << formatTime(remainingSecs()) << " remaining)       ";
         }
+        return msg.str();
+    }
+
+    std::string formatTime(size_t secs) {
+        std::ostringstream msg;
+        constexpr size_t minute = 60;
+        constexpr size_t hour = 60 * minute;
+        constexpr size_t day = 24 * hour;
+        if (secs / day > 0) {
+            msg << secs / day << "d";
+            secs = secs % day;
+        }
+        if (secs / hour > 0) {
+            msg << secs / hour << "h";
+            secs = secs % hour;
+        }
+        if (secs / minute > 0) {
+            msg << secs / minute << "m";
+            secs = secs % minute;
+        }
+        msg << secs << "s";
         return msg.str();
     }
 
     size_t numIt_;
     size_t printEvery_;
     std::atomic_size_t it_{0};
-    std::chrono::time_point<std::chrono::system_clock> startTime_;
-    bool is_done_{false};
+    std::chrono::time_point<std::chrono::steady_clock> startTime_;
+    std::atomic_bool is_done_{false};
 };
 
 
@@ -87,9 +106,13 @@ private:
 
     void printProgress(size_t it) {
         double pct = std::round((it + 1) * 100.0 / numIt_);
-        std::stringstream msg;
+        std::ostringstream msg;
         msg << "\rCalculating: " << pct << "% " << remaingTimeString(it);
-        Rcout << msg.str();
+        if (!is_done_) {
+            if (it + 1 == numIt_)
+                is_done_ = true;
+            Rcout << msg.str();
+        }
     }
 };
 
@@ -108,15 +131,27 @@ private:
 
     void printProgress(size_t it) {
         size_t pct = (it + 1) * 100 / numIt_;
-        std::stringstream msg;
-        msg << "\rCalculating: [";
+        std::ostringstream msg;
+        msg << "\rCalculating: " <<
+            makeBar(pct) << pct << "% " <<
+            remaingTimeString(it);
+        if (!is_done_) {
+            if (it + 1 == numIt_)
+                is_done_ = true;
+            Rcout << msg.str();
+        }
+    }
+
+    std::string makeBar(size_t pct, size_t numBars = 40) {
+        std::ostringstream msg;
+        msg << "[";
         int i = 0;
-        for (; i < pct / 100.0 * 40; i++)
+        for (; i < pct / 100.0 * numBars; i++)
             msg << "=";
-        for (; i < 40; i++)
+        for (; i < numBars; i++)
             msg << " ";
-        msg << "] " << pct << "% " << remaingTimeString(it);
-        Rcout << msg.str();
+        msg << "] ";
+        return msg.str();
     }
 };
 
