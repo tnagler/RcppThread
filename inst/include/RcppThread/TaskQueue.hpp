@@ -37,7 +37,7 @@ public:
   size_t capacity() const { return capacity_; }
 
   // Store (copy) at modulo index
-  void store(size_t i, Task&& task) { buffer_[i & mask_] = std::move(task); }
+  void store(size_t i, Task task) { buffer_[i & mask_] = task; }
 
   // Load (copy) at modulo index
   Task load(size_t i) const { return buffer_[i & mask_]; }
@@ -137,7 +137,8 @@ TaskQueue::push(Task&& task)
 
   if (buffers_[bufferIndex_].capacity() < (b - t) + 1) {
     // capacity reached, create copy with double size
-    buffers_.push_back(buffers_[bufferIndex_++].enlarge(b, t));
+    buffers_.push_back(buffers_[bufferIndex_].enlarge(b, t));
+    bufferIndex_++;
   }
   buffers_[bufferIndex_].store(b, std::move(task));
 
