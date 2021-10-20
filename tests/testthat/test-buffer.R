@@ -20,20 +20,20 @@ void testTaskQueue()
     queue.pop();
 
     std::thread thread1([&] {
-        for (int i = 0; i < 1600; i++)
+        for (int i = 0; i < 400; i++)
             queue.push([] { std::this_thread::sleep_for(std::chrono::milliseconds(10)); });
     });
 
     std::thread thread2([&] {
-        for (int i = 0; i < 400; i++)
+        for (int i = 0; i < 100; i++)
             queue.pop()();
     });
     std::thread thread3([&] {
-        for (int i = 0; i < 400; i++)
+        for (int i = 0; i < 100; i++)
             queue.pop()();
     });
     std::thread thread4([&] {
-        for (int i = 0; i < 400; i++)
+        for (int i = 0; i < 100; i++)
             queue.pop()();
     });
     thread1.join();
@@ -68,12 +68,12 @@ void testTaskQueueFromPool()
     queue.pop();
 
     std::thread thread1([&] {
-        for (int i = 0; i < 1600; i++)
+        for (int i = 0; i < 400; i++)
             queue.push([] { std::this_thread::sleep_for(std::chrono::milliseconds(10)); });
     });
 
-    RcppThread::ThreadPool pool(1);
-    for (int i = 0; i < 1600; i++)
+    RcppThread::ThreadPool pool(4);
+    for (int i = 0; i < 400; i++)
         pool.push([&queue] { queue.pop()(); });
     thread1.join();
     pool.join();

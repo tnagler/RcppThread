@@ -6,27 +6,26 @@
 
 #pragma once
 
+#include "RcppThread/Batch.hpp"
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
-#include "RcppThread/Batch.hpp"
 #include "RcppThread/TaskQueue.hpp"
 
-#include <vector>
-#include <thread>
-#include <queue>
+#include <atomic>
 #include <condition_variable>
-#include <future>      // std::shared_future
+#include <functional>
+#include <future>
+#include <memory>
 #include <mutex>
-#include <atomic>
-#include <memory>      // std::shared_ptr
-#include <atomic>
-#include <functional>  // std::function
+#include <thread>
+#include <vector>
 
 namespace RcppThread {
 
 //! Implemenation of the thread pool pattern based on `Thread`.
-class ThreadPool {
-public:
+class ThreadPool
+{
+  public:
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool();
@@ -41,11 +40,10 @@ public:
     void push(F&& f, Args&&... args);
 
     template<class F, class... Args>
-    auto pushReturn(F&& f, Args&&... args)
-        -> std::future<decltype(f(args...))>;
+    auto pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>;
 
     template<class F, class I>
-    void map(F&& f, I &&items);
+    void map(F&& f, I&& items);
 
     template<class F>
     inline void parallelFor(ptrdiff_t begin,
@@ -60,9 +58,11 @@ public:
     void join();
     void clear();
 
-private:
+  private:
     void startWorker();
     void doJob(std::function<void()>&& job);
+    void waitForJobs();
+    void processJobs();
     void announceBusy();
     void announceIdle();
     void announceStop();
@@ -74,20 +74,21 @@ private:
     void rethrowExceptions();
 
     std::vector<std::thread> workers_;
-    TaskQueue jobs_{256};
+    TaskQueue jobs_{ 4096 };
 
     // variables for synchronization between workers
     std::mutex mTasks_;
+    std::mutex mBusy_;
     std::condition_variable cvTasks_;
     std::condition_variable cvBusy_;
-    size_t numBusy_{0};
-    bool stopped_{false};
-    std::exception_ptr error_ptr_;
+    std::atomic_size_t numBusy_{ 0 };
+    bool stopped_{ false };
+    std::exception_ptr errorPtr_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
-inline ThreadPool::ThreadPool() :
-    ThreadPool(std::thread::hardware_concurrency())
+inline ThreadPool::ThreadPool()
+  : ThreadPool(std::thread::hardware_concurrency())
 {}
 
 //! constructs a thread pool with `nWorkers` threads.
@@ -95,10 +96,9 @@ inline ThreadPool::ThreadPool() :
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
 {
-  for (size_t w = 0; w < nWorkers; ++w)
-    this->startWorker();
+    for (size_t w = 0; w < nWorkers; ++w)
+        this->startWorker();
 }
-
 
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
@@ -107,7 +107,8 @@ inline ThreadPool::~ThreadPool() noexcept
     try {
         this->announceStop();
         this->joinWorkers();
-    } catch (...) {}
+    } catch (...) {
+    }
 }
 
 //! pushes jobs to the thread pool.
@@ -117,20 +118,22 @@ inline ThreadPool::~ThreadPool() noexcept
 //!
 //! The function returns void; if a job returns a result, use `pushReturn()`.
 template<class F, class... Args>
-void ThreadPool::push(F&& f, Args&&... args)
+void
+ThreadPool::push(F&& f, Args&&... args)
 {
+    using Task = std::function<void()>;
     if (workers_.size() == 0) {
         f(args...); // if there are no workers, do the job in the main thread
-        return;
     } else {
-        // must hold lock while modifying the shared queue
-        std::lock_guard<std::mutex> lk(mTasks_);
         if (stopped_)
             throw std::runtime_error("cannot push to joined thread pool");
+
         jobs_.push([f, args...] { f(args...); });
+
+        // wake up waiting workers. no lock required: 
+        // by definition of TaskQueue, other threads already see new jobs
+        cvTasks_.notify_all();
     }
-    // signal a waiting worker that there's a new job
-    cvTasks_.notify_one();
 }
 
 //! pushes jobs returning a value to the thread pool.
@@ -140,13 +143,13 @@ void ThreadPool::push(F&& f, Args&&... args)
 //! @return an `std::shared_future`, where the user can get the result and
 //!   rethrow the catched exceptions.
 template<class F, class... Args>
-auto ThreadPool::pushReturn(F&& f, Args&&... args)
-    -> std::future<decltype(f(args...))>
+auto
+ThreadPool::pushReturn(F&& f, Args&&... args)
+  -> std::future<decltype(f(args...))>
 {
     using jobPackage = std::packaged_task<decltype(f(args...))()>;
-    auto job = std::make_shared<jobPackage>([&f, args...] {
-        return f(args...);
-    });
+    auto job =
+      std::make_shared<jobPackage>([&f, args...] { return f(args...); });
     this->push([job] { (*job)(); });
 
     return job->get_future();
@@ -158,9 +161,10 @@ auto ThreadPool::pushReturn(F&& f, Args&&... args)
 //!   mapped; must allow for `auto` loops (i.e., `std::begin(I)`/
 //!  `std::end(I)` must be defined).
 template<class F, class I>
-void ThreadPool::map(F&& f, I &&items)
+void
+ThreadPool::map(F&& f, I&& items)
 {
-    for (auto &&item : items)
+    for (auto&& item : items)
         this->push(f, item);
 }
 
@@ -188,14 +192,15 @@ void ThreadPool::map(F&& f, I &&items)
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
-inline void ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end,
-                                    F&& f,
-                                    size_t nBatches)
+inline void
+ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end, F&& f, size_t nBatches)
 {
     if (end < begin)
-        throw std::range_error("end is less than begin; cannot run backward loops.");
-    auto doBatch = [f] (const Batch& b) {
-        for (ptrdiff_t i = b.begin; i < b.end; i++) f(i);
+        throw std::range_error(
+          "end is less than begin; cannot run backward loops.");
+    auto doBatch = [f](const Batch& b) {
+        for (ptrdiff_t i = b.begin; i < b.end; i++)
+            f(i);
     };
     auto batches = createBatches(begin, end - begin, workers_.size(), nBatches);
     for (const auto& batch : batches)
@@ -225,10 +230,12 @@ inline void ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end,
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F, class I>
-inline void ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
+inline void
+ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 {
-    auto doBatch = [f, &items] (const Batch& b) {
-        for (ptrdiff_t i = b.begin; i < b.end; i++) f(items[i]);
+    auto doBatch = [f, &items](const Batch& b) {
+        for (ptrdiff_t i = b.begin; i < b.end; i++)
+            f(items[i]);
     };
     size_t size = std::end(items) - std::begin(items);
     auto batches = createBatches(0, size, workers_.size(), nBatches);
@@ -238,15 +245,16 @@ inline void ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 
 //! waits for all jobs to finish and checks for interruptions,
 //! but does not join the threads.
-inline void ThreadPool::wait()
+inline void
+ThreadPool::wait()
 {
     while (true) {
-        if ( waitForWakeUpEvent() ) {
-            if ( !this->allJobsDone() ) {
-                this->clear();  // cancel all remaining jobs
-                continue;       // wait for currently running jobs
+        if (waitForWakeUpEvent()) {
+            if (this->hasErrored()) {
+                this->clear(); // cancel all remaining jobs
+                continue;      // wait for currently running jobs
             }
-            if ( this->hasErrored() | this->allJobsDone() | isInterrupted() )
+            if (this->hasErrored() | this->allJobsDone() | isInterrupted())
                 break;
         }
         Rcout << "";
@@ -258,7 +266,8 @@ inline void ThreadPool::wait()
 }
 
 //! waits for all jobs to finish and joins all threads.
-inline void ThreadPool::join()
+inline void
+ThreadPool::join()
 {
     this->wait();
     this->announceStop();
@@ -266,77 +275,80 @@ inline void ThreadPool::join()
 }
 
 //! clears the pool from all open jobs.
-inline void ThreadPool::clear()
+inline void
+ThreadPool::clear()
 {
     jobs_.clear();
 }
 
 //! spawns a worker thread waiting for jobs to arrive.
-inline void ThreadPool::startWorker()
+inline void
+ThreadPool::startWorker()
 {
     workers_.emplace_back([this] {
-        std::function<void()> job;
-        // observe thread pool; only stop after all jobs are done
-        while (!stopped_ | !jobs_.empty()) {
-            // must hold a lock while modifying shared variables
-            std::unique_lock<std::mutex> lk(mTasks_);
-
-            // thread should wait when there is no job
-            cvTasks_.wait(lk, [this] {
-                return stopped_ || !jobs_.empty();
-            });
-
-            // queue can be empty if thread pool is stopped
-            if (jobs_.empty())
-                continue;
-
-            // take job from the queue
-            auto job = jobs_.pop();
-
-            // lock can be released before starting work, but must signal
-            // that thread will be busy before (!) to avoid premature breaks
-            this->announceBusy();
-            lk.unlock();
-
-            this->doJob(std::move(job));
-            this->announceIdle();
-            std::this_thread::yield();
+        while (!stopped_) {
+            this->waitForJobs();
+            if (!stopped_)
+                this->processJobs();
         }
     });
 }
 
+inline void
+ThreadPool::waitForJobs()
+{
+    std::unique_lock<std::mutex> lk(mTasks_);
+    while (!stopped_ && jobs_.empty()) {
+        cvTasks_.wait(lk);
+    }
+}
+
+inline void
+ThreadPool::processJobs()
+{
+    this->announceBusy();
+    std::function<void()> job;
+    while (!jobs_.empty()) {
+        this->doJob(jobs_.pop());
+    }
+    this->announceIdle();
+}
+
 //! executes a job safely and let's pool know when it's busy.
 //! @param job job to be exectued.
-inline void ThreadPool::doJob(std::function<void()>&& job)
+inline void
+ThreadPool::doJob(std::function<void()>&& job)
 {
     // checkUserInterrupt();
     try {
         job();
     } catch (...) {
-        std::lock_guard<std::mutex> lk(mTasks_);
-        error_ptr_ = std::current_exception();
+        std::lock_guard<std::mutex> lk(mBusy_);
+        errorPtr_ = std::current_exception();
     }
 }
 
-//! signals that a worker is busy (must be called why locking mTasks).
-inline void ThreadPool::announceBusy()
+//! signals that a worker is busy.
+inline void
+ThreadPool::announceBusy()
 {
-    ++numBusy_;
-    cvBusy_.notify_one();
+    numBusy_.fetch_add(1, std::memory_order_release);
 }
 
 //! signals that a worker is idle.
-inline void ThreadPool::announceIdle()
+inline void
+ThreadPool::announceIdle()
 {
     {
-        std::lock_guard<std::mutex> lk(mTasks_);
-        --numBusy_;
+        std::lock_guard<std::mutex> lk(mBusy_);
+        numBusy_.fetch_sub(1, std::memory_order_relaxed);
     }
     cvBusy_.notify_one();
 }
 
 //! signals threads that no more new work is coming.
-inline void ThreadPool::announceStop()
+inline void
+ThreadPool::announceStop()
 {
     {
         std::unique_lock<std::mutex> lk(mTasks_);
@@ -346,10 +358,11 @@ inline void ThreadPool::announceStop()
 }
 
 //! joins worker threads if possible.
-inline void ThreadPool::joinWorkers()
+inline void
+ThreadPool::joinWorkers()
 {
     if (workers_.size() > 0) {
-        for (auto &worker : workers_) {
+        for (auto& worker : workers_) {
             if (worker.joinable())
                 worker.join();
         }
@@ -357,36 +370,40 @@ inline void ThreadPool::joinWorkers()
 }
 
 //! checks if an error occured.
-inline bool ThreadPool::hasErrored()
+inline bool
+ThreadPool::hasErrored()
 {
-    return static_cast<bool>(error_ptr_);
+    return static_cast<bool>(errorPtr_);
 }
 
 //! check whether all jobs are done
-inline bool ThreadPool::allJobsDone()
+inline bool
+ThreadPool::allJobsDone()
 {
-    return (numBusy_ == 0) && jobs_.empty();
+    // acquire might prevent an unncessary loop
+    return !numBusy_.load(std::memory_order_acquire) && jobs_.empty();
 }
 
 //! checks whether wait() needs to wake up
-inline bool ThreadPool::waitForWakeUpEvent()
+inline bool
+ThreadPool::waitForWakeUpEvent()
 {
     static auto timeout = std::chrono::milliseconds(50);
     auto isWakeUpEvent = [this] {
         return this->allJobsDone() | this->hasErrored();
     };
-    std::unique_lock<std::mutex> lk(mTasks_);
+    std::unique_lock<std::mutex> lk(mBusy_);
     cvBusy_.wait_for(lk, timeout, isWakeUpEvent);
     return isWakeUpEvent();
 }
 
 //! rethrows exceptions (exceptions from workers are caught and stored; the
 //! wait loop only checks, but does not throw for interruptions)
-inline void ThreadPool::rethrowExceptions()
+inline void
+ThreadPool::rethrowExceptions()
 {
     checkUserInterrupt();
-    if ( this->hasErrored() )
-        std::rethrow_exception(error_ptr_);
+    if (this->hasErrored())
+        std::rethrow_exception(errorPtr_);
 }
-
 }
