@@ -420,15 +420,15 @@ void testTaskQueue()
 
     std::thread thread2([&] {
         for (int i = 0; i < 400; i++)
-            queue.steal()();
+            queue.pop()();
     });
     std::thread thread3([&] {
         for (int i = 0; i < 400; i++)
-            queue.steal()();
+            queue.pop()();
     });
     std::thread thread4([&] {
         for (int i = 0; i < 400; i++)
-            queue.steal()();
+            queue.pop()();
     });
     thread1.join();
     thread2.join();

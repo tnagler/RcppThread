@@ -93,12 +93,9 @@ public:
   //! pushes a task to the bottom of the queue; enlarges the queue if full.
   void push(Task&& task);
 
-  //! pops a task from the bottom of the queue. Only the owner thread should
-  //! pop.
+  //! pops a task from the top of the queue. Returns an empty task 
+  //! when lost race.
   Task pop();
-
-  //! steals an item from the top of the queue.
-  Task steal();
 
 private:
   alignas(64) std::atomic_ptrdiff_t top_{0};
@@ -157,36 +154,6 @@ TaskQueue::push(Task&& task)
 
 std::function<void()>
 TaskQueue::pop()
-{
-  auto b = bottom_.load(m_relaxed) - 1;
-  // stealers can still steal the task
-  bottom_.store(b, m_relaxed); 
-  // stealers can no longer steal this task
-  std::atomic_thread_fence(m_seq_cst);
-  auto t = top_.load(m_relaxed);
-
-  if (t <= b) {
-    if (t == b) {
-      if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
-        bottom_.store(b + 1, m_relaxed);
-      } else {
-        // task was stolen
-        bottom_.store(b + 1, m_relaxed);
-        return Task();
-      }
-      bottom_.store(b + 1, m_relaxed);
-    }
-
-    return *buffers_[bufferIndex_].load(b);
-  }
-
-  // queue is empty
-  bottom_.store(b + 1, m_relaxed);
-  return Task();
-}
-
-std::function<void()>
-TaskQueue::steal()
 {
   auto t = top_.load(m_acquire);
   std::atomic_thread_fence(m_seq_cst);
