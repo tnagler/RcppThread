@@ -15,6 +15,13 @@ test_that("Thread class works", {
     expect_output(testThreadClass())
 })
 
+## ------------------------------------------------------
+context("Lock-free task queue")
+test_that("ProgressCounter works", {
+    expect_silent(testTaskQueue())
+})
+
+
 ## -------------------------------------------------------
 context("Thread pool")
 test_that("push works", {

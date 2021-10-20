@@ -30,7 +30,7 @@ public:
     , mask_(capacity - 1)
     , buffer_(TaskVec(capacity))
   {
-    if (capacity_ && (!(capacity_ & (capacity_ - 1))))
+    if (capacity_ & (capacity_ - 1))
       throw std::runtime_error("capacity must be a power of two");
   }
 
@@ -92,14 +92,13 @@ public:
   Task steal();
 
 private:
-  alignas(64) std::atomic_size_t top_{0};
-  alignas(64) std::atomic_size_t bottom_{0};
+  alignas(64) std::atomic_ptrdiff_t top_{0};
+  alignas(64) std::atomic_ptrdiff_t bottom_{0};
   alignas(64) std::vector<detail::RingBuffer> buffers_;
   alignas(64) std::atomic_size_t bufferIndex_{0};
 
   // convenience aliases
   static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
-  static constexpr std::memory_order m_consume = std::memory_order_consume;
   static constexpr std::memory_order m_acquire = std::memory_order_acquire;
   static constexpr std::memory_order m_release = std::memory_order_release;
   static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
@@ -113,8 +112,8 @@ TaskQueue::TaskQueue(size_t capacity)
 size_t
 TaskQueue::size() const
 {
-  size_t b = bottom_.load(m_relaxed);
-  size_t t = top_.load(m_relaxed);
+  auto b = bottom_.load(m_relaxed);
+  auto t = top_.load(m_relaxed);
   return static_cast<size_t>(b >= t ? b - t : 0);
 }
 
@@ -133,8 +132,8 @@ TaskQueue::empty() const
 void
 TaskQueue::push(Task&& task)
 {
-  size_t b = bottom_.load(m_relaxed);
-  size_t t = top_.load(m_acquire);
+  auto b = bottom_.load(m_relaxed);
+  auto t = top_.load(m_acquire);
 
   if (buffers_[bufferIndex_].capacity() < (b - t) + 1) {
     // capacity reached, create copy with double size
@@ -149,12 +148,12 @@ TaskQueue::push(Task&& task)
 std::function<void()>
 TaskQueue::pop()
 {
-  size_t b = bottom_.load(m_relaxed) - 1;
+  auto b = bottom_.load(m_relaxed) - 1;
   // stealers can still steal the task
   bottom_.store(b, m_relaxed); 
   // stealers can no longer steal this task
   std::atomic_thread_fence(m_seq_cst);
-  size_t t = top_.load(m_relaxed);
+  auto t = top_.load(m_relaxed);
 
   if (t <= b) {
     if (t == b) {
@@ -179,9 +178,9 @@ TaskQueue::pop()
 std::function<void()>
 TaskQueue::steal()
 {
-  size_t t = top_.load(m_acquire);
+  auto t = top_.load(m_acquire);
   std::atomic_thread_fence(m_seq_cst);
-  size_t b = bottom_.load(m_acquire);
+  auto b = bottom_.load(m_acquire);
 
   if (t < b) {
     // Must load *before* acquiring the slot as slot may be overwritten
@@ -195,10 +194,10 @@ TaskQueue::steal()
     if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
       return task;
     } else {
-      return Task();  // lost race for this task
+      return [] {};  // lost race for this task
     }
   } else {
-    return Task();  // queue is empty
+    return [] {};  // queue is empty
   }
 }
 
