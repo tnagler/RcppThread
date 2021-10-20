@@ -6,7 +6,6 @@ Rcpp::sourceCpp(code = {
 
 #include "RcppThread.h"
 
-
 // [[Rcpp::export]]
 void testTaskQueue()
 {

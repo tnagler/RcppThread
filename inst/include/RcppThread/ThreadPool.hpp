@@ -9,6 +9,7 @@
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
 #include "RcppThread/Batch.hpp"
+#include "RcppThread/TaskQueue.hpp"
 
 #include <vector>
 #include <thread>
@@ -72,8 +73,8 @@ private:
     bool waitForWakeUpEvent();
     void rethrowExceptions();
 
-    std::vector<std::thread> workers_;        // worker threads in the pool
-    std::queue<std::function<void()>> jobs_;  // the task que
+    std::vector<std::thread> workers_;
+    TaskQueue jobs_{256};
 
     // variables for synchronization between workers
     std::mutex mTasks_;
@@ -126,7 +127,7 @@ void ThreadPool::push(F&& f, Args&&... args)
         std::lock_guard<std::mutex> lk(mTasks_);
         if (stopped_)
             throw std::runtime_error("cannot push to joined thread pool");
-        jobs_.emplace([f, args...] { f(args...); });
+        jobs_.push([f, args...] { f(args...); });
     }
     // signal a waiting worker that there's a new job
     cvTasks_.notify_one();
@@ -267,10 +268,7 @@ inline void ThreadPool::join()
 //! clears the pool from all open jobs.
 inline void ThreadPool::clear()
 {
-    // must hold lock while modifying job queue
-    std::lock_guard<std::mutex> lk(mTasks_);
-    std::queue<std::function<void()>>().swap(jobs_);
-    cvTasks_.notify_all();
+    jobs_.clear();
 }
 
 //! spawns a worker thread waiting for jobs to arrive.
@@ -293,8 +291,7 @@ inline void ThreadPool::startWorker()
                 continue;
 
             // take job from the queue
-            job = std::move(jobs_.front());
-            jobs_.pop();
+            auto job = jobs_.pop();
 
             // lock can be released before starting work, but must signal
             // that thread will be busy before (!) to avoid premature breaks
