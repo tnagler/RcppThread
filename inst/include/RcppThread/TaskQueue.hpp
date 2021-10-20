@@ -22,7 +22,7 @@ namespace detail {
 class RingBuffer
 {
   using Task = std::function<void()>;
-  using TaskVec = std::vector<Task>;
+  using TaskVec = std::vector<std::shared_ptr<Task>>;
 
 public:
   explicit RingBuffer(size_t capacity)
@@ -37,17 +37,26 @@ public:
   size_t capacity() const { return capacity_; }
 
   // Store (copy) at modulo index
-  void store(size_t i, Task task) { buffer_[i & mask_] = task; }
+  void store(size_t i, Task&& task) 
+  {
+     buffer_[i & mask_] = std::make_shared<Task>(std::move(task)); 
+  }
+
+  // Swaps (copy) at modulo index
+  void copy(size_t i, std::shared_ptr<Task> taskPtr) 
+  {
+     buffer_[i & mask_] = taskPtr; 
+  }
 
   // Load (copy) at modulo index
-  Task load(size_t i) const { return buffer_[i & mask_]; }
+  std::shared_ptr<Task> load(size_t i) const { return buffer_[i & mask_]; }
 
   // Allocates and returns a new ring buffer and copies current elements.
   RingBuffer enlarge(size_t bottom, size_t top) const
   {
     RingBuffer buffer(2 * capacity_);
     for (size_t i = top; i != bottom; ++i)
-      buffer.store(i, this->load(i));
+      buffer.copy(i, this->load(i));
     return buffer;
   }
 
@@ -168,7 +177,7 @@ TaskQueue::pop()
       bottom_.store(b + 1, m_relaxed);
     }
 
-    return buffers_[bufferIndex_].load(b);
+    return *buffers_[bufferIndex_].load(b);
   }
 
   // queue is empty
@@ -190,10 +199,10 @@ TaskQueue::steal()
     // we win the race below garanteeing we had no race during our read. If we
     // loose the race then 'x' could be corrupt due to read-during-write race
     // but as T is trivially destructible this does not matter.
-    auto task = buffers_[bufferIndex_].load(t);
+    auto taskPtr = buffers_[bufferIndex_].load(t);
 
     if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
-      return task;
+      return *taskPtr;
     } else {
       return [] {};  // lost race for this task
     }
