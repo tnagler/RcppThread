@@ -91,7 +91,7 @@ protected:
     {
         std::lock_guard<std::mutex> lk(m_);
         msgs_ << object;
-        if ( calledFromMainThread() ) {
+        if ( calledFromMainThread() && (msgs_.str() != std::string("")) ) {
             // release messages in buffer
             Rprintf("%s", msgs_.str().c_str());
             R_FlushConsole();
