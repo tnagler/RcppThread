@@ -117,7 +117,6 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    using Task = std::function<void()>;
     if (workers_.size() == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
@@ -307,12 +306,16 @@ ThreadPool::waitForJobs(moodycamel::ConsumerToken& tk)
 inline void
 ThreadPool::processJobs(moodycamel::ConsumerToken& tk)
 {
-    std::function<void()> job;
-    while ((numJobs_.load(std::memory_order_acquire) != 0) &&
-           !stopped_.load(std::memory_order_relaxed)) {
-        std::function<void()> job;
-        if (jobs_.try_dequeue(tk, job))
-            this->doJob(std::move(job));
+    while ((numJobs_.load(std::memory_order_acquire) != 0)) {
+        // inner loop avoids acquire read above in hot path
+        while (true) {
+            if (stopped_.load(std::memory_order_relaxed))
+                return;
+            std::function<void()> job;
+            if (jobs_.try_dequeue(tk, job))
+                this->doJob(std::move(job));
+            else break;
+        }
     }
 }
 
