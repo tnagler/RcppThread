@@ -22,6 +22,8 @@
 
 namespace RcppThread {
 
+using RcppThreadJob = std::function<void()>;
+
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool
 {
@@ -60,7 +62,7 @@ class ThreadPool
 
   private:
     void startWorker();
-    void doJob(std::function<void()>&& job);
+    void doJob(RcppThreadJob&& job);
     void waitForJobs(moodycamel::ConsumerToken& tk);
     void processJobs(moodycamel::ConsumerToken& tk);
     void announceStop();
@@ -72,7 +74,12 @@ class ThreadPool
     void rethrowExceptions();
 
     std::vector<std::thread> workers_;
-    moodycamel::BlockingConcurrentQueue<std::function<void()>> jobs_{ 1024 };
+    struct QueueTraits : public moodycamel::ConcurrentQueueDefaultTraits
+    {
+        static const size_t BLOCK_SIZE = 256; // Use bigger blocks
+    };
+    moodycamel::BlockingConcurrentQueue<RcppThreadJob, QueueTraits>
+      jobs_{ 1024 };
 
     // variables for synchronization between workers
     std::mutex mDone_;
@@ -268,7 +275,7 @@ ThreadPool::join()
 inline void
 ThreadPool::clear()
 {
-    std::function<void()> job;
+    RcppThreadJob job;
     while (numJobs_.load(std::memory_order_acquire) != 0) {
         numJobs_.fetch_sub(jobs_.try_dequeue(job), std::memory_order_release);
     }
@@ -280,7 +287,7 @@ ThreadPool::startWorker()
 {
     workers_.emplace_back([this] {
         thread_local moodycamel::ConsumerToken tk(jobs_);
-        std::function<void()> job;
+        RcppThreadJob job;
         while (!stopped_.load(std::memory_order_relaxed)) {
             this->waitForJobs(tk);
             this->processJobs(tk);
@@ -295,7 +302,7 @@ ThreadPool::startWorker()
 inline void
 ThreadPool::waitForJobs(moodycamel::ConsumerToken& tk)
 {
-    std::function<void()> job;
+    RcppThreadJob job;
     jobs_.wait_dequeue(tk, job);
     // popped job needs to be done here
     if (!stopped_.load(std::memory_order_relaxed))
@@ -311,10 +318,11 @@ ThreadPool::processJobs(moodycamel::ConsumerToken& tk)
         while (true) {
             if (stopped_.load(std::memory_order_relaxed))
                 return;
-            std::function<void()> job;
+            RcppThreadJob job;
             if (jobs_.try_dequeue(tk, job))
                 this->doJob(std::move(job));
-            else break;
+            else
+                break;
         }
     }
 }
@@ -322,7 +330,7 @@ ThreadPool::processJobs(moodycamel::ConsumerToken& tk)
 //! executes a job safely and decrements the job count.
 //! @param job job to be exectued.
 inline void
-ThreadPool::doJob(std::function<void()>&& job)
+ThreadPool::doJob(RcppThreadJob&& job)
 {
     try {
         job();
