@@ -12,3 +12,4 @@ inst/include/mainpage.h
 revdep
 ^\.github$
 ^CRAN-RELEASE$
+.vscode/

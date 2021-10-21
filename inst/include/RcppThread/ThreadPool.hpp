@@ -342,7 +342,7 @@ ThreadPool::announceStop()
     // push empty jobs to wake up waiting workers
     for (size_t i = 0; i < workers_.size(); i++) {
         numJobs_.fetch_add(1, std::memory_order_release);
-        jobs_.enqueue([]{});
+        jobs_.enqueue([] {});
     }
 }
 
