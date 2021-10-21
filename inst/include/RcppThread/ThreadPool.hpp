@@ -9,7 +9,7 @@
 #include "RcppThread/Batch.hpp"
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
-#include "RcppThread/TaskQueue.hpp"
+#include "moodyCamel/blockingconcurrentqueue.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -63,26 +63,22 @@ class ThreadPool
     void doJob(std::function<void()>&& job);
     void waitForJobs();
     void processJobs();
-    void announceBusy();
-    void announceIdle();
     void announceStop();
     void joinWorkers();
 
     bool hasErrored();
     bool allJobsDone();
-    bool waitForWakeUpEvent();
+    void waitForEvents();
     void rethrowExceptions();
 
     std::vector<std::thread> workers_;
-    TaskQueue jobs_{ 4096 };
+    moodycamel::BlockingConcurrentQueue<std::function<void()>> jobs_{ 1024 };
 
     // variables for synchronization between workers
-    std::mutex mTasks_;
-    std::mutex mBusy_;
-    std::condition_variable cvTasks_;
-    std::condition_variable cvBusy_;
-    std::atomic_size_t numBusy_{ 0 };
-    bool stopped_{ false };
+    std::mutex mDone_;
+    std::condition_variable cvDone_;
+    std::atomic_size_t numJobs_{ 0 };
+    std::atomic_bool stopped_{ false };
     std::exception_ptr errorPtr_;
 };
 
@@ -127,12 +123,8 @@ ThreadPool::push(F&& f, Args&&... args)
     } else {
         if (stopped_)
             throw std::runtime_error("cannot push to joined thread pool");
-
-        jobs_.push([f, args...] { f(args...); });
-
-        // wake up waiting workers. no lock required: 
-        // by definition of TaskQueue, other threads already see new jobs
-        cvTasks_.notify_all();
+        numJobs_.fetch_add(1, std::memory_order_release);
+        jobs_.enqueue([f, args...] { f(args...); });
     }
 }
 
@@ -248,21 +240,21 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (true) {
-        if (waitForWakeUpEvent()) {
-            if (this->hasErrored()) {
-                this->clear(); // cancel all remaining jobs
-                continue;      // wait for currently running jobs
-            }
-            if (this->hasErrored() | this->allJobsDone() | isInterrupted())
-                break;
+    while (numJobs_.load(std::memory_order_acquire) != 0) {
+        waitForEvents(); // non-spinning wait for mDone_
+        if (this->hasErrored()) {
+            this->announceStop(); // stop thread pool
+            continue;             // wait for currently running jobs
         }
+        if (this->hasErrored() | isInterrupted())
+            break;
         Rcout << "";
         std::this_thread::yield();
     }
+    // Rcout << "rethrowing exceptions" << std::endl;
 
     Rcout << "";
-    this->rethrowExceptions();
+    // this->rethrowExceptions();
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -278,7 +270,10 @@ ThreadPool::join()
 inline void
 ThreadPool::clear()
 {
-    jobs_.clear();
+    std::function<void()> job;
+    while (numJobs_.load(std::memory_order_acquire) != 0) {
+        numJobs_.fetch_sub(jobs_.try_dequeue(job), std::memory_order_release);
+    }
 }
 
 //! spawns a worker thread waiting for jobs to arrive.
@@ -286,75 +281,68 @@ inline void
 ThreadPool::startWorker()
 {
     workers_.emplace_back([this] {
-        while (!stopped_) {
+        std::function<void()> job;
+        while (!stopped_.load(std::memory_order_relaxed)) {
             this->waitForJobs();
-            if (!stopped_)
-                this->processJobs();
+            this->processJobs();
+            // if all jobs are done, notify potentially waiting threads
+            if (!numJobs_.load(std::memory_order_acquire))
+                cvDone_.notify_all();
         }
     });
 }
 
+//! blocking wait for elements in the queue; also processes first job.
 inline void
 ThreadPool::waitForJobs()
 {
-    std::unique_lock<std::mutex> lk(mTasks_);
-    while (!stopped_ && jobs_.empty()) {
-        cvTasks_.wait(lk);
-    }
+    std::function<void()> job;
+    jobs_.wait_dequeue(job);
+    // popped job needs to be done here
+    if (!stopped_.load(std::memory_order_relaxed))
+        this->doJob(std::move(job));
 }
 
+//! process jobs until none are left.
 inline void
 ThreadPool::processJobs()
 {
-    this->announceBusy();
     std::function<void()> job;
-    while (!jobs_.empty()) {
-        this->doJob(jobs_.pop());
+    while ((numJobs_.load(std::memory_order_acquire) != 0) &&
+           !stopped_.load(std::memory_order_relaxed)) {
+        std::function<void()> job;
+        if (jobs_.try_dequeue(job))
+            this->doJob(std::move(job));
     }
-    this->announceIdle();
 }
 
-//! executes a job safely and let's pool know when it's busy.
+//! executes a job safely and decrements the job count.
 //! @param job job to be exectued.
 inline void
 ThreadPool::doJob(std::function<void()>&& job)
 {
-    // checkUserInterrupt();
     try {
         job();
+        numJobs_.fetch_sub(1, std::memory_order_release);
     } catch (...) {
-        std::lock_guard<std::mutex> lk(mBusy_);
-        errorPtr_ = std::current_exception();
+        {
+            std::lock_guard<std::mutex> lk(mDone_);
+            errorPtr_ = std::current_exception();
+        }
+        cvDone_.notify_all();
     }
-}
-
-//! signals that a worker is busy.
-inline void
-ThreadPool::announceBusy()
-{
-    numBusy_.fetch_add(1, std::memory_order_release);
-}
-
-//! signals that a worker is idle.
-inline void
-ThreadPool::announceIdle()
-{
-    {
-        std::lock_guard<std::mutex> lk(mBusy_);
-        numBusy_.fetch_sub(1, std::memory_order_relaxed);
-    }
-    cvBusy_.notify_one();
 }
 
 //! signals threads that no more new work is coming.
 inline void
 ThreadPool::announceStop()
 {
-    {
-        std::unique_lock<std::mutex> lk(mTasks_);
-        stopped_ = true;
+    stopped_ = true;
+    // push empty jobs to wake up waiting workers
+    for (size_t i = 0; i < workers_.size(); i++) {
+        numJobs_.fetch_add(1, std::memory_order_release);
+        jobs_.enqueue([]{});
     }
-    cvTasks_.notify_all();
 }
 
 //! joins worker threads if possible.
@@ -381,20 +369,19 @@ inline bool
 ThreadPool::allJobsDone()
 {
     // acquire might prevent an unncessary loop
-    return !numBusy_.load(std::memory_order_acquire) && jobs_.empty();
+    return numJobs_.load(std::memory_order_acquire) == 0;
 }
 
 //! checks whether wait() needs to wake up
-inline bool
-ThreadPool::waitForWakeUpEvent()
+inline void
+ThreadPool::waitForEvents()
 {
     static auto timeout = std::chrono::milliseconds(50);
     auto isWakeUpEvent = [this] {
         return this->allJobsDone() | this->hasErrored();
     };
-    std::unique_lock<std::mutex> lk(mBusy_);
-    cvBusy_.wait_for(lk, timeout, isWakeUpEvent);
-    return isWakeUpEvent();
+    std::unique_lock<std::mutex> lk(mDone_);
+    cvDone_.wait_for(lk, timeout, isWakeUpEvent);
 }
 
 //! rethrows exceptions (exceptions from workers are caught and stored; the
@@ -403,7 +390,6 @@ inline void
 ThreadPool::rethrowExceptions()
 {
     checkUserInterrupt();
-    if (this->hasErrored())
-        std::rethrow_exception(errorPtr_);
+    std::rethrow_exception(errorPtr_);
 }
 }
