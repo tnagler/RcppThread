@@ -125,7 +125,8 @@ ThreadPool::push(F&& f, Args&&... args)
         if (stopped_.load(std::memory_order_relaxed))
             throw std::runtime_error("cannot push to joined thread pool");
         numJobs_.fetch_add(1, std::memory_order_release);
-        jobs_.enqueue([f, args...] { f(args...); });
+        auto job = std::bind(f, args...);
+        jobs_.enqueue(job);
     }
 }
 
@@ -141,8 +142,7 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
   -> std::future<decltype(f(args...))>
 {
     using jobPackage = std::packaged_task<decltype(f(args...))()>;
-    auto job =
-      std::make_shared<jobPackage>([&f, args...] { return f(args...); });
+    auto job = std::make_shared<jobPackage>(std::bind(f, args...));
     this->push([job] { (*job)(); });
 
     return job->get_future();
