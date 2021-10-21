@@ -79,7 +79,7 @@ class ThreadPool
     std::condition_variable cvDone_;
     std::atomic_size_t numJobs_{ 0 };
     std::atomic_bool stopped_{ false };
-    std::exception_ptr errorPtr_;
+    std::exception_ptr errorPtr_{ nullptr };
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -121,7 +121,7 @@ ThreadPool::push(F&& f, Args&&... args)
     if (workers_.size() == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
-        if (stopped_)
+        if (stopped_.load(std::memory_order_relaxed))
             throw std::runtime_error("cannot push to joined thread pool");
         numJobs_.fetch_add(1, std::memory_order_release);
         jobs_.enqueue([f, args...] { f(args...); });
@@ -251,10 +251,9 @@ ThreadPool::wait()
         Rcout << "";
         std::this_thread::yield();
     }
-    // Rcout << "rethrowing exceptions" << std::endl;
 
     Rcout << "";
-    // this->rethrowExceptions();
+    this->rethrowExceptions();
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -391,6 +390,7 @@ inline void
 ThreadPool::rethrowExceptions()
 {
     checkUserInterrupt();
-    std::rethrow_exception(errorPtr_);
+    if (errorPtr_)
+        std::rethrow_exception(errorPtr_);
 }
 }
