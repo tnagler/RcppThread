@@ -61,8 +61,8 @@ class ThreadPool
   private:
     void startWorker();
     void doJob(std::function<void()>&& job);
-    void waitForJobs();
-    void processJobs();
+    void waitForJobs(moodycamel::ConsumerToken& tk);
+    void processJobs(moodycamel::ConsumerToken& tk);
     void announceStop();
     void joinWorkers();
 
@@ -281,10 +281,11 @@ inline void
 ThreadPool::startWorker()
 {
     workers_.emplace_back([this] {
+        thread_local moodycamel::ConsumerToken tk(jobs_);
         std::function<void()> job;
         while (!stopped_.load(std::memory_order_relaxed)) {
-            this->waitForJobs();
-            this->processJobs();
+            this->waitForJobs(tk);
+            this->processJobs(tk);
             // if all jobs are done, notify potentially waiting threads
             if (!numJobs_.load(std::memory_order_acquire))
                 cvDone_.notify_all();
@@ -294,10 +295,10 @@ ThreadPool::startWorker()
 
 //! blocking wait for elements in the queue; also processes first job.
 inline void
-ThreadPool::waitForJobs()
+ThreadPool::waitForJobs(moodycamel::ConsumerToken& tk)
 {
     std::function<void()> job;
-    jobs_.wait_dequeue(job);
+    jobs_.wait_dequeue(tk, job);
     // popped job needs to be done here
     if (!stopped_.load(std::memory_order_relaxed))
         this->doJob(std::move(job));
@@ -305,13 +306,13 @@ ThreadPool::waitForJobs()
 
 //! process jobs until none are left.
 inline void
-ThreadPool::processJobs()
+ThreadPool::processJobs(moodycamel::ConsumerToken& tk)
 {
     std::function<void()> job;
     while ((numJobs_.load(std::memory_order_acquire) != 0) &&
            !stopped_.load(std::memory_order_relaxed)) {
         std::function<void()> job;
-        if (jobs_.try_dequeue(job))
+        if (jobs_.try_dequeue(tk, job))
             this->doJob(std::move(job));
     }
 }
