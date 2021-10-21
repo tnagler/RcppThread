@@ -74,12 +74,7 @@ class ThreadPool
     void rethrowExceptions();
 
     std::vector<std::thread> workers_;
-    struct QueueTraits : public moodycamel::ConcurrentQueueDefaultTraits
-    {
-        static const size_t BLOCK_SIZE = 256; // Use bigger blocks
-    };
-    moodycamel::BlockingConcurrentQueue<RcppThreadJob, QueueTraits>
-      jobs_{ 1024 };
+    moodycamel::BlockingConcurrentQueue<RcppThreadJob> jobs_;
 
     // variables for synchronization between workers
     std::mutex mDone_;
