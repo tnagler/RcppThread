@@ -29,44 +29,17 @@
 
 // Also dual-licensed under the Boost Software License (see LICENSE.md)
 
+// RcppThread: File has been cleaned from diagnostic pragmas for CRAN.
+
 #pragma once
 
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
-// Disable -Wconversion warnings (spuriously triggered when Traits::size_t and
-// Traits::index_t are set to < 32 bits, causing integer promotion, causing warnings
-// upon assigning any computed values)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-
-#ifdef MCDBGQ_USE_RELACY
-#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-#endif
-#endif
-
-#if defined(_MSC_VER) && (!defined(_HAS_CXX17) || !_HAS_CXX17)
-// VS2019 with /W4 warns about constant conditional expressions but unless /std=c++17 or higher
-// does not support `if constexpr`, so we have no choice but to simply disable the warning
-#pragma warning(push)
-#pragma warning(disable: 4127)  // conditional expression is constant
-#endif
 
 #if defined(__APPLE__)
 #include "TargetConditionals.h"
 #endif
 
-#ifdef MCDBGQ_USE_RELACY
-#include "relacy/relacy_std.hpp"
-#include "relacy_shims.h"
-// We only use malloc/free anyway, and the delete macro messes up `= delete` method declarations.
-// We'll override the default trait malloc ourselves without a macro.
-#undef new
-#undef delete
-#undef malloc
-#undef free
-#else
 #include <atomic>		// Requires C++11. Sorry VS2010.
 #include <cassert>
-#endif
 #include <cstddef>              // for max_align_t
 #include <cstdint>
 #include <cstdlib>
@@ -468,15 +441,8 @@ namespace details
 	template<typename T>
 	static inline bool circular_less_than(T a, T b)
 	{
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4554)
-#endif
 		static_assert(std::is_integral<T>::value && !std::numeric_limits<T>::is_signed, "circular_less_than is intended to be used only with unsigned integer types");
 		return static_cast<T>(a - b) > static_cast<T>(static_cast<T>(1) << static_cast<T>(sizeof(T) * CHAR_BIT - 1));
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 	}
 	
 	template<typename U>
@@ -758,15 +724,7 @@ public:
 	static const size_t IMPLICIT_INITIAL_INDEX_SIZE = static_cast<size_t>(Traits::IMPLICIT_INITIAL_INDEX_SIZE);
 	static const size_t INITIAL_IMPLICIT_PRODUCER_HASH_SIZE = static_cast<size_t>(Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE);
 	static const std::uint32_t EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE = static_cast<std::uint32_t>(Traits::EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE);
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4307)		// + integral constant overflow (that's what the ternary expression is for!)
-#pragma warning(disable: 4309)		// static_cast: Truncation of constant value
-#endif
 	static const size_t MAX_SUBQUEUE_SIZE = (details::const_numeric_max<size_t>::value - static_cast<size_t>(Traits::MAX_SUBQUEUE_SIZE) < BLOCK_SIZE) ? details::const_numeric_max<size_t>::value : ((static_cast<size_t>(Traits::MAX_SUBQUEUE_SIZE) + (BLOCK_SIZE - 1)) / BLOCK_SIZE * BLOCK_SIZE);
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 	static_assert(!std::numeric_limits<size_t>::is_signed && std::is_integral<size_t>::value, "Traits::size_t must be an unsigned integral type");
 	static_assert(!std::numeric_limits<index_t>::is_signed && std::is_integral<index_t>::value, "Traits::index_t must be an unsigned integral type");
@@ -2603,10 +2561,6 @@ private:
 			return false;
 		}
 		
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4706)  // assignment within conditional expression
-#endif
 		template<AllocationMode allocMode, typename It>
 		bool enqueue_bulk(It itemFirst, size_t count)
 		{
@@ -2757,9 +2711,6 @@ private:
 			this->tailIndex.store(newTailIndex, std::memory_order_release);
 			return true;
 		}
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 		
 		template<typename It>
 		size_t dequeue_bulk(It& itemFirst, size_t max)
@@ -3732,11 +3683,3 @@ inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, ty
 }
 
 }
-
-#if defined(_MSC_VER) && (!defined(_HAS_CXX17) || !_HAS_CXX17)
-#pragma warning(pop)
-#endif
-
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
-#pragma GCC diagnostic pop
-#endif
