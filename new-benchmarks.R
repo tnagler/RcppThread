@@ -38,7 +38,7 @@ void RcppThreadEmpty(int nThreads)
     }
 }
 ")
-
+#
 timing <- tibble(
     threads = c(1:4, seq.int(5, 50, l = 6)),
     timings = map(
@@ -577,7 +577,7 @@ timing <- crossing(
                 parallelFor = parallelFor(.x, .y),
                 OpenMP = OpenMP(.x, .y),
                 RcppParallelFor = RcppParallelFor(.x, .y),
-                times = 20
+                times = 50
             )
         )
     ) %>%
