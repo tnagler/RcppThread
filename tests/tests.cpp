@@ -4,6 +4,8 @@
 #include "RcppThread.h"
 using namespace RcppThread;
 
+constexpr size_t NUM_THREADS = 8;
+
 // [[Rcpp::export]]
 void testMonitor()
 {
@@ -49,7 +51,7 @@ void testThreadClass()
 // [[Rcpp::export]]
 void testThreadPoolPush()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
         checkUserInterrupt();
@@ -71,7 +73,7 @@ void testThreadPoolPush()
 // [[Rcpp::export]]
 void testThreadPoolPushReturn()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i)  {
         checkUserInterrupt();
@@ -97,7 +99,7 @@ void testThreadPoolPushReturn()
 // [[Rcpp::export]]
 void testThreadPoolMap()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
 
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
@@ -123,7 +125,7 @@ void testThreadPoolMap()
 // [[Rcpp::export]]
 void testThreadPoolParallelFor()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
 
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
@@ -146,10 +148,10 @@ void testThreadPoolParallelFor()
 // [[Rcpp::export]]
 void testThreadPoolNestedParallelFor()
 {
-    ThreadPool pool(2);
-    std::vector<std::vector<double>> x(100);
+    ThreadPool pool(NUM_THREADS);
+    std::vector<std::vector<double>> x(1000);
     for (auto &xx : x)
-        xx = std::vector<double>(100, 1.0);
+        xx = std::vector<double>(1000, 1.0);
     pool.parallelFor(0, x.size(), [&] (int i) {
         pool.parallelFor(0, x[i].size(), [&x, i] (int j) {
             x[i][j] *= 2;
@@ -169,7 +171,7 @@ void testThreadPoolNestedParallelFor()
 // [[Rcpp::export]]
 void testThreadPoolParallelForEach()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
 
     std::vector<size_t> x(1000000, 1);
     auto dummy = [&] (size_t i) -> void {
@@ -195,7 +197,7 @@ void testThreadPoolParallelForEach()
 // [[Rcpp::export]]
 void testThreadPoolNestedParallelForEach()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
 
     std::vector<std::vector<double>> x(100);
     for (auto &xx : x)
@@ -243,7 +245,7 @@ void testThreadPoolSingleThreaded()
 // [[Rcpp::export]]
 void testThreadPoolDestructWOJoin()
 {
-    ThreadPool pool(2);
+    ThreadPool pool(NUM_THREADS);
 }
 
 
@@ -256,7 +258,7 @@ void testParallelFor()
         x[i] = 2 * x[i];
     };
 
-    parallelFor(0, x.size() / 2, dummy, 2);
+    parallelFor(0, x.size() / 2, dummy, NUM_THREADS);
     parallelFor(0, x.size() / 2, dummy, 0);
 
     size_t count_wrong = 0;
@@ -279,7 +281,7 @@ void testNestedParallelFor()
         parallelFor(0, x[i].size(), [&x, i] (int j) {
             x[i][j] *= 2;
         }, 1);
-    }, 1);
+    }, NUM_THREADS / 2);
 
     size_t count_wrong = 0;
     for (auto xx : x) {
@@ -302,7 +304,7 @@ void testParallelForEach()
     auto ids = std::vector<size_t>(x.size() / 2);
     for (size_t i = 0; i < ids.size(); i++)
         ids[i] = i;
-    parallelForEach(ids, dummy, 2);
+    parallelForEach(ids, dummy, NUM_THREADS);
     parallelForEach(ids, dummy, 0);
 
     size_t count_wrong = 0;
@@ -317,15 +319,15 @@ void testParallelForEach()
 // [[Rcpp::export]]
 void testNestedParallelForEach()
 {
-    std::vector<std::vector<double>> x(1);
+    std::vector<std::vector<double>> x(100);
     for (auto &xx : x)
-        xx = std::vector<double>(1, 1.0);
+        xx = std::vector<double>(100, 1.0);
 
     parallelForEach(x, [&] (std::vector<double>& xx) {
         parallelForEach(xx, [&] (double& xxx) {
             xxx *= 2;
         }, 1);
-    }, 1);
+    }, NUM_THREADS);
 
     size_t count_wrong = 0;
     for (auto xx : x) {
@@ -384,9 +386,9 @@ void testProgressCounter()
 {
     RcppThread::ProgressCounter cntr(20, 1);
     RcppThread::parallelFor(0, 20, [&] (int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         cntr++;
-    });
+    }, NUM_THREADS);
 }
 
 // [[Rcpp::export]]
@@ -395,39 +397,30 @@ void testProgressBar()
     // 20 iterations in loop, update progress every 1 sec
     RcppThread::ProgressBar bar(20, 1);
     RcppThread::parallelFor(0, 20, [&] (int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         ++bar;
-    });
+    }, NUM_THREADS);
 }
 
 // [[Rcpp::export]]
 void testTaskQueue()
 {
-    RcppThread::detail::RingBuffer buff(2);
-
-    RcppThread::TaskQueue queue(128);
-    queue.push(std::function<void()>());
-    queue.push(std::function<void()>());
-    queue.pop();
-    queue.pop();
-    queue.pop();
-    queue.pop();
-
+    RcppThread::TaskQueue queue(16);
     std::thread thread1([&] {
-        for (int i = 0; i < 1600; i++)
+        for (int i = 0; i < 160; i++)
             queue.push([] { std::this_thread::sleep_for(std::chrono::milliseconds(10)); });
     });
 
     std::thread thread2([&] {
-        for (int i = 0; i < 400; i++)
+        for (int i = 0; i < 40; i++)
             queue.pop()();
     });
     std::thread thread3([&] {
-        for (int i = 0; i < 400; i++)
+        for (int i = 0; i < 40; i++)
             queue.pop()();
     });
     std::thread thread4([&] {
-        for (int i = 0; i < 400; i++)
+        for (int i = 0; i < 40; i++)
             queue.pop()();
     });
     thread1.join();
