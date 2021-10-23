@@ -73,14 +73,18 @@ class ThreadPool
     void waitForEvents();
     void rethrowExceptions();
 
-    std::vector<std::thread> workers_;
     moodycamel::BlockingConcurrentQueue<RcppThreadJob> jobs_;
 
     // variables for synchronization between workers
+    size_t maxWorkers_;
+    std::atomic_size_t nActiveWorkers_{ 0 };
+    std::vector<std::thread> workers_;
+
+    alignas(64) std::atomic_size_t numJobs_{ 0 };
     std::mutex mDone_;
     std::condition_variable cvDone_;
-    std::atomic_size_t numJobs_{ 0 };
-    std::atomic_bool stopped_{ false };
+
+    alignas(64) std::atomic_bool stopped_{ false };
     std::exception_ptr errorPtr_{ nullptr };
 };
 
@@ -93,9 +97,9 @@ inline ThreadPool::ThreadPool()
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
+  : maxWorkers_(nWorkers)
 {
-    for (size_t w = 0; w < nWorkers; ++w)
-        this->startWorker();
+    workers_.resize(maxWorkers_);
 }
 
 //! destructor joins all threads if possible.
@@ -119,7 +123,7 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    if (workers_.size() == 0) {
+    if (maxWorkers_ == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
         if (stopped_.load(std::memory_order_relaxed))
@@ -127,6 +131,8 @@ ThreadPool::push(F&& f, Args&&... args)
         numJobs_.fetch_add(1, std::memory_order_release);
         auto job = std::bind(f, args...);
         jobs_.enqueue(job);
+        if (nActiveWorkers_ < maxWorkers_)
+            this->startWorker();
     }
 }
 
@@ -195,7 +201,7 @@ ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end, F&& f, size_t nBatches)
         for (ptrdiff_t i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, end - begin, workers_.size(), nBatches);
+    auto batches = createBatches(begin, end - begin, maxWorkers_, nBatches);
     for (const auto& batch : batches)
         this->push(doBatch, batch);
 }
@@ -231,7 +237,7 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
             f(items[i]);
     };
     size_t size = std::end(items) - std::begin(items);
-    auto batches = createBatches(0, size, workers_.size(), nBatches);
+    auto batches = createBatches(0, size, maxWorkers_, nBatches);
     for (const auto& batch : batches)
         this->push(doBatch, batch);
 }
@@ -280,9 +286,9 @@ ThreadPool::clear()
 inline void
 ThreadPool::startWorker()
 {
-    workers_.emplace_back([this] {
+    auto ix = nActiveWorkers_++;
+    workers_[ix] = std::thread([this] {
         thread_local moodycamel::ConsumerToken tk(jobs_);
-        RcppThreadJob job;
         while (!stopped_.load(std::memory_order_relaxed)) {
             this->waitForJobs(tk);
             this->processJobs(tk);
@@ -308,7 +314,7 @@ ThreadPool::waitForJobs(moodycamel::ConsumerToken& tk)
 inline void
 ThreadPool::processJobs(moodycamel::ConsumerToken& tk)
 {
-    while ((numJobs_.load(std::memory_order_acquire) != 0)) {
+    while (numJobs_.load(std::memory_order_acquire) != 0) {
         // inner loop avoids acquire read above in hot path
         while (true) {
             if (stopped_.load(std::memory_order_relaxed))
@@ -345,7 +351,7 @@ ThreadPool::announceStop()
 {
     stopped_ = true;
     // push empty jobs to wake up waiting workers
-    for (size_t i = 0; i < workers_.size(); i++) {
+    for (size_t i = 0; i < maxWorkers_; i++) {
         numJobs_.fetch_add(1, std::memory_order_release);
         jobs_.enqueue([] {});
     }
@@ -355,11 +361,9 @@ ThreadPool::announceStop()
 inline void
 ThreadPool::joinWorkers()
 {
-    if (workers_.size() > 0) {
-        for (auto& worker : workers_) {
-            if (worker.joinable())
-                worker.join();
-        }
+    for (auto& worker : workers_) {
+        if (worker.joinable())
+            worker.join();
     }
 }
 

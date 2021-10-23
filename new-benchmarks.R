@@ -4,121 +4,121 @@ library("Rcpp")
 library("RcppParallel")
 library("RcppThread")
 
-# Measuring synchronization overhead ------------------------
-
-## Create, join, and destruct threads
-
-Rcpp::sourceCpp(code =
-"
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(RcppThread)]]
-#include <RcppThread.h>
-
-// [[Rcpp::export]]
-void stdEmpty(int nThreads)
-{
-    std::vector<std::thread> threads;
-    for (size_t t = 0; t < nThreads; ++t) {
-        threads.emplace_back( [] {} );
-    }
-    for (size_t t = 0; t < nThreads; ++t) {
-        threads[t].join();
-    }
-}
-
-// [[Rcpp::export]]
-void RcppThreadEmpty(int nThreads)
-{
-    std::vector<RcppThread::Thread> threads;
-    for (size_t t = 0; t < nThreads; ++t) {
-        threads.emplace_back( [] {} );
-    }
-    for (size_t t = 0; t < nThreads; ++t) {
-        threads[t].join();
-    }
-}
-")
+# # Measuring synchronization overhead ------------------------
 #
-timing <- tibble(
-    threads = c(1:4, seq.int(5, 50, l = 6)),
-    timings = map(
-        threads,
-        ~ microbenchmark(
-            `std::thread` = stdEmpty(.),
-            `RcppThread::Thread` = RcppThreadEmpty(.),
-            times = 1000
-        )
-    )
-) %>%
-    unnest()
-
-medians <- timing %>%
-    group_by(threads, expr) %>%
-    summarize(ms = median(time / 10^6)) %>%
-    ungroup()
-
-medians %>%
-    ggplot(aes(threads, ms, color = expr, linetype = expr)) +
-    geom_line(size = 0.8) +
-    expand_limits(y = 0) +
-    labs(color = "", linetype = "") +
-    theme(legend.margin = margin(1, 1, 1, 1)) +
-    theme(legend.position = "bottom")
-ggsave("benchEmptyThread.pdf", width = 5.5, height = 3)
-
-
-## Checking for interruptions
-
-## Checking for user interruptions
-
-Rcpp::sourceCpp(code =
-"
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(RcppThread)]]
-#include <RcppThread.h>
-
-// [[Rcpp::export]]
-void interruptMain(int nChecks)
-{
-    for (size_t i = 0; i < nChecks; ++i)
-        RcppThread::checkUserInterrupt();
-}
-
-// [[Rcpp::export]]
-void interruptChild(int nChecks)
-{
-    RcppThread::Thread thread([nChecks] {
-        for (size_t i = 0; i < nChecks; ++i)
-            RcppThread::checkUserInterrupt();
-    });
-    thread.join();
-}
-")
-
-timing <- tibble(
-    interruptions = seq.int(0, 10^4, l = 10),
-    timings = map(
-        interruptions,
-        ~ microbenchmark(
-            `main thread` = interruptMain(.),
-            `child thread` = interruptChild(.),
-            times = 1000
-        )
-    )
-) %>%
-    unnest()
-
-medians <- timing %>%
-    group_by(interruptions, expr) %>%
-    summarize(ms = median(time / 10^6))
-
-medians %>%
-    ggplot(aes(interruptions, ms, color = expr, linetype = expr)) +
-    geom_line(size = 0.8) +
-    expand_limits(y = 0) +
-    labs(linetype = "called from", color = "called from")  +
-    theme(legend.position = "bottom")
-ggsave("benchInterrupt.pdf", width = 5.5, height = 3)
+# ## Create, join, and destruct threads
+#
+# Rcpp::sourceCpp(code =
+# "
+# // [[Rcpp::plugins(cpp11)]]
+# // [[Rcpp::depends(RcppThread)]]
+# #include <RcppThread.h>
+#
+# // [[Rcpp::export]]
+# void stdEmpty(int nThreads)
+# {
+#     std::vector<std::thread> threads;
+#     for (size_t t = 0; t < nThreads; ++t) {
+#         threads.emplace_back( [] {} );
+#     }
+#     for (size_t t = 0; t < nThreads; ++t) {
+#         threads[t].join();
+#     }
+# }
+#
+# // [[Rcpp::export]]
+# void RcppThreadEmpty(int nThreads)
+# {
+#     std::vector<RcppThread::Thread> threads;
+#     for (size_t t = 0; t < nThreads; ++t) {
+#         threads.emplace_back( [] {} );
+#     }
+#     for (size_t t = 0; t < nThreads; ++t) {
+#         threads[t].join();
+#     }
+# }
+# ")
+# #
+# timing <- tibble(
+#     threads = c(1:4, seq.int(5, 50, l = 6)),
+#     timings = map(
+#         threads,
+#         ~ microbenchmark(
+#             `std::thread` = stdEmpty(.),
+#             `RcppThread::Thread` = RcppThreadEmpty(.),
+#             times = 1000
+#         )
+#     )
+# ) %>%
+#     unnest()
+#
+# medians <- timing %>%
+#     group_by(threads, expr) %>%
+#     summarize(ms = median(time / 10^6)) %>%
+#     ungroup()
+#
+# medians %>%
+#     ggplot(aes(threads, ms, color = expr, linetype = expr)) +
+#     geom_line(size = 0.8) +
+#     expand_limits(y = 0) +
+#     labs(color = "", linetype = "") +
+#     theme(legend.margin = margin(1, 1, 1, 1)) +
+#     theme(legend.position = "bottom")
+# ggsave("benchEmptyThread.pdf", width = 5.5, height = 3)
+#
+#
+# ## Checking for interruptions
+#
+# ## Checking for user interruptions
+#
+# Rcpp::sourceCpp(code =
+# "
+# // [[Rcpp::plugins(cpp11)]]
+# // [[Rcpp::depends(RcppThread)]]
+# #include <RcppThread.h>
+#
+# // [[Rcpp::export]]
+# void interruptMain(int nChecks)
+# {
+#     for (size_t i = 0; i < nChecks; ++i)
+#         RcppThread::checkUserInterrupt();
+# }
+#
+# // [[Rcpp::export]]
+# void interruptChild(int nChecks)
+# {
+#     RcppThread::Thread thread([nChecks] {
+#         for (size_t i = 0; i < nChecks; ++i)
+#             RcppThread::checkUserInterrupt();
+#     });
+#     thread.join();
+# }
+# ")
+#
+# timing <- tibble(
+#     interruptions = seq.int(0, 10^4, l = 10),
+#     timings = map(
+#         interruptions,
+#         ~ microbenchmark(
+#             `main thread` = interruptMain(.),
+#             `child thread` = interruptChild(.),
+#             times = 1000
+#         )
+#     )
+# ) %>%
+#     unnest()
+#
+# medians <- timing %>%
+#     group_by(interruptions, expr) %>%
+#     summarize(ms = median(time / 10^6))
+#
+# medians %>%
+#     ggplot(aes(interruptions, ms, color = expr, linetype = expr)) +
+#     geom_line(size = 0.8) +
+#     expand_limits(y = 0) +
+#     labs(linetype = "called from", color = "called from")  +
+#     theme(legend.position = "bottom")
+# ggsave("benchInterrupt.pdf", width = 5.5, height = 3)
 
 
 
@@ -226,11 +226,20 @@ Rcpp::sourceCpp(code =
 #include <RcppThread.h>
 #include <RcppParallel.h>
 
+
+double op(double x) {
+    double xx = x;
+    for (int j = 0; j != 1000; j++) {
+        xx = std::sqrt(xx);
+    }
+    return xx;
+}
+
 // [[Rcpp::export]]
 void singleThreaded(int n)
 {
     std::vector<double> x(100000);
-    for (size_t i = 0; i < n; ++i) x[i] = std::exp(x[i]);
+    for (size_t i = 0; i < n; ++i) x[i] = op(x[i]);
 }
 
 // [[Rcpp::export]]
@@ -239,7 +248,7 @@ void ThreadPool(int n)
     std::vector<double> x(100000);
     RcppThread::ThreadPool pool;
     for (size_t i = 0; i < n; ++i)
-        pool.push([&, i] { x[i] = std::exp(x[i]); });
+        pool.push([&, i] { x[i] = op(x[i]); });
     pool.join();
 }
 
@@ -247,7 +256,7 @@ void ThreadPool(int n)
 void parallelFor(int n)
 {
     std::vector<double> x(100000);
-    RcppThread::parallelFor(0, n, [&] (int i) { x[i] = std::exp(x[i]) ;});
+    RcppThread::parallelFor(0, n, [&] (int i) { x[i] = op(x[i]) ;});
 }
 
 // [[Rcpp::export]]
@@ -257,7 +266,7 @@ void OpenMP(int n)
     auto xx = x;
     omp_set_num_threads(std::thread::hardware_concurrency());
     #pragma omp parallel for
-    for (size_t i = 0; i < n; ++i) xx[i] = std::exp(x[i]);
+    for (size_t i = 0; i < n; ++i) x[i] = op(x[i]);
 }
 
 struct FastJob : public RcppParallel::Worker
@@ -269,7 +278,7 @@ struct FastJob : public RcppParallel::Worker
     {}
 
     void operator()(std::size_t begin, std::size_t end) {
-        for (size_t i = begin; i < end; i++) output[i] = std::exp(input[i]);
+        for (size_t i = begin; i < end; i++) output[i] = op(input[i]);
     }
 };
 
@@ -293,7 +302,7 @@ timing <- tibble(
             parallelFor = parallelFor(.),
             OpenMP = OpenMP(.),
             RcppParallel = RcppParallelFor(.),
-            times = 500
+            times = 200
         )
     )
 ) %>%
@@ -452,150 +461,150 @@ medians %>%
     labs(linetype = "", color = "") +
     xlab("sample size")  +
     theme(legend.position = "bottom")
-ggsave("benchKDE.pdf", width = 8, height = 3)
+ggsave("benchKDE.pdf", width = 8, height = 8)
 
-
-## Kendall correlation matrix
-
-Rcpp::sourceCpp(code =
-'
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppThread)]]
-// [[Rcpp::depends(RcppParallel)]]
-// [[Rcpp::depends(wdm)]]
-// [[Rcpp::depends(RcppEigen)]]
-
-#include <wdm/eigen.hpp>
-#include <omp.h>
-#include <RcppThread.h>
-#include <RcppParallel.h>
-#include <RcppEigen.h>
-
-using namespace Eigen;
-
-void computeKendall(size_t i, size_t j, const MatrixXd& mat, MatrixXd& cor)
-{
-    cor(i, j) = wdm::wdm(mat.col(i), mat.col(j), "kendall");
-    cor(j, i) = cor(i, j);
-}
-
-// [[Rcpp::export]]
-void singleThreaded(int n, int d)
-{
-    MatrixXd mat = MatrixXd(n, d).setRandom();
-    MatrixXd cor = MatrixXd::Identity(d, d);
-    for (size_t i = 0; i < d; ++i) {
-        for (size_t j = i + 1; j < d; ++j) {
-            computeKendall(i, j, mat, cor);
-        }
-    }
-}
-
-// [[Rcpp::export]]
-void ThreadPool(int n, int d)
-{
-    MatrixXd mat = MatrixXd(n, d).setRandom();
-    MatrixXd cor = MatrixXd::Identity(d, d);
-
-    RcppThread::ThreadPool pool;
-    for (size_t i = 0; i < d; ++i) {
-        for (size_t j = i + 1; j < d; ++j) {
-            pool.push([&, i, j] { computeKendall(i, j, mat, cor); });
-        }
-    }
-    pool.join();
-}
-
-// [[Rcpp::export]]
-void parallelFor(int n, int d)
-{
-    MatrixXd mat = MatrixXd(n, d).setRandom();
-    MatrixXd cor = MatrixXd::Identity(d, d);
-
-    RcppThread::parallelFor(0, d, [&] (size_t i) {
-        for (size_t j = i + 1; j < d; ++j) {
-            computeKendall(i, j, mat, cor);
-        }
-    });
-}
-
-// [[Rcpp::export]]
-void OpenMP(int n, int d)
-{
-    MatrixXd mat = MatrixXd(n, d).setRandom();
-    MatrixXd cor = MatrixXd::Identity(d, d);
-
-    omp_set_num_threads(std::thread::hardware_concurrency());
-    #pragma omp parallel for
-    for (size_t i = 0; i < d; ++i) {
-        for (size_t j = i + 1; j < d; ++j) {
-            computeKendall(i, j, mat, cor);
-        }
-    }
-}
-
-struct CorJob : public RcppParallel::Worker
-{
-    CorJob(const MatrixXd& mat, MatrixXd& cor)
-    : mat_(mat), cor_(cor), d_(cor.cols()) {}
-
-    void operator()(size_t begin, size_t end) {
-        for (size_t i = begin; i < end; i++) {
-            for (size_t j = i + 1; j < d_; ++j) {
-                computeKendall(i, j, mat_, cor_);
-            }
-        }
-    }
-
-    const MatrixXd& mat_;
-    MatrixXd& cor_;
-    size_t d_;
-};
-
-// [[Rcpp::export]]
-void RcppParallelFor(int n, int d)
-{
-    MatrixXd mat = MatrixXd(n, d).setRandom();
-    MatrixXd cor = MatrixXd::Identity(d, d);
-
-    CorJob job(mat, cor);
-    RcppParallel::parallelFor(0, d, job);
-}
-')
-
-timing <- crossing(
-    n = c(10, 100, 500, 1000),
-    d = c(10, 100)
-) %>%
-    mutate(
-        timings = map2(
-            n, d,
-            ~ microbenchmark(
-                `single threaded` =  singleThreaded(.x, .y),
-                ThreadPool = ThreadPool(.x, .y),
-                parallelFor = parallelFor(.x, .y),
-                OpenMP = OpenMP(.x, .y),
-                RcppParallelFor = RcppParallelFor(.x, .y),
-                times = 50
-            )
-        )
-    ) %>%
-    unnest()
-
-medians <- timing %>%
-    group_by(n, d, expr) %>%
-    summarize(ms = median(time / 10^6)) %>%
-    ungroup()
-
-medians %>%
-    mutate(d = str_c("d = ", d)) %>%
-    ggplot(aes(n, ms, color = expr, linetype = expr)) +
-    facet_wrap(~ d, scales = "free_y") +
-    geom_line(size = 0.8) +
-    expand_limits(y = 0) +
-    labs(linetype = "", color = "") +
-    xlab("sample size")  +
-    theme(legend.position = "bottom")
-ggsave("benchKendall.pdf", width = 8, height = 3)
+#
+# ## Kendall correlation matrix
+#
+# Rcpp::sourceCpp(code =
+# '
+# // [[Rcpp::plugins(cpp11)]]
+# // [[Rcpp::plugins(openmp)]]
+# // [[Rcpp::depends(RcppThread)]]
+# // [[Rcpp::depends(RcppParallel)]]
+# // [[Rcpp::depends(wdm)]]
+# // [[Rcpp::depends(RcppEigen)]]
+#
+# #include <wdm/eigen.hpp>
+# #include <omp.h>
+# #include <RcppThread.h>
+# #include <RcppParallel.h>
+# #include <RcppEigen.h>
+#
+# using namespace Eigen;
+#
+# void computeKendall(size_t i, size_t j, const MatrixXd& mat, MatrixXd& cor)
+# {
+#     cor(i, j) = wdm::wdm(mat.col(i), mat.col(j), "kendall");
+#     cor(j, i) = cor(i, j);
+# }
+#
+# // [[Rcpp::export]]
+# void singleThreaded(int n, int d)
+# {
+#     MatrixXd mat = MatrixXd(n, d).setRandom();
+#     MatrixXd cor = MatrixXd::Identity(d, d);
+#     for (size_t i = 0; i < d; ++i) {
+#         for (size_t j = i + 1; j < d; ++j) {
+#             computeKendall(i, j, mat, cor);
+#         }
+#     }
+# }
+#
+# // [[Rcpp::export]]
+# void ThreadPool(int n, int d)
+# {
+#     MatrixXd mat = MatrixXd(n, d).setRandom();
+#     MatrixXd cor = MatrixXd::Identity(d, d);
+#
+#     RcppThread::ThreadPool pool;
+#     for (size_t i = 0; i < d; ++i) {
+#         for (size_t j = i + 1; j < d; ++j) {
+#             pool.push([&, i, j] { computeKendall(i, j, mat, cor); });
+#         }
+#     }
+#     pool.join();
+# }
+#
+# // [[Rcpp::export]]
+# void parallelFor(int n, int d)
+# {
+#     MatrixXd mat = MatrixXd(n, d).setRandom();
+#     MatrixXd cor = MatrixXd::Identity(d, d);
+#
+#     RcppThread::parallelFor(0, d, [&] (size_t i) {
+#         for (size_t j = i + 1; j < d; ++j) {
+#             computeKendall(i, j, mat, cor);
+#         }
+#     });
+# }
+#
+# // [[Rcpp::export]]
+# void OpenMP(int n, int d)
+# {
+#     MatrixXd mat = MatrixXd(n, d).setRandom();
+#     MatrixXd cor = MatrixXd::Identity(d, d);
+#
+#     omp_set_num_threads(std::thread::hardware_concurrency());
+#     #pragma omp parallel for
+#     for (size_t i = 0; i < d; ++i) {
+#         for (size_t j = i + 1; j < d; ++j) {
+#             computeKendall(i, j, mat, cor);
+#         }
+#     }
+# }
+#
+# struct CorJob : public RcppParallel::Worker
+# {
+#     CorJob(const MatrixXd& mat, MatrixXd& cor)
+#     : mat_(mat), cor_(cor), d_(cor.cols()) {}
+#
+#     void operator()(size_t begin, size_t end) {
+#         for (size_t i = begin; i < end; i++) {
+#             for (size_t j = i + 1; j < d_; ++j) {
+#                 computeKendall(i, j, mat_, cor_);
+#             }
+#         }
+#     }
+#
+#     const MatrixXd& mat_;
+#     MatrixXd& cor_;
+#     size_t d_;
+# };
+#
+# // [[Rcpp::export]]
+# void RcppParallelFor(int n, int d)
+# {
+#     MatrixXd mat = MatrixXd(n, d).setRandom();
+#     MatrixXd cor = MatrixXd::Identity(d, d);
+#
+#     CorJob job(mat, cor);
+#     RcppParallel::parallelFor(0, d, job);
+# }
+# ')
+#
+# timing <- crossing(
+#     n = c(10, 100, 500, 1000),
+#     d = c(10, 100)
+# ) %>%
+#     mutate(
+#         timings = map2(
+#             n, d,
+#             ~ microbenchmark(
+#                 `single threaded` =  singleThreaded(.x, .y),
+#                 ThreadPool = ThreadPool(.x, .y),
+#                 parallelFor = parallelFor(.x, .y),
+#                 OpenMP = OpenMP(.x, .y),
+#                 RcppParallelFor = RcppParallelFor(.x, .y),
+#                 times = 50
+#             )
+#         )
+#     ) %>%
+#     unnest()
+#
+# medians <- timing %>%
+#     group_by(n, d, expr) %>%
+#     summarize(ms = median(time / 10^6)) %>%
+#     ungroup()
+#
+# medians %>%
+#     mutate(d = str_c("d = ", d)) %>%
+#     ggplot(aes(n, ms, color = expr, linetype = expr)) +
+#     facet_wrap(~ d, scales = "free_y") +
+#     geom_line(size = 0.8) +
+#     expand_limits(y = 0) +
+#     labs(linetype = "", color = "") +
+#     xlab("sample size")  +
+#     theme(legend.position = "bottom")
+# ggsave("benchKendall.pdf", width = 8, height = 8)
 
