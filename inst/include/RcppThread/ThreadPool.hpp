@@ -58,7 +58,7 @@ class ThreadPool
 
     template<class F>
     inline void parallelFor(ptrdiff_t begin,
-                            ptrdiff_t end,
+                            size_t size,
                             F&& f,
                             size_t nBatches = 0);
 
@@ -138,7 +138,7 @@ ThreadPool::push(F&& f, Args&&... args)
         if (stopped_.load(std::memory_order_relaxed))
             throw std::runtime_error("cannot push to joined thread pool");
         numJobs_.fetch_add(1, std::memory_order_release);
-        auto job = std::bind(f, args...);
+        auto job = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
         jobs_.enqueue(job);
     }
 }
@@ -155,9 +155,9 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
   -> std::future<decltype(f(args...))>
 {
     using jobPackage = std::packaged_task<decltype(f(args...))()>;
-    auto job = std::make_shared<jobPackage>(std::bind(f, args...));
+    auto job = std::make_shared<jobPackage>(
+      std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     this->push([job] { (*job)(); });
-
     return job->get_future();
 }
 
@@ -170,8 +170,11 @@ template<class F, class I>
 void
 ThreadPool::map(F&& f, I&& items)
 {
-    for (auto&& item : items)
-        this->push(f, item);
+    auto pushJob = [=] {
+        for (auto&& item : items)
+            this->push(f, item);
+    };
+    this->push(pushJob);
 }
 
 //! computes an index-based for loop in parallel batches.
@@ -199,18 +202,18 @@ ThreadPool::map(F&& f, I&& items)
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
 inline void
-ThreadPool::parallelFor(ptrdiff_t begin, ptrdiff_t end, F&& f, size_t nBatches)
+ThreadPool::parallelFor(ptrdiff_t begin, size_t size, F&& f, size_t nBatches)
 {
-    if (end < begin)
-        throw std::range_error(
-          "end is less than begin; cannot run backward loops.");
     auto doBatch = [f](const Batch& b) {
         for (ptrdiff_t i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, end - begin, nWorkers_, nBatches);
-    for (const auto& batch : batches)
-        this->push(doBatch, batch);
+    auto batches = createBatches(begin, size, nWorkers_, nBatches);
+    auto pushJob = [=] {
+        for (const auto& batch : batches)
+            this->push(doBatch, batch);
+    };
+    this->push(pushJob);
 }
 
 //! computes a for-each loop in parallel batches.
@@ -239,14 +242,7 @@ template<class F, class I>
 inline void
 ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 {
-    auto doBatch = [f, &items](const Batch& b) {
-        for (ptrdiff_t i = b.begin; i < b.end; i++)
-            f(items[i]);
-    };
-    size_t size = std::end(items) - std::begin(items);
-    auto batches = createBatches(0, size, nWorkers_, nBatches);
-    for (const auto& batch : batches)
-        this->push(doBatch, batch);
+    this->parallelFor(0, items.size(), [&items, f](size_t i) { f(items[i]); });
 }
 
 //! waits for all jobs to finish and checks for interruptions,
