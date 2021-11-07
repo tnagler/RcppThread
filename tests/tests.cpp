@@ -1,6 +1,12 @@
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppThread)]]
 
+// https://github.com/RcppCore/Rcpp/commit/16848780ee764a83c00017c8c6e403b2192ea980
+#ifdef __MACH__
+#include <mach/boolean.h>
+#endif
+#include <Rcpp.h>
+
 #include "RcppThread.h"
 using namespace RcppThread;
 

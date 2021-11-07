@@ -8,11 +8,7 @@
 
 // R API
 #define R_NO_REMAP
-// ifndef to fix Rcpp/OSX issue:
-// https://github.com/RcppCore/Rcpp/commit/16848780ee764a83c00017c8c6e403b2192ea980
-#ifndef R_INTERNALS_H_
 #include "Rinternals.h"
-#endif
 #include "R.h"
 
 // for tracking threads
