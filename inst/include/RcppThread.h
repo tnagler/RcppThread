@@ -10,7 +10,6 @@
 #include "RcppThread/Rcout.hpp"
 #include "RcppThread/Thread.hpp"
 #include "RcppThread/Batch.hpp"
-#include "RcppThread/TaskQueue.hpp"
 #include "RcppThread/ThreadPool.hpp"
 #include "RcppThread/parallelFor.hpp"
 #include "RcppThread/Progress.hpp"

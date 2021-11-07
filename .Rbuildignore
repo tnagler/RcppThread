@@ -13,3 +13,4 @@ revdep
 ^\.github$
 ^CRAN-RELEASE$
 .vscode/
+new-benchmarks.R

@@ -5,6 +5,8 @@
 * Add classes `ProgressCounter` and `ProgressBar` for tracking progress in long-
   running loops (#49).
 
+* Increased speed for short running tasks due to lock-free queue (#50).
+
 
 # RcppThread 1.0.0
 
