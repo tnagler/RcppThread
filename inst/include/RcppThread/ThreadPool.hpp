@@ -22,16 +22,7 @@
 
 namespace RcppThread {
 
-struct RcppThreadJob
-{
-    alignas(64) std::function<void()> f_;
-    RcppThreadJob() {}
-    template<class F>
-    RcppThreadJob(F&& f)
-      : f_(std::forward<F>(f))
-    {}
-    decltype(f_()) operator()() { return f_(); }
-};
+using RcppThreadJob = std::function<void()>;
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool
