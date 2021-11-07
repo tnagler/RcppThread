@@ -15,12 +15,9 @@ test_that("Thread class works", {
     expect_output(testThreadClass())
 })
 
+
 ## -------------------------------------------------------
 context("Thread pool")
-test_that("push works", {
-    expect_silent(testThreadPoolPush())
-})
-
 test_that("push works", {
     expect_silent(testThreadPoolPush())
 })

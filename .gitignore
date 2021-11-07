@@ -4,3 +4,5 @@
 inst/doc
 revdep
 __pycache__
+.vscode/
+new-benchmarks.R
