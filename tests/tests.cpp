@@ -65,6 +65,7 @@ void testThreadPoolPush()
         pool.push(dummy, i);
 
     pool.join();
+
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size() / 2; i++)
         count_wrong += (x[i] != 2);

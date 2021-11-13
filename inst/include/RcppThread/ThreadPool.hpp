@@ -9,7 +9,7 @@
 #include "RcppThread/Batch.hpp"
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
-#include "moodyCamel/blockingconcurrentqueue.h"
+#include "RcppThread/tpool.hpp"
 
 #include <atomic>
 #include <condition_variable>
@@ -21,8 +21,6 @@
 #include <vector>
 
 namespace RcppThread {
-
-using RcppThreadJob = std::function<void()>;
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool
@@ -62,29 +60,20 @@ class ThreadPool
 
   private:
     void startWorker();
-    void doJob(RcppThreadJob&& job);
-    void waitForJobs(moodycamel::ConsumerToken& tk);
-    void processJobs(moodycamel::ConsumerToken& tk);
-    void announceStop();
     void joinWorkers();
 
-    bool hasErrored();
+    template<class Task>
+    void executeSafely(Task& task);
+
     bool allJobsDone();
     void waitForEvents();
     void rethrowExceptions();
 
-    moodycamel::BlockingConcurrentQueue<RcppThreadJob> jobs_;
-
-    // variables for synchronization between workers
-    size_t nWorkers_;
     std::vector<std::thread> workers_;
-
-    alignas(64) std::atomic_size_t numJobs_{ 0 };
-    std::mutex mDone_;
-    std::condition_variable cvDone_;
-
-    alignas(64) std::atomic_bool stopped_{ false };
-    std::exception_ptr errorPtr_{ nullptr };
+    size_t nWorkers_;
+    // variables for synchronization between workers
+    tpool::detail::TaskManager taskManager_;
+    tpool::FinishLine finishLine_{ 0 };
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -98,18 +87,18 @@ inline ThreadPool::ThreadPool()
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_(nWorkers)
 {
-    for (size_t w = 0; w != nWorkers_; w++)
+    for (size_t w = 0; w < nWorkers_; w++)
         this->startWorker();
 }
 
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
-    // destructors should never throw
     try {
-        this->announceStop();
+        taskManager_.stop();
         this->joinWorkers();
     } catch (...) {
+        // destructors should never throw
     }
 }
 
@@ -126,11 +115,8 @@ ThreadPool::push(F&& f, Args&&... args)
     if (nWorkers_ == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
-        if (stopped_.load(std::memory_order_relaxed))
-            throw std::runtime_error("cannot push to joined thread pool");
-        numJobs_.fetch_add(1, std::memory_order_release);
-        auto job = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-        jobs_.enqueue(job);
+        taskManager_.push(
+          std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
 }
 
@@ -145,11 +131,11 @@ auto
 ThreadPool::pushReturn(F&& f, Args&&... args)
   -> std::future<decltype(f(args...))>
 {
-    using jobPackage = std::packaged_task<decltype(f(args...))()>;
-    auto job = std::make_shared<jobPackage>(
-      std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-    this->push([job] { (*job)(); });
-    return job->get_future();
+    using task = std::packaged_task<decltype(f(args...))()>;
+    auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+    auto taskPtr = std::make_shared<task>(std::move(pack));
+    taskManager_.push([taskPtr] { (*taskPtr)(); });
+    return taskPtr->get_future();
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
@@ -241,20 +227,19 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (numJobs_.load(std::memory_order_acquire) != 0) {
-        waitForEvents(); // non-spinning wait for mDone_
-        if (this->hasErrored()) {
-            this->announceStop(); // stop thread pool
-            continue;             // wait for currently running jobs
+    while (!taskManager_.empty()) {
+        finishLine_.wait_for(std::chrono::milliseconds(50));
+        if (isInterrupted()) {
+            taskManager_.stop();
+            break;
         }
-        if (this->hasErrored() | isInterrupted())
+        if (taskManager_.empty())
             break;
         Rcout << "";
         std::this_thread::yield();
     }
-
     Rcout << "";
-    this->rethrowExceptions();
+    checkUserInterrupt();
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -262,7 +247,7 @@ inline void
 ThreadPool::join()
 {
     this->wait();
-    this->announceStop();
+    taskManager_.stop();
     this->joinWorkers();
 }
 
@@ -270,10 +255,7 @@ ThreadPool::join()
 inline void
 ThreadPool::clear()
 {
-    RcppThreadJob job;
-    while (numJobs_.load(std::memory_order_acquire) != 0) {
-        numJobs_.fetch_sub(jobs_.try_dequeue(job), std::memory_order_release);
-    }
+    taskManager_.clear();
 }
 
 //! spawns a worker thread waiting for jobs to arrive.
@@ -281,72 +263,26 @@ inline void
 ThreadPool::startWorker()
 {
     workers_.emplace_back([this] {
-        thread_local moodycamel::ConsumerToken tk(jobs_);
-        while (!stopped_.load(std::memory_order_relaxed)) {
-            this->waitForJobs(tk);
-            this->processJobs(tk);
-            // if all jobs are done, notify potentially waiting threads
-            if (!numJobs_.load(std::memory_order_acquire))
-                cvDone_.notify_all();
+        std::function<void()> task;
+        while (!taskManager_.stopped()) {
+            taskManager_.wait_for_jobs();
+
+            finishLine_.start();
+            while (taskManager_.try_pop(task))
+                executeSafely(task);
+            finishLine_.cross();
         }
     });
 }
 
-//! blocking wait for elements in the queue; also processes first job.
+template<class Task>
 inline void
-ThreadPool::waitForJobs(moodycamel::ConsumerToken& tk)
-{
-    RcppThreadJob job;
-    jobs_.wait_dequeue(tk, job);
-    // popped job needs to be done here
-    if (!stopped_.load(std::memory_order_relaxed))
-        this->doJob(std::move(job));
-}
-
-//! process jobs until none are left.
-inline void
-ThreadPool::processJobs(moodycamel::ConsumerToken& tk)
-{
-    while (numJobs_.load(std::memory_order_acquire) != 0) {
-        // inner loop avoids acquire read above in hot path
-        while (true) {
-            if (stopped_.load(std::memory_order_relaxed))
-                return;
-            RcppThreadJob job;
-            if (jobs_.try_dequeue(tk, job))
-                this->doJob(std::move(job));
-            else
-                break;
-        }
-    }
-}
-
-//! executes a job safely and decrements the job count.
-//! @param job job to be exectued.
-inline void
-ThreadPool::doJob(RcppThreadJob&& job)
+ThreadPool::executeSafely(Task& task)
 {
     try {
-        job();
-        numJobs_.fetch_sub(1, std::memory_order_release);
+        task();
     } catch (...) {
-        {
-            std::lock_guard<std::mutex> lk(mDone_);
-            errorPtr_ = std::current_exception();
-        }
-        cvDone_.notify_all();
-    }
-}
-
-//! signals threads that no more new work is coming.
-inline void
-ThreadPool::announceStop()
-{
-    stopped_ = true;
-    // push empty jobs to wake up waiting workers
-    for (size_t i = 0; i < nWorkers_; i++) {
-        numJobs_.fetch_add(1, std::memory_order_release);
-        jobs_.enqueue([] {});
+        finishLine_.abort(std::current_exception());
     }
 }
 
@@ -360,40 +296,4 @@ ThreadPool::joinWorkers()
     }
 }
 
-//! checks if an error occured.
-inline bool
-ThreadPool::hasErrored()
-{
-    return static_cast<bool>(errorPtr_);
-}
-
-//! check whether all jobs are done
-inline bool
-ThreadPool::allJobsDone()
-{
-    // acquire might prevent an unncessary loop
-    return numJobs_.load(std::memory_order_acquire) == 0;
-}
-
-//! checks whether wait() needs to wake up
-inline void
-ThreadPool::waitForEvents()
-{
-    static auto timeout = std::chrono::milliseconds(50);
-    auto isWakeUpEvent = [this] {
-        return this->allJobsDone() | this->hasErrored();
-    };
-    std::unique_lock<std::mutex> lk(mDone_);
-    cvDone_.wait_for(lk, timeout, isWakeUpEvent);
-}
-
-//! rethrows exceptions (exceptions from workers are caught and stored; the
-//! wait loop only checks, but does not throw for interruptions)
-inline void
-ThreadPool::rethrowExceptions()
-{
-    checkUserInterrupt();
-    if (errorPtr_)
-        std::rethrow_exception(errorPtr_);
-}
 }
