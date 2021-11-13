@@ -59,17 +59,14 @@ parallelFor(int begin,
     };
     for (const auto& batch : batches)
         ThreadPool::globalInstance().push(doBatch, batch);
-    finishLine.wait();
+    util::waitAndSync(finishLine);
 }
 
 //! computes a range-based for loop in parallel batches.
 //! @param items an object allowing for `items.size()` and whose elements
 //!   are accessed by the `[]` operator.
 //! @param f a function (the 'loop body').
-//! @param nThreads the number of threads to use; the default uses the
-//! number
-//!   of cores in the machine;  if `nThreads = 0`, all work will be done in
-//!   the main thread.
+//! @param nThreads deprecated; loop is run on global thread pool.
 //! @param nBatches the number of batches to create; the default (0)
 //!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code:
@@ -101,7 +98,6 @@ parallelForEach(I& items,
     const auto begin_it = std::begin(items);
     const auto end_it = std::end(items);
     auto size = std::distance(begin_it, end_it);
-    parallelFor(
-      0, size, [f, &items, &begin_it](int i) { f(*(begin_it + i)); });
+    parallelFor(0, size, [f, &items, &begin_it](int i) { f(*(begin_it + i)); });
 }
 }

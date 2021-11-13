@@ -379,10 +379,10 @@ void testNestedParallelForEach()
 // {
 //     ThreadPool pool(2);
 //     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+//         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 //         checkUserInterrupt();
 //     };
-//     for (size_t i = 0; i < 10; i++)
+//     for (size_t i = 0; i < 20; i++)
 //         pool.push(dummy);
 //     pool.join();
 //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
@@ -391,15 +391,15 @@ void testNestedParallelForEach()
 // // [[Rcpp::export]]
 // void testThreadPoolInterruptWait()
 // {
-//     ThreadPool pool(0);
+//     ThreadPool pool(2);
 //     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+//         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 //         checkUserInterrupt();
 //     };
 //     for (size_t i = 0; i < 20; i++) {
 //         pool.push(dummy);
 //     }
-//     pool.join();
+//     pool.wait();
 //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 // }
 
@@ -409,7 +409,7 @@ void testProgressCounter()
 {
     RcppThread::ProgressCounter cntr(20, 1);
     RcppThread::parallelFor(0, 20, [&] (int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         cntr++;
     });
 }
@@ -420,7 +420,7 @@ void testProgressBar()
     // 20 iterations in loop, update progress every 1 sec
     RcppThread::ProgressBar bar(20, 1);
     RcppThread::parallelFor(0, 20, [&] (int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         ++bar;
     });
 }
