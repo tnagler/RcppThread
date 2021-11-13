@@ -162,15 +162,21 @@ void testThreadPoolNestedParallelFor()
             x[i][j] *= 2;
         });
     });
-    pool.join();
+    pool.wait();
 
     size_t count_wrong = 0;
     for (auto xx : x) {
         for (auto xxx : xx)
             count_wrong += xxx != 2;
     }
-    if (count_wrong > 0)
+    if (count_wrong > 0) {
+        for (auto xx : x) {
+            for (auto xxx : xx)
+                std::cout << xxx;
+            std::cout << std::endl;
+        }
         throw std::runtime_error("nested parallelFor gives wrong result");
+    }
 }
 
 // [[Rcpp::export]]
@@ -212,15 +218,21 @@ void testThreadPoolNestedParallelForEach()
             xxx *= 2;
         });
     });
-    pool.join();
+    pool.wait();
 
     size_t count_wrong = 0;
     for (auto xx : x) {
         for (auto xxx : xx)
             count_wrong += xxx != 2;
     }
-    if (count_wrong > 0)
-        throw std::runtime_error("nested parallelForEach gives wrong result");
+    if (count_wrong > 0) {
+        for (auto xx : x) {
+            for (auto xxx : xx)
+                std::cout << xxx;
+            std::cout << std::endl;
+        }
+        throw std::runtime_error("nested parallelFor gives wrong result");
+    }
 }
 
 // [[Rcpp::export]]
@@ -293,8 +305,14 @@ void testNestedParallelFor()
         for (auto xxx : xx)
             count_wrong += xxx != 2;
     }
-    if (count_wrong > 0)
+    if (count_wrong > 0) {
+        for (auto xx : x) {
+            for (auto xxx : xx)
+                std::cout << xxx;
+            std::cout << std::endl;
+        }
         throw std::runtime_error("nested parallelFor gives wrong result");
+    }
 }
 
 // [[Rcpp::export]]
@@ -391,7 +409,7 @@ void testProgressCounter()
 {
     RcppThread::ProgressCounter cntr(20, 1);
     RcppThread::parallelFor(0, 20, [&] (int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         cntr++;
     });
 }
@@ -402,7 +420,7 @@ void testProgressBar()
     // 20 iterations in loop, update progress every 1 sec
     RcppThread::ProgressBar bar(20, 1);
     RcppThread::parallelFor(0, 20, [&] (int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         ++bar;
     });
 }

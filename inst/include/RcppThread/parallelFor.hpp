@@ -13,11 +13,9 @@ namespace RcppThread {
 
 //! computes an index-based for loop in parallel batches.
 //! @param begin first index of the loop.
-//! @param size the loop runs in the range `[begin, begin + size)`.
+//! @param end the loop runs in the range `[begin, end)`.
 //! @param f a function (the 'loop body').
-//! @param nThreads the number of threads to use; the default uses the number
-//!   of cores in the machine;  if `nThreads = 0`, all work will be done in the
-//!   main thread.
+//! @param nThreads deprecated; loop is run on global thread pool.
 //! @param nBatches the number of batches to create; the default (0)
 //!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code:
@@ -33,29 +31,45 @@ namespace RcppThread {
 //!     x[i] = i;
 //! });
 //! ```
-//! The function sets up a `ThreadPool` object to do the scheduling. If you
-//! want to run multiple parallel for loops, consider creating a `ThreadPool`
-//! yourself and using `ThreadPool::forEach()`.
+//! The function dispatches to a global thread pool, so it can safely be nested
+//! or called multiple times with almost no overhead.
 //!
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
-inline void parallelFor(ptrdiff_t begin, ptrdiff_t size, F&& f,
-                        size_t nThreads = std::thread::hardware_concurrency(),
-                        size_t nBatches = 0)
+inline void
+parallelFor(int begin,
+            int end,
+            F&& f,
+            size_t nThreads = std::thread::hardware_concurrency(),
+            size_t nBatches = 0)
 {
-    ThreadPool pool(nThreads);
-    pool.parallelFor(begin, size, f, nBatches);
-    pool.join();
+    if (end < begin)
+        throw std::runtime_error("can only run forward loops");
+    if (end == begin)
+        return;
+
+    nThreads = std::thread::hardware_concurrency();
+    auto batches = createBatches(begin, end - begin, nThreads, nBatches);
+    tpool::FinishLine finishLine{ batches.size() };
+    auto doBatch = [f, &finishLine](const Batch& b) {
+        for (ptrdiff_t i = b.begin; i < b.end; i++)
+            f(i);
+        finishLine.cross();
+    };
+    for (const auto& batch : batches)
+        ThreadPool::globalInstance().push(doBatch, batch);
+    finishLine.wait();
 }
 
 //! computes a range-based for loop in parallel batches.
 //! @param items an object allowing for `items.size()` and whose elements
 //!   are accessed by the `[]` operator.
 //! @param f a function (the 'loop body').
-//! @param nThreads the number of threads to use; the default uses the number
-//!   of cores in the machine;  if `nThreads = 0`, all work will be done in the
-//!   main thread.
+//! @param nThreads the number of threads to use; the default uses the
+//! number
+//!   of cores in the machine;  if `nThreads = 0`, all work will be done in
+//!   the main thread.
 //! @param nBatches the number of batches to create; the default (0)
 //!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code:
@@ -71,21 +85,23 @@ inline void parallelFor(ptrdiff_t begin, ptrdiff_t size, F&& f,
 //!     xx *= 2;
 //! });
 //! ```
-//! The function sets up a `ThreadPool` object to do the scheduling. If you
-//! want to run multiple parallel for loops, consider creating a `ThreadPool`
-//! yourself and using `ThreadPool::forEach()`.
+//! The function dispatches to a global thread pool, so it can safely be nested
+//! or called multiple times with almost no overhead.
 //!
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class I, class F>
-inline void parallelForEach(I& items, F&& f,
-    size_t nThreads = std::thread::hardware_concurrency(),
-    size_t nBatches = 0)
+inline void
+parallelForEach(I& items,
+                F&& f,
+                size_t nThreads = std::thread::hardware_concurrency(),
+                size_t nBatches = 0)
 {
-    ThreadPool pool(nThreads);
-    pool.parallelForEach(items, f, nBatches);
-    pool.join();
+    // loop ranges ranges indicate iterator offset
+    const auto begin_it = std::begin(items);
+    const auto end_it = std::end(items);
+    auto size = std::distance(begin_it, end_it);
+    parallelFor(
+      0, size, [f, &items, &begin_it](int i) { f(*(begin_it + i)); });
 }
-
-
 }

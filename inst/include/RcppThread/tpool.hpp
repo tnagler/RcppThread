@@ -54,8 +54,9 @@ class FinishLine
     //! indicates that a runner has crossed the finish line.
     void cross() noexcept
     {
-        if (--runners_ <= 0)
+        if (--runners_ <= 0) {
             cv_.notify_all();
+        }
     }
 
     //! waits for all active runners to cross the finish line.
@@ -188,18 +189,24 @@ class TaskQueue
     //! currently locked; enlarges the queue if full.
     bool try_push(Task&& task)
     {
+        // must hold lock in case there are multiple producers, abort if already
+        // taken, so we can check out next queue
+        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
+        if (!lk)
+            return false;
+
         auto b = bottom_.load(m_relaxed);
         auto t = top_.load(m_acquire);
         RingBuffer<Task>* buf_ptr = buffer_.load(m_relaxed);
 
         if (buf_ptr->capacity() < (b - t) + 1) {
-            // capacity reached, create buffer with double size
             old_buffers_.emplace_back(
               exchange(buf_ptr, buf_ptr->enlarge(b, t)));
             buffer_.store(buf_ptr, m_relaxed);
         }
 
         buf_ptr->store(b, std::move(task));
+
         std::atomic_thread_fence(m_release);
         bottom_.store(b + 1, m_relaxed);
 
@@ -209,10 +216,6 @@ class TaskQueue
     //! pops a task from the top of the queue; returns false if lost race.
     bool try_pop(Task& task)
     {
-        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
-        if (!lk)
-            return false;
-
         auto t = top_.load(m_acquire);
         std::atomic_thread_fence(m_seq_cst);
         auto b = bottom_.load(m_acquire);
