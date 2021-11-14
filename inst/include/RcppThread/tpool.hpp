@@ -198,11 +198,11 @@ class TaskQueue
     //! currently locked; enlarges the queue if full.
     bool try_push(Task&& task)
     {
-        // must hold lock in case there are multiple producers, abort if already
-        // taken, so we can check out next queue
-        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
-        if (!lk)
-            return false;
+        // // must hold lock in case there are multiple producers, abort if already
+        // // taken, so we can check out next queue
+        // std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
+        // if (!lk)
+        //     return false;
 
         auto b = bottom_.load(m_relaxed);
         auto t = top_.load(m_acquire);
