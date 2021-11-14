@@ -25,11 +25,11 @@ for (run in seq_len(runs)) {
     })
 
 
-    # -------------------------------------------------------
-    # context("Thread pool")
-    # test_that("push works", {
-    #     expect_silent(testThreadPoolPush())
-    # })
+    -------------------------------------------------------
+    context("Thread pool")
+    test_that("push works", {
+        expect_silent(testThreadPoolPush())
+    })
 
     # test_that("pushReturn works", {
     #     expect_silent(testThreadPoolPushReturn())
