@@ -3,7 +3,7 @@ context("Compile test functions")
 Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
 
-runs <- 100
+runs <- 1
 for (run in seq_len(runs)) {
     context(paste0("---------------------------- run ", run, "/", runs))
     test_that("start", expect_true(TRUE))
