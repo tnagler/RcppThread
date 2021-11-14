@@ -23,7 +23,7 @@ for (run in seq_len(runs)) {
     # })
 
 
-    -------------------------------------------------------
+    ## -------------------------------------------------------
     context("Thread pool")
     test_that("push works", {
         testThreadPoolPush()
