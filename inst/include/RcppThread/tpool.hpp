@@ -49,11 +49,12 @@ class FinishLine
     void add(size_t runners = 1) noexcept { runners_ = runners_ + runners; }
 
     //! adds a single runner.
-    void start() noexcept { ++runners_; }
+    void start() noexcept { std::cout << ++runners_ << "+" << std::endl; }
 
     //! indicates that a runner has crossed the finish line.
     void cross() noexcept
     {
+        std::cout << runners_ << "-" << std::endl;
         if (--runners_ <= 0) {
             cv_.notify_all();
         }
