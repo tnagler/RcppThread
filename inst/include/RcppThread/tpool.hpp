@@ -122,10 +122,11 @@ class RingBuffer
     }
 
     size_t capacity() const { return capacity_; }
+    
     void set_entry(size_t i, T val) { buffer_[i & mask_] = val; }
+    
     T get_entry(size_t i) const { return buffer_[i & mask_]; }
 
-    // creates a new ring buffer with pointers to current elements.
     RingBuffer<T>* enlarge(size_t bottom, size_t top) const
     {
         RingBuffer<T>* new_buffer = new RingBuffer{ 2 * capacity_ };
@@ -155,7 +156,6 @@ exchange(T& obj, T&& new_value) noexcept
 class TaskQueue
 {
     using Task = std::function<void()>;
-
   public:
     //! constructs the que with a given capacity.
     //! @param capacity must be a power of two.
@@ -167,10 +167,11 @@ class TaskQueue
     {
         // must free memory allocated by push(), but not deallocated by pop()
         auto buf_ptr = buffer_.load();
-        for (size_t i = top_; i < bottom_; ++i)
+        for (int i = top_; i < bottom_.load(m_relaxed); ++i)
             delete buf_ptr->get_entry(i);
         delete buf_ptr;
     }
+
     TaskQueue(TaskQueue const& other) = delete;
     TaskQueue& operator=(TaskQueue const& other) = delete;
 
@@ -274,7 +275,6 @@ struct TaskManager
     template<typename Task>
     void push(Task&& task)
     {
-        size_t count = 0;
         while (!queues_[push_idx_++ % num_queues_].try_push(task))
             continue;
         cv_.notify_all();
