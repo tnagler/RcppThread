@@ -26,9 +26,11 @@ namespace util {
 void
 waitAndSync(tpool::FinishLine& finishLine)
 {
-    finishLine.wait_for(std::chrono::milliseconds(50));
-    Rcout << "";
-    checkUserInterrupt();
+    while (!finishLine.all_finished()) {
+        finishLine.wait_for(std::chrono::milliseconds(50));
+        Rcout << "";
+        checkUserInterrupt();
+    }
 }
 }
 
@@ -132,6 +134,7 @@ ThreadPool::push(F&& f, Args&&... args)
     if (nWorkers_ == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
+        finishLine_.start();
         taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
@@ -151,6 +154,7 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
     using task = std::packaged_task<decltype(f(args...))()>;
     auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
     auto taskPtr = std::make_shared<task>(std::move(pack));
+    finishLine_.start();
     taskManager_.push([taskPtr] { (*taskPtr)(); });
     return taskPtr->get_future();
 }
@@ -244,8 +248,7 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (!taskManager_.empty())
-        util::waitAndSync(finishLine_);
+    util::waitAndSync(finishLine_);
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -273,10 +276,8 @@ ThreadPool::startWorker()
         while (!taskManager_.stopped()) {
             taskManager_.wait_for_jobs();
 
-            finishLine_.start();
             while (taskManager_.try_pop(task))
                 executeSafely(task);
-            finishLine_.cross();
         }
     });
 }
@@ -287,6 +288,7 @@ ThreadPool::executeSafely(Task& task)
 {
     try {
         task();
+        finishLine_.cross();
     } catch (...) {
         finishLine_.abort(std::current_exception());
     }

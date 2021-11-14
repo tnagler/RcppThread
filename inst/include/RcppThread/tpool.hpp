@@ -62,9 +62,11 @@ class FinishLine
     //! waits for all active runners to cross the finish line.
     void wait() noexcept
     {
+        std::this_thread::yield();
         std::unique_lock<std::mutex> lk(mtx_);
         while ((runners_ > 0) && !exception_ptr_)
             cv_.wait(lk);
+
         if (exception_ptr_)
             std::rethrow_exception(exception_ptr_);
     }
@@ -92,6 +94,8 @@ class FinishLine
         cv_.notify_all();
     }
 
+    bool all_finished() const noexcept { return (runners_ <= 0); }
+
   private:
     alignas(64) std::atomic<size_t> runners_;
     std::mutex mtx_;
@@ -108,9 +112,10 @@ class RingBuffer
 {
   public:
     explicit RingBuffer(size_t capacity)
-      : capacity_{ capacity }
+      : buffer_{ std::unique_ptr<T[]>(new T[capacity]) }
+      , capacity_{ capacity }
       , mask_{ capacity - 1 }
-      , buffer_{ std::unique_ptr<T[]>(new T[capacity]) }
+
     {
         if (capacity_ & (capacity_ - 1))
             throw std::runtime_error("capacity must be a power of two");
@@ -125,8 +130,8 @@ class RingBuffer
     // creates a new ring buffer with pointers to current elements.
     RingBuffer<T>* enlarge(size_t bottom, size_t top) const
     {
-        RingBuffer<T>* new_buffer = new RingBuffer{ 2 * capacity_ };
-        for (size_t i = top; i != bottom; ++i)
+        auto new_buffer = new RingBuffer{ 2 * capacity_ };
+        for (size_t i = top; i < bottom; ++i)
             new_buffer->store(i, this->load(i));
         return new_buffer;
     }
@@ -139,12 +144,12 @@ class RingBuffer
 
 // exchange is not available in C++11, use implementatino from
 // https://en.cppreference.com/w/cpp/utility/exchange
-template<class T, class U = T>
+template<class T>
 T
-exchange(T& obj, U&& new_value) noexcept
+exchange(T& obj, T&& new_value) noexcept
 {
     T old_value = std::move(obj);
-    obj = std::forward<U>(new_value);
+    obj = std::forward<T>(new_value);
     return old_value;
 }
 
@@ -199,7 +204,7 @@ class TaskQueue
         auto t = top_.load(m_acquire);
         RingBuffer<Task>* buf_ptr = buffer_.load(m_relaxed);
 
-        if (buf_ptr->capacity() < (b - t) + 1) {
+        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
             old_buffers_.emplace_back(
               exchange(buf_ptr, buf_ptr->enlarge(b, t)));
             buffer_.store(buf_ptr, m_relaxed);
@@ -216,23 +221,26 @@ class TaskQueue
     //! pops a task from the top of the queue; returns false if lost race.
     bool try_pop(Task& task)
     {
+        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
+        if (!lk)
+            return false;
+
         auto t = top_.load(m_acquire);
         std::atomic_thread_fence(m_seq_cst);
         auto b = bottom_.load(m_acquire);
 
         if (t < b) {
             // must load task pointer before acquiring the slot
-            task = buffer_.load(m_consume)->load(t);
-            if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
+            task = buffer_.load()->load(t);
+            if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed))
                 return true; // won race
-            }
         }
         return false; // queue is empty or lost race
     }
 
   private:
-    alignas(64) std::atomic_ptrdiff_t top_{ 0 };
-    alignas(64) std::atomic_ptrdiff_t bottom_{ 0 };
+    alignas(64) std::atomic_int top_{ 0 };
+    alignas(64) std::atomic_int bottom_{ 0 };
     alignas(64) std::atomic<RingBuffer<Task>*> buffer_{ nullptr };
     std::vector<std::unique_ptr<RingBuffer<Task>>> old_buffers_;
     std::mutex mutex_;
@@ -242,7 +250,6 @@ class TaskQueue
     static constexpr std::memory_order m_acquire = std::memory_order_acquire;
     static constexpr std::memory_order m_release = std::memory_order_release;
     static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
-    static constexpr std::memory_order m_consume = std::memory_order_consume;
 };
 
 //! Task manager based on work stealing
@@ -257,8 +264,8 @@ struct TaskManager
     size_t num_queues_;
 
     TaskManager(size_t num_queues = 1)
-      : num_queues_{ num_queues }
-      , queues_{ std::vector<TaskQueue>(num_queues) }
+      : queues_{ std::vector<TaskQueue>(num_queues) }
+      , num_queues_{ num_queues }
     {}
 
     template<typename Task>
@@ -266,7 +273,7 @@ struct TaskManager
     {
         while (!queues_[push_idx_++ % num_queues_].try_push(task))
             continue;
-        cv_.notify_one();
+        cv_.notify_all();
     }
 
     bool empty()
@@ -391,6 +398,8 @@ template<class Function, class... Args>
 void
 ThreadPool::push(Function&& f, Args&&... args)
 {
+    if (n_workers_ == 0)
+        return f(args...);
     task_manager_.push(
       std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
 }
@@ -404,15 +413,16 @@ ThreadPool::async(Function&& f, Args&&... args)
     auto pack =
       std::bind(std::forward<Function>(f), std::forward<Args>(args)...);
     auto task_ptr = std::make_shared<task>(std::move(pack));
-    task_manager_.push([task_ptr] { (*task_ptr)(); });
+    task_manager_.push([task_ptr] { return (*task_ptr)(); });
     return task_ptr->get_future();
 }
 
 void
 ThreadPool::wait()
 {
-    while (!task_manager_.empty())
+    while (!task_manager_.empty()) {
         finish_line_.wait();
+    }
 }
 
 void
@@ -432,6 +442,7 @@ ThreadPool::start_worker()
             finish_line_.start();
             while (task_manager_.try_pop(task))
                 execute_safely(task);
+
             finish_line_.cross();
         }
     });
