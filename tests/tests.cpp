@@ -56,7 +56,7 @@ void testThreadClass()
 void testThreadPoolPush()
 {
     ThreadPool pool(2);
-    std::vector<size_t> x(1000000, 1);
+    std::vector<size_t> x(10, 1);
     auto dummy = [&] (size_t i) -> void {
         checkUserInterrupt();
         x[i] = 2 * x[i];
