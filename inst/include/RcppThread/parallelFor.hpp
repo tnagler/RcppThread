@@ -52,7 +52,7 @@ parallelFor(int begin,
     nThreads = std::thread::hardware_concurrency();
     auto batches = createBatches(begin, end - begin, nThreads, nBatches);
     tpool::FinishLine finishLine{ batches.size() };
-    auto doBatch = [f, &finishLine](const Batch& b) {
+    auto doBatch = [&](const Batch& b) {
         for (ptrdiff_t i = b.begin; i < b.end; i++)
             f(i);
         finishLine.cross();
