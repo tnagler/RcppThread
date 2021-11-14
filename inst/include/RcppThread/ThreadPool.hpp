@@ -26,11 +26,11 @@ namespace util {
 void
 waitAndSync(tpool::FinishLine& finishLine)
 {
-    // while (!finishLine.all_finished()) {
-    //     finishLine.wait_for(std::chrono::milliseconds(50));
-    //     Rcout << "not done yet";
-    //     checkUserInterrupt();
-    // }
+    while (!finishLine.all_finished()) {
+        finishLine.wait_for(std::chrono::milliseconds(50));
+        Rcout << "not done yet";
+        checkUserInterrupt();
+    }
 }
 }
 
