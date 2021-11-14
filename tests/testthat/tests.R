@@ -9,25 +9,24 @@ for (run in seq_len(runs)) {
     context(paste0("---------------------------- run ", run, "/", runs))
     test_that("start", expect_true(TRUE))
 
-    cat("\n\n RUNNING PUSH \n\n")
-
-    ## -------------------------------------------------------
-    context("R-monitor")
-    test_that("R-monitor works", {
-        expect_output(testMonitor(), "RcppThread says hi!", fixed = TRUE)
-    })
+    # ## -------------------------------------------------------
+    # context("R-monitor")
+    # test_that("R-monitor works", {
+    #     expect_output(testMonitor(), "RcppThread says hi!", fixed = TRUE)
+    # })
 
 
-    ## -------------------------------------------------------
-    context("Thread class")
-    test_that("Thread class works", {
-        expect_output(testThreadClass())
-    })
+    # ## -------------------------------------------------------
+    # context("Thread class")
+    # test_that("Thread class works", {
+    #     expect_output(testThreadClass())
+    # })
 
 
     -------------------------------------------------------
     context("Thread pool")
     test_that("push works", {
+        testThreadPoolPush()
         expect_silent(testThreadPoolPush())
     })
 
