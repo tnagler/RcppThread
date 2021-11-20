@@ -27,8 +27,8 @@ void
 waitAndSync(tpool::FinishLine& finishLine)
 {
     while (!finishLine.all_finished()) {
-        finishLine.wait_for(std::chrono::milliseconds(50));
-        Rcout << "not done yet";
+        finishLine.wait_for(std::chrono::milliseconds(20));
+        std::cout << "not done yet" << std::endl;
         checkUserInterrupt();
     }
 }

@@ -34,7 +34,7 @@ namespace tpool {
 //!
 //! Lets some threads wait until others reach a control point. Start a runner
 //! with `FinishLine::start()`, and wait for all runners to finish with
-//! `FinishLine::wait()`.
+//! `FinishLine::wait()`.>
 class FinishLine
 {
   public:
@@ -310,6 +310,7 @@ struct TaskManager
 
     void wait_for_jobs()
     {
+        std::cout << "waiting for jobs " << std::this_thread::get_id() << std::endl;
         std::unique_lock<std::mutex> lk(m_);
         cv_.wait(lk, [this] { return !this->empty() || stopped_; });
     }
