@@ -56,7 +56,7 @@ class FinishLine
 
     ~FinishLine()
     {
-        std::cout << "~FinishLine() "<< get_time() std::endl;
+        std::cout << "~FinishLine() "<< get_time() << std::endl;
     }
 
     //! adds runners.
