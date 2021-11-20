@@ -122,9 +122,9 @@ class RingBuffer
     }
 
     size_t capacity() const { return capacity_; }
-    
+
     void set_entry(size_t i, T val) { buffer_[i & mask_] = val; }
-    
+
     T get_entry(size_t i) const { return buffer_[i & mask_]; }
 
     RingBuffer<T>* enlarge(size_t bottom, size_t top) const
@@ -156,6 +156,7 @@ exchange(T& obj, T&& new_value) noexcept
 class TaskQueue
 {
     using Task = std::function<void()>;
+
   public:
     //! constructs the que with a given capacity.
     //! @param capacity must be a power of two.
@@ -290,10 +291,11 @@ struct TaskManager
     }
 
     template<typename Task>
-    bool try_pop(Task& task)
+    bool try_pop(Task& task, size_t worker_id = 0)
     {
         do {
-            if (!stopped_ && queues_[pop_idx_++ % num_queues_].try_pop(task))
+            if (!stopped_ &&
+                queues_[worker_id++ % num_queues_].try_pop(task))
                 return true;
         } while (!this->empty() && !stopped_);
         return false;

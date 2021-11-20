@@ -105,8 +105,17 @@ inline ThreadPool::ThreadPool()
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_(nWorkers)
 {
-    for (size_t w = 0; w < nWorkers_; w++)
-        this->startWorker();
+    for (size_t id = 0; id < nWorkers_; id++) {
+        workers_.emplace_back([this, id] {
+            std::function<void()> task;
+            while (!taskManager_.stopped()) {
+                taskManager_.wait_for_jobs();
+
+                while (taskManager_.try_pop(task, id))
+                    executeSafely(task);
+            }
+        });
+    }
 }
 
 //! destructor joins all threads if possible.
@@ -264,21 +273,6 @@ inline void
 ThreadPool::clear()
 {
     taskManager_.clear();
-}
-
-//! spawns a worker thread waiting for jobs to arrive.
-inline void
-ThreadPool::startWorker()
-{
-    workers_.emplace_back([this] {
-        std::function<void()> task;
-        while (!taskManager_.stopped()) {
-            taskManager_.wait_for_jobs();
-
-            while (taskManager_.try_pop(task))
-                executeSafely(task);
-        }
-    });
 }
 
 template<class Task>
