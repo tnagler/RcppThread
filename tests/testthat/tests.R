@@ -36,11 +36,11 @@ for (run in seq_len(runs)) {
         testThreadPoolPush()
         expect_silent(testThreadPoolPush())
     })
-    my_print("pushReturn works \n")
 
-    test_that("pushReturn works", {
-        expect_silent(testThreadPoolPushReturn())
-    })
+    # my_print("pushReturn works \n")
+    # test_that("pushReturn works", {
+    #     expect_silent(testThreadPoolPushReturn())
+    # })
     my_print("map works \n")
 
     test_that("map works", {
