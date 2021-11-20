@@ -79,30 +79,30 @@ for (run in seq_len(runs)) {
     })
     
     
-    ## -------------------------------------------------------
-    context("Parallel for functions")
+    # ## -------------------------------------------------------
+    # context("Parallel for functions")
 
-    my_print("parallelFor works\n")
-    test_that("parallelFor works", {
-        expect_silent(testParallelFor())
-    })
+    # my_print("parallelFor works\n")
+    # test_that("parallelFor works", {
+    #     expect_silent(testParallelFor())
+    # })
     
-    my_print("nested parallelFor works\n")
-    test_that("nested parallelFor works", {
-        expect_silent(testNestedParallelFor())
-    })
+    # my_print("nested parallelFor works\n")
+    # test_that("nested parallelFor works", {
+    #     expect_silent(testNestedParallelFor())
+    # })
     
 
-    my_print("parallelForEach works\n")
-    test_that("parallelForEach works", {
-        expect_silent(testParallelForEach())
-    })
+    # my_print("parallelForEach works\n")
+    # test_that("parallelForEach works", {
+    #     expect_silent(testParallelForEach())
+    # })
     
     
-    test_that("nested parallelForEach works", {
-        expect_silent(testNestedParallelForEach())
-    })
-    my_print("nested parallelForEach works\n")
+    # test_that("nested parallelForEach works", {
+    #     expect_silent(testNestedParallelForEach())
+    # })
+    # my_print("nested parallelForEach works\n")
     
     ## ------------------------------------------------------
     my_print("progress tracking\n")
