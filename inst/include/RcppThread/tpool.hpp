@@ -276,7 +276,7 @@ struct TaskManager
     template<typename Task>
     void push(Task&& task)
     {
-        while (!queues_[push_idx_++ % num_queues_].try_push(task))
+        while (!stopped_ && !queues_[push_idx_++ % num_queues_].try_push(task))
             continue;
         cv_.notify_all();
     }
@@ -294,9 +294,9 @@ struct TaskManager
     bool try_pop(Task& task)
     {
         do {
-            if (queues_[pop_idx_++ % num_queues_].try_pop(task))
+            if (!stopped_ && queues_[pop_idx_++ % num_queues_].try_pop(task))
                 return true;
-        } while (!this->empty());
+        } while (!this->empty() && !stopped_);
         return false;
     }
 
