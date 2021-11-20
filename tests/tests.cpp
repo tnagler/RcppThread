@@ -64,7 +64,6 @@ void testThreadPoolPush()
     for (size_t i = 0; i < x.size() / 2; i++)
         pool.push(dummy, i);
 
-    std::cout << "CALLING WAIT" << std::endl;
     pool.wait();
 
     size_t count_wrong = 0;

@@ -49,12 +49,11 @@ class FinishLine
     void add(size_t runners = 1) noexcept { runners_ = runners_ + runners; }
 
     //! adds a single runner.
-    void start() noexcept { std::cout << ++runners_ << "+" << std::endl; }
+    void start() noexcept { ++runners_; }
 
     //! indicates that a runner has crossed the finish line.
     void cross() noexcept
     {
-        std::cout << runners_ << "-" << std::endl;
         if (--runners_ <= 0) {
             cv_.notify_all();
         }
@@ -310,7 +309,6 @@ struct TaskManager
 
     void wait_for_jobs()
     {
-        std::cout << "waiting for jobs " << std::this_thread::get_id() << std::endl;
         std::unique_lock<std::mutex> lk(m_);
         cv_.wait(lk, [this] { return !this->empty() || stopped_; });
     }
