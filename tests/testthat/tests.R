@@ -2,7 +2,6 @@
 context("Compile test functions")
 Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
-cat("\n\n DONE COMPILING \n\n")
 
 runs <- 1
 for (run in seq_len(runs)) {
@@ -25,19 +24,24 @@ for (run in seq_len(runs)) {
 
     ## -------------------------------------------------------
     context("Thread pool")
+    cat("push works \n")
+
     test_that("push works", {
         testThreadPoolPush()
         expect_silent(testThreadPoolPush())
     })
+    cat("pushReturn works \n")
 
     test_that("pushReturn works", {
         expect_silent(testThreadPoolPushReturn())
     })
-    
+    cat("map works \n")
+
     test_that("map works", {
         expect_silent(testThreadPoolMap())
     })
-    
+    cat("parallelFor works \n")
+
     test_that("parallelFor works", {
         expect_silent(testThreadPoolParallelFor())
     })
@@ -45,7 +49,8 @@ for (run in seq_len(runs)) {
     # test_that("nested parallelFor works", {
     #     expect_silent(testThreadPoolNestedParallelFor())
     # })
-    
+    cat("parallelForEach works \n")
+
     test_that("parallelForEach works", {
         expect_silent(testThreadPoolParallelForEach())
     })
@@ -53,11 +58,13 @@ for (run in seq_len(runs)) {
     # test_that("nested parallelForEach works", {
     #     expect_silent(testThreadPoolNestedParallelForEach())
     # })
-    
+    cat("works single threaded \n")
+
     test_that("works single threaded", {
         expect_silent(testThreadPoolSingleThreaded())
     })
-    
+    cat("destructible without join \n")
+
     test_that("destructible without join", {
         expect_silent(testThreadPoolDestructWOJoin())
     })
