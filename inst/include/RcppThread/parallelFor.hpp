@@ -98,6 +98,7 @@ parallelForEach(I& items,
     const auto begin_it = std::begin(items);
     const auto end_it = std::end(items);
     auto size = std::distance(begin_it, end_it);
-    parallelFor(0, size, [f, &items, &begin_it](int i) { f(*(begin_it + i)); });
+    parallelFor(0, size, [f, &begin_it](int i) { f(*(begin_it + i)); });
 }
+
 }
