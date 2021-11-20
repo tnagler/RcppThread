@@ -23,7 +23,7 @@
 namespace RcppThread {
 
 namespace util {
-    
+
 void
 waitAndSync(tpool::FinishLine& finishLine)
 {
@@ -127,9 +127,11 @@ inline ThreadPool::~ThreadPool() noexcept
 {
     try {
         taskManager_.stop();
+        std::cout << "wait destruct" << std::endl;
         this->wait();
         std::cout << "join destruct" << std::endl;
         this->joinWorkers();
+        std::cout << "done" << std::endl;
     } catch (...) {
         // destructors should never throw
     }
