@@ -88,8 +88,8 @@ void testThreadPoolPushReturn()
     std::vector<std::future<size_t>> fut(x.size());
     for (size_t i = 0; i < x.size() / 2; i++)
         fut[i] = pool.pushReturn(dummy, i);
-    for (size_t i = 0; i < x.size() / 2; i++)
-        x[i] = fut[i].get();
+    // for (size_t i = 0; i < x.size() / 2; i++)
+    //     x[i] = fut[i].get();
     pool.join();
 
     size_t count_wrong = 0;

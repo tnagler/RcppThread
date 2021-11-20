@@ -55,6 +55,7 @@ class FinishLine
     void cross() noexcept
     {
         if (--runners_ <= 0) {
+            std::lock_guard<std::mutex> lk(mtx);
             cv_.notify_all();
         }
     }
@@ -294,8 +295,7 @@ struct TaskManager
     bool try_pop(Task& task, size_t worker_id = 0)
     {
         do {
-            if (!stopped_ &&
-                queues_[worker_id++ % num_queues_].try_pop(task))
+            if (!stopped_ && queues_[worker_id++ % num_queues_].try_pop(task))
                 return true;
         } while (!this->empty() && !stopped_);
         return false;
