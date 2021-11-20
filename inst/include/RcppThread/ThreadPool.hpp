@@ -28,7 +28,7 @@ void
 waitAndSync(tpool::FinishLine& finishLine)
 {
     while (!finishLine.all_finished()) {
-        finishLine.wait_for(std::chrono::milliseconds(20));
+        finishLine.wait_for(std::chrono::milliseconds(50));
         Rcout << "";
         checkUserInterrupt();
     }
