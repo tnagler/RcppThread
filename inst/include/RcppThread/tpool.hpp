@@ -54,6 +54,11 @@ class FinishLine
       : runners_(runners)
     {}
 
+    ~FinishLine()
+    {
+        std::cout << "~FinishLine() "<< get_time() std::endl;
+    }
+
     //! adds runners.
     //! @param runners adds runners to the race.
     void add(size_t runners = 1) noexcept { runners_ = runners_ + runners; }
