@@ -4,7 +4,7 @@ Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
 my_print <- function(txt) {
     time <- Sys.time()
-    msg <- paste0("[", time "]  ", txt)
+    msg <- paste0("[", time, "]  ", txt)
     cat(msg)
 }
 
