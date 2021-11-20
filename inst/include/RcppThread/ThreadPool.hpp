@@ -29,10 +29,10 @@ waitAndSync(tpool::FinishLine& finishLine)
 {
     while (!finishLine.all_finished()) {
         finishLine.wait_for(std::chrono::milliseconds(50));
-        // Rcout << "";
+        Rcout << "";
         checkUserInterrupt();
     }
-    // Rcout << "";
+    Rcout << "";
 }
 
 }
@@ -122,16 +122,26 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
     }
 }
 
+#include <ctime>
+
+std::string
+get_time()
+{
+    using namespace std::chrono;
+    auto time = system_clock::to_time_t(system_clock::now());
+    return "| " + std::string(std::ctime(&time));
+}
+
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
     try {
         taskManager_.stop();
-        std::cout << "wait destruct" << std::endl;
+        std::cout << "wait destruct " << get_time() << std::endl;
         this->wait();
-        std::cout << "join destruct" << std::endl;
+        std::cout << "join destruct " << get_time() << std::endl;
         this->joinWorkers();
-        std::cout << "done" << std::endl;
+        std::cout << "done " << get_time() << std::endl;
     } catch (...) {
         // destructors should never throw
     }
