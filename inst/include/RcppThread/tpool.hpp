@@ -27,6 +27,16 @@
 #include <thread>
 #include <vector>
 
+#include <ctime>
+
+std::string
+get_time()
+{
+    using namespace std::chrono;
+    auto time = system_clock::to_time_t(system_clock::now());
+    return "| " + std::string(std::ctime(&time));
+}
+
 //! tpool namespace
 namespace tpool {
 
@@ -167,15 +177,15 @@ class TaskQueue
 
     ~TaskQueue() noexcept
     {
-        std::cout << "~TaskQueue()" << std::endl;
+        std::cout << "~TaskQueue() " << get_time() << std::endl;
         // must free memory allocated by push(), but not deallocated by pop()
         auto buf_ptr = buffer_.load();
-        std::cout << "deleting buffer" << std::endl;
+        std::cout << "deleting buffer " << get_time() << std::endl;
         for (int i = top_; i < bottom_.load(m_relaxed); ++i)
             delete buf_ptr->get_entry(i);
-        std::cout << "deleting buffer pointer" << std::endl;
+        std::cout << "deleting buffer pointer " << get_time() << std::endl;
         delete buf_ptr;
-        std::cout << "done" << std::endl;
+        std::cout << "done " << get_time() << std::endl;
     }
 
     TaskQueue(TaskQueue const& other) = delete;

@@ -124,15 +124,6 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
     }
 }
 
-#include <ctime>
-
-std::string
-get_time()
-{
-    using namespace std::chrono;
-    auto time = system_clock::to_time_t(system_clock::now());
-    return "| " + std::string(std::ctime(&time));
-}
 
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
