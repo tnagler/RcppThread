@@ -129,7 +129,7 @@ inline ThreadPool::~ThreadPool() noexcept
         taskManager_.stop();
         this->wait();
         // this->joinWorkers();
-        for (auto& t : threads)
+        for (auto& t : workers_)
             t.detach();
     } catch (...) {
         // destructors should never throw
