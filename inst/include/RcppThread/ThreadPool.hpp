@@ -127,6 +127,7 @@ inline ThreadPool::~ThreadPool() noexcept
 {
     try {
         taskManager_.stop();
+        this->wait();
         this->joinWorkers();
     } catch (...) {
         // destructors should never throw

@@ -17,9 +17,9 @@ void testMonitor()
         checkUserInterrupt();  // should have no effect since not main
         Rcout << "RcppThread says hi!" << std::endl; // should print to R console
         if (isInterrupted())
-            throw std::runtime_error("isInterrupted should not return 'true'");
+            Rcout << "isInterrupted should not return 'true'" << std::endl;
         if (isInterrupted(false))
-            throw std::runtime_error("isInterrupted checks despite condition is 'false'");
+            Rcout << "isInterrupted checks despite condition is 'false'" << std::endl;
     };
 
     std::thread t = std::thread(checks);
@@ -43,7 +43,7 @@ void testThreadClass()
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     t0.detach();
     if (t0.joinable())
-        throw std::runtime_error("thread wasn't detached");
+        Rcout << "thread wasn't detached" << std::endl;
     Thread t1 = Thread(dummy);
     Thread t2 = Thread(dummy);
     t1.swap(t2);
@@ -72,7 +72,7 @@ void testThreadPoolPush()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("push gives wrong result");
+        Rcout << "push gives wrong result" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -98,7 +98,7 @@ void testThreadPoolPushReturn()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("push gives wrong result");
+        Rcout << "push gives wrong result" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -124,7 +124,7 @@ void testThreadPoolMap()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("map gives wrong result");
+        Rcout << "map gives wrong result" << std::endl;;
 }
 
 // [[Rcpp::export]]
@@ -147,7 +147,7 @@ void testThreadPoolParallelFor()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("parallelFor gives wrong result");
+        Rcout << "parallelFor gives wrong result" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -175,7 +175,7 @@ void testThreadPoolNestedParallelFor()
                 std::cout << xxx;
             std::cout << std::endl;
         }
-        throw std::runtime_error("nested parallelFor gives wrong result");
+        Rcout << "nested parallelFor gives wrong result" << std::endl;
     }
 }
 
@@ -202,7 +202,7 @@ void testThreadPoolParallelForEach()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("parallelForEach gives wrong result");
+        Rcout << "parallelForEach gives wrong result" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -231,7 +231,7 @@ void testThreadPoolNestedParallelForEach()
                 std::cout << xxx;
             std::cout << std::endl;
         }
-        throw std::runtime_error("nested parallelFor gives wrong result");
+        Rcout << "nested parallelFor gives wrong result" << std::endl;
     }
 }
 
@@ -255,7 +255,7 @@ void testThreadPoolSingleThreaded()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("push gives wrong result");
+        Rcout << "push gives wrong result" << std::endl;
     pool.join();
 }
 
@@ -284,7 +284,7 @@ void testParallelFor()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("parallelFor gives wrong result");
+        Rcout << "parallelFor gives wrong result" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -311,7 +311,7 @@ void testNestedParallelFor()
                 std::cout << xxx;
             std::cout << std::endl;
         }
-        throw std::runtime_error("nested parallelFor gives wrong result");
+        Rcout << "nested parallelFor gives wrong result" << std::endl;
     }
 }
 
@@ -336,7 +336,7 @@ void testParallelForEach()
     for (size_t i = x.size() / 2 + 1; i < x.size(); i++)
         count_wrong += (x[i] != 1);
     if (count_wrong > 0)
-        throw std::runtime_error("forEach gives wrong result");
+        Rcout << "forEach gives wrong result" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -358,7 +358,7 @@ void testNestedParallelForEach()
             count_wrong += xxx != 2;
     }
     if (count_wrong > 0)
-        throw std::runtime_error("nested parallelForEach gives wrong result");
+        Rcout << "nested parallelForEach gives wrong result" << std::endl;
 
 }
 
