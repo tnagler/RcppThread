@@ -128,9 +128,8 @@ inline ThreadPool::~ThreadPool() noexcept
     try {
         taskManager_.stop();
         this->wait();
-        // this->joinWorkers();
-        for (auto& t : workers_)
-            t.detach();
+        std::cout << "join destruct" << std::endl;
+        this->joinWorkers();
     } catch (...) {
         // destructors should never throw
     }
