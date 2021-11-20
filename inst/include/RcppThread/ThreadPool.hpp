@@ -23,16 +23,16 @@
 namespace RcppThread {
 
 namespace util {
-    
+
 void
 waitAndSync(tpool::FinishLine& finishLine)
 {
     while (!finishLine.all_finished()) {
         finishLine.wait_for(std::chrono::milliseconds(20));
-        Rcout << "";
+        // Rcout << "";
         checkUserInterrupt();
     }
-    Rcout << "";
+    // Rcout << "";
 }
 
 }
