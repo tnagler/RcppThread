@@ -108,6 +108,7 @@ inline ThreadPool::ThreadPool()
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_(nWorkers)
+  , taskManager_(nWorkers)
 {
     for (size_t id = 0; id < nWorkers_; id++) {
         workers_.emplace_back([this, id] {

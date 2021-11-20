@@ -273,7 +273,7 @@ struct TaskManager
     alignas(64) std::atomic_size_t pop_idx_;
     size_t num_queues_;
 
-    TaskManager(size_t num_queues = 1)
+    TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
     {}
