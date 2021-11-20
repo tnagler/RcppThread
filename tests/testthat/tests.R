@@ -2,6 +2,12 @@
 context("Compile test functions")
 Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
+my_print <- function(txt) {
+    time <- Sys.time()
+    msg <- paste0("[", time "]  ", txt)
+    cat(msg)
+}
+
 
 runs <- 1
 for (run in seq_len(runs)) {
@@ -24,46 +30,48 @@ for (run in seq_len(runs)) {
 
     ## -------------------------------------------------------
     context("Thread pool")
-    cat("push works \n")
+    my_print("push works \n")
 
     test_that("push works", {
         testThreadPoolPush()
         expect_silent(testThreadPoolPush())
     })
-    # cat("pushReturn works \n")
+    my_print("pushReturn works \n")
 
-    # test_that("pushReturn works", {
-    #     expect_silent(testThreadPoolPushReturn())
-    # })
-    cat("map works \n")
+    test_that("pushReturn works", {
+        expect_silent(testThreadPoolPushReturn())
+    })
+    my_print("map works \n")
 
     test_that("map works", {
         expect_silent(testThreadPoolMap())
     })
-    cat("parallelFor works \n")
+    my_print("parallelFor works \n")
 
     test_that("parallelFor works", {
         expect_silent(testThreadPoolParallelFor())
     })
-    
-    # test_that("nested parallelFor works", {
-    #     expect_silent(testThreadPoolNestedParallelFor())
-    # })
-    cat("parallelForEach works \n")
+
+    my_print("nested parallelFor works \n")
+    test_that("nested parallelFor works", {
+        expect_silent(testThreadPoolNestedParallelFor())
+    })
+    my_print("parallelForEach works \n")
 
     test_that("parallelForEach works", {
         expect_silent(testThreadPoolParallelForEach())
     })
     
-    # test_that("nested parallelForEach works", {
-    #     expect_silent(testThreadPoolNestedParallelForEach())
-    # })
-    cat("works single threaded \n")
+    my_print("nested parallelForEach works \n")
+    test_that("nested parallelForEach works", {
+        expect_silent(testThreadPoolNestedParallelForEach())
+    })
+    my_print("works single threaded \n")
 
     test_that("works single threaded", {
         expect_silent(testThreadPoolSingleThreaded())
     })
-    cat("destructible without join \n")
+    my_print("destructible without join \n")
 
     test_that("destructible without join", {
         expect_silent(testThreadPoolDestructWOJoin())
@@ -73,18 +81,18 @@ for (run in seq_len(runs)) {
     ## -------------------------------------------------------
     context("Parallel for functions")
 
-    cat("parallelFor works\n")
+    my_print("parallelFor works\n")
     test_that("parallelFor works", {
         expect_silent(testParallelFor())
     })
     
-    cat("nested parallelFor works\n")
+    my_print("nested parallelFor works\n")
     test_that("nested parallelFor works", {
         expect_silent(testNestedParallelFor())
     })
     
 
-    cat("parallelForEach works\n")
+    my_print("parallelForEach works\n")
     test_that("parallelForEach works", {
         expect_silent(testParallelForEach())
     })
@@ -93,10 +101,10 @@ for (run in seq_len(runs)) {
     test_that("nested parallelForEach works", {
         expect_silent(testNestedParallelForEach())
     })
-    cat("nested parallelForEach works\n")
+    my_print("nested parallelForEach works\n")
     
     ## ------------------------------------------------------
-    cat("progress tracking\n")
+    my_print("progress tracking\n")
     context("Progress tracking")
     test_that("ProgressCounter works", {
         expect_output(testProgressCounter(), "100% \\(done\\)")
@@ -106,7 +114,7 @@ for (run in seq_len(runs)) {
         expect_output(testProgressBar(), "100% \\(done\\)")
     })
 
-    cat("done with test run\n")
+    my_print("done with test run\n")
 }
 
-cat("done testing\n")
+my_print("done testing\n")
