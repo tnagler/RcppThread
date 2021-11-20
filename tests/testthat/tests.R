@@ -105,15 +105,15 @@ for (run in seq_len(runs)) {
     # my_print("nested parallelForEach works\n")
     
     ## ------------------------------------------------------
-    my_print("progress tracking\n")
-    context("Progress tracking")
-    test_that("ProgressCounter works", {
-        expect_output(testProgressCounter(), "100% \\(done\\)")
-    })
+    # my_print("progress tracking\n")
+    # context("Progress tracking")
+    # test_that("ProgressCounter works", {
+    #     expect_output(testProgressCounter(), "100% \\(done\\)")
+    # })
     
-    test_that("ProgressBar works", {
-        expect_output(testProgressBar(), "100% \\(done\\)")
-    })
+    # test_that("ProgressBar works", {
+    #     expect_output(testProgressBar(), "100% \\(done\\)")
+    # })
 
     my_print("done with test run\n")
 }
