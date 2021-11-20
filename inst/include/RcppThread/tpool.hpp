@@ -167,6 +167,7 @@ class TaskQueue
 
     ~TaskQueue() noexcept
     {
+        std::cout << "~TaskQueue()" << std::endl;
         // must free memory allocated by push(), but not deallocated by pop()
         auto buf_ptr = buffer_.load();
         std::cout << "deleting buffer" << std::endl;
@@ -276,6 +277,8 @@ struct TaskManager
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
     {}
+
+    ~TaskManager() { std::cout << "~TaskManager()" << std::endl; }
 
     template<typename Task>
     void push(Task&& task)
