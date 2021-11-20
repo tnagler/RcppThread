@@ -78,19 +78,22 @@ for (run in seq_len(runs)) {
         expect_silent(testParallelFor())
     })
     
-    # test_that("nested parallelFor works", {
-    #     expect_silent(testNestedParallelFor())
-    # })
+    cat("nested parallelFor works\n")
+    test_that("nested parallelFor works", {
+        expect_silent(testNestedParallelFor())
+    })
     
+
     cat("parallelForEach works\n")
     test_that("parallelForEach works", {
         expect_silent(testParallelForEach())
     })
     
-    # test_that("nested parallelForEach works", {
-    #     expect_silent(testNestedParallelForEach())
-    # })
     
+    test_that("nested parallelForEach works", {
+        expect_silent(testNestedParallelForEach())
+    })
+    cat("nested parallelForEach works\n")
     
     ## ------------------------------------------------------
     cat("progress tracking\n")
@@ -102,4 +105,8 @@ for (run in seq_len(runs)) {
     test_that("ProgressBar works", {
         expect_output(testProgressBar(), "100% \\(done\\)")
     })
+
+    cat("done with test run\n")
 }
+
+cat("done testing\n")
