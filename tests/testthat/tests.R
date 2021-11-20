@@ -72,6 +72,8 @@ for (run in seq_len(runs)) {
     
     ## -------------------------------------------------------
     context("Parallel for functions")
+
+    cat("parallelFor works\n")
     test_that("parallelFor works", {
         expect_silent(testParallelFor())
     })
@@ -80,6 +82,7 @@ for (run in seq_len(runs)) {
     #     expect_silent(testNestedParallelFor())
     # })
     
+    cat("parallelForEach works\n")
     test_that("parallelForEach works", {
         expect_silent(testParallelForEach())
     })
@@ -90,6 +93,7 @@ for (run in seq_len(runs)) {
     
     
     ## ------------------------------------------------------
+    cat("progress tracking\n")
     context("Progress tracking")
     test_that("ProgressCounter works", {
         expect_output(testProgressCounter(), "100% \\(done\\)")

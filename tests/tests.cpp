@@ -80,7 +80,7 @@ void testThreadPoolPushReturn()
 {
     ThreadPool pool(2);
     std::vector<size_t> x(1000000, 1);
-    auto dummy = [&] (size_t i)  {
+    auto dummy = [x] (size_t i)  {
         checkUserInterrupt();
         return 2 * x[i];
     };
@@ -88,8 +88,8 @@ void testThreadPoolPushReturn()
     std::vector<std::future<size_t>> fut(x.size());
     for (size_t i = 0; i < x.size() / 2; i++)
         fut[i] = pool.pushReturn(dummy, i);
-    // for (size_t i = 0; i < x.size() / 2; i++)
-    //     x[i] = fut[i].get();
+    for (size_t i = 0; i < x.size() / 2; i++)
+        x[i] = fut[i].get();
     pool.join();
 
     size_t count_wrong = 0;
