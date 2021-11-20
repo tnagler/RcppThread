@@ -265,20 +265,24 @@ class TaskQueue
 //! Task manager based on work stealing
 struct TaskManager
 {
-    std::vector<TaskQueue> queues_;
     std::mutex m_;
     std::condition_variable cv_;
     std::atomic_bool stopped_{ false };
     alignas(64) std::atomic_size_t push_idx_;
     alignas(64) std::atomic_size_t pop_idx_;
     size_t num_queues_;
+    std::vector<TaskQueue> queues_;
 
     TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
     {}
 
-    ~TaskManager() { std::cout << "~TaskManager()" << std::endl; }
+    ~TaskManager()
+    {
+        this->stop();
+        std::cout << "~TaskManager()" << std::endl;
+    }
 
     template<typename Task>
     void push(Task&& task)

@@ -90,12 +90,13 @@ class ThreadPool
     bool allJobsDone();
     void waitForEvents();
     void rethrowExceptions();
-    // variables for synchronization between workers
-    tpool::detail::TaskManager taskManager_;
-    tpool::FinishLine finishLine_{ 0 };
 
     std::vector<std::thread> workers_;
     size_t nWorkers_;
+
+    // variables for synchronization between workers
+    tpool::detail::TaskManager taskManager_;
+    tpool::FinishLine finishLine_{ 0 };
 };
 
 //! constructs a thread pool with as many workers as there are cores.
