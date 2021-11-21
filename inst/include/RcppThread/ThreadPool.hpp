@@ -85,7 +85,7 @@ class ThreadPool
     void rethrowExceptions();
 
     // variables for synchronization between workers
-    std::unique_ptr<tpool::detail::TaskManager> taskManager_;
+    tpool::detail::TaskManager taskManager_;
     tpool::FinishLine finishLine_{ 0 };
 
     std::vector<std::thread> workers_;

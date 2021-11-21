@@ -281,9 +281,6 @@ struct TaskManager
       , num_queues_{ num_queues }
     {}
 
-    ~TaskManager()
-    {}
-
     template<typename Task>
     void push(Task&& task)
     {
