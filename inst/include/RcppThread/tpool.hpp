@@ -345,7 +345,6 @@ struct TaskManager
         {
             std::lock_guard<std::mutex> lk(m_);
             stopped_ = true;
-            this->clear();
         }
         cv_.notify_all();
     }
