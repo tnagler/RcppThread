@@ -209,8 +209,9 @@ class TaskQueue
     {
         auto buf_ptr = buffer_.load();
         auto b = bottom_.load(m_relaxed);
+        int t;
         while (true) {
-            auto t = top_load(m_relaxed);
+            t = top_.load(m_relaxed);
             if (top_.compare_exchange_weak(t, b, m_release, m_relaxed))
                 break;
         }
@@ -287,7 +288,7 @@ struct TaskManager
     std::mutex m_;
     std::condition_variable cv_;
     std::atomic_bool stopped_{ false };
-    alignas(64) std::atomic_size_t{ 0 };
+    alignas(64) std::atomic_size_t push_idx_{ 0 };
     size_t num_queues_;
     std::vector<TaskQueue> queues_;
 
