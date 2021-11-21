@@ -130,7 +130,6 @@ inline ThreadPool::~ThreadPool() noexcept
     std::cout << "~ThreadPool( " << get_time() << std::endl;
     try {
         taskManager_.stop();
-        this->wait();
         this->joinWorkers();
     } catch (...) {
         // destructors should never throw
