@@ -10,7 +10,7 @@ my_print("compiling")
 context("Compile test functions")
 Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
-runs <- 10
+runs <- 100
 for (run in seq_len(runs)) {
     context(paste0("---------------------------- run ", run, "/", runs))
     test_that("start", expect_true(TRUE))

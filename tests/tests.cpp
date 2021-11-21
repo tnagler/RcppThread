@@ -391,35 +391,35 @@ testNestedParallelForEach()
 //     t.join();
 //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 // }
-//
-// // [[Rcpp::export]]
-// void testThreadPoolInterruptJoin()
-// {
-//     ThreadPool pool(2);
-//     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-//         checkUserInterrupt();
-//     };
-//     for (size_t i = 0; i < 20; i++)
-//         pool.push(dummy);
-//     pool.join();
-//     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-// }
-//
-// // [[Rcpp::export]]
-// void testThreadPoolInterruptWait()
-// {
-//     ThreadPool pool(2);
-//     auto dummy = [] {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-//         checkUserInterrupt();
-//     };
-//     for (size_t i = 0; i < 20; i++) {
-//         pool.push(dummy);
-//     }
-//     pool.wait();
-//     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-// }
+
+// [[Rcpp::export]]
+void testThreadPoolInterruptJoin()
+{
+    ThreadPool pool(2);
+    auto dummy = [] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        checkUserInterrupt();
+    };
+    for (size_t i = 0; i < 20; i++)
+        pool.push(dummy);
+    pool.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
+// [[Rcpp::export]]
+void testThreadPoolInterruptWait()
+{
+    ThreadPool pool(2);
+    auto dummy = [] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        checkUserInterrupt();
+    };
+    for (size_t i = 0; i < 20; i++) {
+        pool.push(dummy);
+    }
+    pool.wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+}
 
 // [[Rcpp::export]]
 void
