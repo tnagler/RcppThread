@@ -79,9 +79,10 @@ void testThreadPoolPush()
 void testThreadPoolPushReturn()
 {
     ThreadPool pool(2);
-    std::vector<size_t> x(1000000, 1);
+    std::vector<size_t> x(100, 1);
     auto dummy = [&x] (size_t i) -> size_t  {
         checkUserInterrupt();
+        std::cout << i << std::endl;
         x[i] = 2 * x[i];
         return x[i];
     };

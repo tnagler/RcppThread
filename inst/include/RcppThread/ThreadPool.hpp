@@ -101,7 +101,8 @@ inline ThreadPool::ThreadPool()
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
-  : nWorkers_(nWorkers), taskManager_(nWorkers)
+  : taskManager_{ nWorkers }
+  , nWorkers_{ nWorkers }
 {
     for (size_t id = 0; id < nWorkers_; id++) {
         workers_.emplace_back([this, id] {
@@ -160,10 +161,8 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
     using task = std::packaged_task<decltype(f(args...))()>;
     auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
     auto taskPtr = std::make_shared<task>(std::move(pack));
-    auto future = taskPtr->get_future();
-    finishLine_.start();
-    taskManager_.push([taskPtr] { (*taskPtr)(); });
-    return future;
+    this->push([taskPtr] { (*taskPtr)(); });
+    return taskPtr->get_future();;
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
