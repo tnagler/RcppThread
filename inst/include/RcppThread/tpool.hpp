@@ -182,12 +182,9 @@ class TaskQueue
         std::cout << "~TaskQueue() " << get_time() << std::endl;
         // must free memory allocated by push(), but not deallocated by pop()
         auto buf_ptr = buffer_.load();
-        std::cout << "deleting buffer " << get_time() << std::endl;
         for (int i = top_; i < bottom_.load(m_relaxed); ++i)
             delete buf_ptr->get_entry(i);
-        std::cout << "deleting buffer pointer " << get_time() << std::endl;
         delete buf_ptr;
-        std::cout << "done " << get_time() << std::endl;
     }
 
     TaskQueue(TaskQueue const& other) = delete;

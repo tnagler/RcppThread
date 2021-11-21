@@ -124,17 +124,14 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
     }
 }
 
-
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
+    std::cout << "~ThreadPool( " << get_time() << std::endl;
     try {
         taskManager_.stop();
-        std::cout << "wait destruct " << get_time() << std::endl;
         this->wait();
-        std::cout << "join destruct " << get_time() << std::endl;
         this->joinWorkers();
-        std::cout << "done " << get_time() << std::endl;
     } catch (...) {
         // destructors should never throw
     }
