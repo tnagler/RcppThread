@@ -144,7 +144,7 @@ ThreadPool::push(F&& f, Args&&... args)
     } else {
         finishLine_.start();
         taskManager_->push(
-          std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+          std::bind(f, std::forward<Args>(args)...));
     }
 }
 
