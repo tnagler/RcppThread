@@ -90,8 +90,8 @@ void testThreadPoolPushReturn()
     for (size_t i = 0; i < x.size() / 2; i++)
         fut[i] = pool.pushReturn(dummy, i);
     pool.join();
-    for (size_t i = 0; i < x.size() / 2; i++)
-        fut[i].get();
+    // for (size_t i = 0; i < x.size() / 2; i++)
+    //     fut[i].get();
 
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size() / 2; i++)
