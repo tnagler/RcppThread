@@ -279,21 +279,11 @@ class TaskQueue
     static constexpr std::memory_order m_consume = std::memory_order_consume;
 };
 
-struct my_cv
-{
-    std::condition_variable cv_;
-    ~my_cv()
-    {
-        std::cout << "destroying cv" << std::endl;
-        cv_.~condition_variable();
-        std::cout << "destroyed cv" << std::endl;
-    }
-};
 
 //! Task manager based on work stealing
 struct TaskManager
 {
-    std::condition_variable cv_;
+    std::unique_ptr<std::condition_variable> cv_;
     std::vector<TaskQueue> queues_;
     std::mutex m_;
     std::atomic_bool stopped_{ false };
@@ -303,14 +293,16 @@ struct TaskManager
     TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
-    {}
+    {
+        cv_ =
+          std::unique_ptr<std::condition_variable>(new std::condition_variable);
+    }
 
     ~TaskManager()
     {
         std::cout << "~TaskManager()" << std::endl;
-        std::cout << "destroying cv" << std::endl;
-        cv_.~condition_variable();
-        std::cout << "destroyed cv" << std::endl;
+        // std::cout << "destroying cv" << std::endl;
+        // std::cout << "destroyed cv" << std::endl;
     }
 
     template<typename Task>
@@ -318,7 +310,7 @@ struct TaskManager
     {
         while (!stopped_ && !queues_[push_idx_++ % num_queues_].try_push(task))
             continue;
-        cv_.notify_all();
+        cv_->notify_all();
     }
 
     bool empty()
@@ -351,7 +343,7 @@ struct TaskManager
     void wait_for_jobs()
     {
         std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [this] { return !this->empty() || stopped_; });
+        cv_->wait(lk, [this] { return !this->empty() || stopped_; });
     }
 
     void stop()
@@ -360,7 +352,7 @@ struct TaskManager
             std::lock_guard<std::mutex> lk(m_);
             stopped_ = true;
         }
-        cv_.notify_all();
+        cv_->notify_all();
     }
 };
 
