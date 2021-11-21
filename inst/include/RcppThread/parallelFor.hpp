@@ -31,8 +31,9 @@ namespace RcppThread {
 //!     x[i] = i;
 //! });
 //! ```
-//! The function dispatches to a global thread pool, so it can safely be nested
-//! or called multiple times with almost no overhead.
+//! The function sets up a `ThreadPool` object to do the scheduling. If you
+//! want to run multiple parallel for loops, consider creating a `ThreadPool`
+//! yourself and using `ThreadPool::parallelFor()`.
 //!
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
@@ -49,17 +50,9 @@ parallelFor(int begin,
     if (end == begin)
         return;
 
-    nThreads = std::thread::hardware_concurrency();
-    auto batches = createBatches(begin, end - begin, nThreads, nBatches);
-    tpool::FinishLine finishLine{ batches.size() };
-    auto doBatch = [&](const Batch& b) {
-        for (ptrdiff_t i = b.begin; i < b.end; i++)
-            f(i);
-        finishLine.cross();
-    };
-    for (const auto& batch : batches)
-        ThreadPool::globalInstance().push(doBatch, batch);
-    util::waitAndSync(finishLine);
+    ThreadPool pool(nThreads);
+    pool.parallelFor(begin, end, std::forward<F>(f), nBatches);
+    pool.join();
 }
 
 //! computes a range-based for loop in parallel batches.
@@ -82,8 +75,9 @@ parallelFor(int begin,
 //!     xx *= 2;
 //! });
 //! ```
-//! The function dispatches to a global thread pool, so it can safely be nested
-//! or called multiple times with almost no overhead.
+//! The function sets up a `ThreadPool` object to do the scheduling. If you
+//! want to run multiple parallel for loops, consider creating a `ThreadPool`
+//! yourself and using `ThreadPool::parallelForEach()`.
 //!
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
@@ -95,10 +89,9 @@ parallelForEach(I& items,
                 size_t nBatches = 0)
 {
     // loop ranges ranges indicate iterator offset
-    const auto begin_it = std::begin(items);
-    const auto end_it = std::end(items);
-    auto size = std::distance(begin_it, end_it);
-    parallelFor(0, size, [f, &begin_it](int i) { f(*(begin_it + i)); });
+    ThreadPool pool(nThreads);
+    pool.parallelForEach(items,, nBatches);
+    pool.join();
 }
 
 }
