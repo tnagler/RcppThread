@@ -283,9 +283,9 @@ class TaskQueue
 struct TaskManager
 {
     std::mutex m_;
-    std::vector<TaskQueue> queues_;
     std::condition_variable cv_;
-    std::atomic_bool stopped_{ false };
+      std::vector<TaskQueue> queues_;
+  std::atomic_bool stopped_{ false };
     alignas(64) std::atomic_size_t push_idx_{ 0 };
     size_t num_queues_;
 
