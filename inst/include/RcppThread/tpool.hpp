@@ -27,16 +27,6 @@
 #include <thread>
 #include <vector>
 
-#include <ctime>
-
-std::string
-get_time()
-{
-    using namespace std::chrono;
-    auto time = system_clock::to_time_t(system_clock::now());
-    return "| " + std::string(std::ctime(&time));
-}
-
 //! tpool namespace
 namespace tpool {
 
@@ -53,8 +43,6 @@ class FinishLine
     FinishLine(size_t runners = 0) noexcept
       : runners_(runners)
     {}
-
-    ~FinishLine() { std::cout << "~FinishLine() " << get_time() << std::endl; }
 
     //! adds runners.
     //! @param runners adds runners to the race.
@@ -179,7 +167,6 @@ class TaskQueue
 
     ~TaskQueue() noexcept
     {
-        std::cout << "~TaskQueue() " << get_time() << std::endl;
         // must free memory allocated by push(), but not deallocated by pop()
         auto buf_ptr = buffer_.load();
         for (int i = top_; i < bottom_.load(m_relaxed); ++i)
@@ -279,38 +266,30 @@ class TaskQueue
     static constexpr std::memory_order m_consume = std::memory_order_consume;
 };
 
-
 //! Task manager based on work stealing
 struct TaskManager
 {
-    std::unique_ptr<std::condition_variable> cv_;
     std::vector<TaskQueue> queues_;
+    size_t num_queues_;
+    alignas(64) std::atomic_size_t push_idx_{ 0 };
+    std::condition_variable cv_;
     std::mutex m_;
     std::atomic_bool stopped_{ false };
-    alignas(64) std::atomic_size_t push_idx_{ 0 };
-    size_t num_queues_;
 
     TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
-    {
-        cv_ =
-          std::unique_ptr<std::condition_variable>(new std::condition_variable);
-    }
+    {}
 
     ~TaskManager()
-    {
-        std::cout << "~TaskManager()" << std::endl;
-        // std::cout << "destroying cv" << std::endl;
-        // std::cout << "destroyed cv" << std::endl;
-    }
+    {}
 
     template<typename Task>
     void push(Task&& task)
     {
         while (!stopped_ && !queues_[push_idx_++ % num_queues_].try_push(task))
             continue;
-        cv_->notify_all();
+        cv_.notify_all();
     }
 
     bool empty()
@@ -343,7 +322,7 @@ struct TaskManager
     void wait_for_jobs()
     {
         std::unique_lock<std::mutex> lk(m_);
-        cv_->wait(lk, [this] { return !this->empty() || stopped_; });
+        cv_.wait(lk, [this] { return !this->empty() || stopped_; });
     }
 
     void stop()
@@ -352,7 +331,7 @@ struct TaskManager
             std::lock_guard<std::mutex> lk(m_);
             stopped_ = true;
         }
-        cv_->notify_all();
+        cv_.notify_all();
     }
 };
 

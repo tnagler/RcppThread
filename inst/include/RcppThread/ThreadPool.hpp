@@ -128,7 +128,6 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
-    std::cout << "~ThreadPool( " << get_time() << std::endl;
     try {
         taskManager_->stop();
         this->joinWorkers();
