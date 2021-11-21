@@ -162,9 +162,10 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
     using task = std::packaged_task<decltype(f(args...))()>;
     auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
     auto taskPtr = std::make_shared<task>(std::move(pack));
+    auto future = taskPtr->get_future();
     finishLine_.start();
     taskManager_->push([taskPtr] { (*taskPtr)(); });
-    return taskPtr->get_future();
+    return future;
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
