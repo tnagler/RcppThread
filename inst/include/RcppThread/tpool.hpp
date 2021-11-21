@@ -279,6 +279,17 @@ class TaskQueue
     static constexpr std::memory_order m_consume = std::memory_order_consume;
 };
 
+struct my_cv
+{
+    std::condition_variable cv_;
+    ~my_cv()
+    {
+        std::cout << "destroying cv" << std::endl;
+        cv_.~condition_variable();
+        std::cout << "destroyed cv" << std::endl;
+    }
+};
+
 //! Task manager based on work stealing
 struct TaskManager
 {
@@ -294,7 +305,13 @@ struct TaskManager
       , num_queues_{ num_queues }
     {}
 
-    ~TaskManager() { std::cout << "~TaskManager()" << std::endl; }
+    ~TaskManager()
+    {
+        std::cout << "~TaskManager()" << std::endl;
+        std::cout << "destroying cv" << std::endl;
+        cv_.~condition_variable();
+        std::cout << "destroyed cv" << std::endl;
+    }
 
     template<typename Task>
     void push(Task&& task)
