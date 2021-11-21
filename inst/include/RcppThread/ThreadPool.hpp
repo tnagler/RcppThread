@@ -92,7 +92,7 @@ class ThreadPool
     void rethrowExceptions();
 
     // variables for synchronization between workers
-    tpool::detail::TaskManager taskManager_;
+    std::unique_ptr<tpool::detail::TaskManager> taskManager_;
     tpool::FinishLine finishLine_{ 0 };
 
     std::vector<std::thread> workers_;
@@ -109,15 +109,16 @@ inline ThreadPool::ThreadPool()
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_(nWorkers)
-  , taskManager_(nWorkers)
 {
+    using TaskManager = tpool::detail::TaskManager;
+    taskManager_ = std::unique_ptr<TaskManager>(new TaskManager(nWorkers));
     for (size_t id = 0; id < nWorkers_; id++) {
         workers_.emplace_back([this, id] {
             std::function<void()> task;
-            while (!taskManager_.stopped()) {
-                taskManager_.wait_for_jobs();
+            while (!taskManager_->stopped()) {
+                taskManager_->wait_for_jobs();
 
-                while (taskManager_.try_pop(task, id))
+                while (taskManager_->try_pop(task, id))
                     executeSafely(task);
             }
         });
@@ -129,7 +130,7 @@ inline ThreadPool::~ThreadPool() noexcept
 {
     std::cout << "~ThreadPool( " << get_time() << std::endl;
     try {
-        taskManager_.stop();
+        taskManager_->stop();
         this->joinWorkers();
     } catch (...) {
         // destructors should never throw
@@ -150,7 +151,7 @@ ThreadPool::push(F&& f, Args&&... args)
         f(args...); // if there are no workers, do the job in the main thread
     } else {
         finishLine_.start();
-        taskManager_.push(
+        taskManager_->push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
 }
@@ -170,7 +171,7 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
     auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
     auto taskPtr = std::make_shared<task>(std::move(pack));
     finishLine_.start();
-    taskManager_.push([taskPtr] { (*taskPtr)(); });
+    taskManager_->push([taskPtr] { (*taskPtr)(); });
     return taskPtr->get_future();
 }
 
@@ -271,7 +272,7 @@ inline void
 ThreadPool::join()
 {
     this->wait();
-    taskManager_.stop();
+    taskManager_->stop();
     this->joinWorkers();
 }
 
@@ -279,7 +280,7 @@ ThreadPool::join()
 inline void
 ThreadPool::clear()
 {
-    taskManager_.clear();
+    taskManager_->clear();
 }
 
 template<class Task>
