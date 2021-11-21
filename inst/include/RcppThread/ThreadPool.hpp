@@ -51,13 +51,6 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
-    //! @brief returns a reference to the global thread pool instance.
-    static ThreadPool& globalInstance()
-    {
-        static ThreadPool instance_;
-        return instance_;
-    }
-
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
 

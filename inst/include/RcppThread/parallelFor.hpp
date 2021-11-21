@@ -15,7 +15,9 @@ namespace RcppThread {
 //! @param begin first index of the loop.
 //! @param end the loop runs in the range `[begin, end)`.
 //! @param f a function (the 'loop body').
-//! @param nThreads deprecated; loop is run on global thread pool.
+//! @param nThreads the number of threads to use; the default uses the number
+//!   of cores in the machine;  if `nThreads = 0`, all work will be done in the
+//!   main thread.
 //! @param nBatches the number of batches to create; the default (0)
 //!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code:
@@ -59,7 +61,9 @@ parallelFor(int begin,
 //! @param items an object allowing for `items.size()` and whose elements
 //!   are accessed by the `[]` operator.
 //! @param f a function (the 'loop body').
-//! @param nThreads deprecated; loop is run on global thread pool.
+//! @param nThreads the number of threads to use; the default uses the number
+//!   of cores in the machine;  if `nThreads = 0`, all work will be done in the
+//!   main thread.
 //! @param nBatches the number of batches to create; the default (0)
 //!   triggers a heuristic to automatically determine the number of batches.
 //! @details Consider the following code:
