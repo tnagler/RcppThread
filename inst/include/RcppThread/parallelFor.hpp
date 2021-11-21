@@ -90,7 +90,7 @@ parallelForEach(I& items,
 {
     // loop ranges ranges indicate iterator offset
     ThreadPool pool(nThreads);
-    pool.parallelForEach(items,, nBatches);
+    pool.parallelForEach(items, std::forward<F>(f), nBatches);
     pool.join();
 }
 
