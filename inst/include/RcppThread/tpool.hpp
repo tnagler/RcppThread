@@ -44,16 +44,13 @@ class TodoList
       : num_tasks_{ num_tasks }
     {}
 
-    //! adds tasks.
+    //! adds tasks to the list.
     //! @param num_tasks add that many tasks to the list.
-    void add(size_t num_tasks = 1) noexcept
-    {
-        num_tasks_.fetch_add(num_tasks);
-    }
+    void add(size_t num_tasks = 1) noexcept { num_tasks_.fetch_add(num_tasks); }
 
-    //! cross tasks from the list.
+    //! crosses tasks from the list.
     //! @param num_tasks cross that many tasks to the list.
-    void cross(size_t num_tasks = 1) noexcept
+    void cross(size_t num_tasks = 1)
     {
 
         num_tasks_.fetch_sub(num_tasks);
@@ -63,13 +60,9 @@ class TodoList
         }
     }
 
-    bool done() const noexcept
-    {
-        // std::cout << "still " << num_tasks_ << std::endl;
-        return num_tasks_ <= 0;
-    }
+    bool done() const noexcept { return num_tasks_ <= 0; }
 
-    //! waits for all active runners to cross the finish line.
+    //! waits for the list to be empty.
     //! @param millis if > 0; waiting aborts after waiting that many
     //! milliseconds.
     void wait(size_t millis = 0)
@@ -130,7 +123,7 @@ class RingBuffer
 
     T get_entry(size_t i) const { return buffer_[i & mask_]; }
 
-    RingBuffer<T>* enlarge(size_t bottom, size_t top) const
+    RingBuffer<T>* enlarged_copy(size_t bottom, size_t top) const
     {
         RingBuffer<T>* new_buffer = new RingBuffer{ 2 * capacity_ };
         for (size_t i = top; i != bottom; ++i)
@@ -161,7 +154,7 @@ class TaskQueue
     using Task = std::function<void()>;
 
   public:
-    //! constructs the que with a given capacity.
+    //! constructs the queue with a given capacity.
     //! @param capacity must be a power of two.
     TaskQueue(size_t capacity = 256)
       : buffer_{ new RingBuffer<Task*>(capacity) }
@@ -179,57 +172,56 @@ class TaskQueue
     TaskQueue(TaskQueue const& other) = delete;
     TaskQueue& operator=(TaskQueue const& other) = delete;
 
-    //! queries the size.
-    size_t size() const
-    {
-        auto b = bottom_.load(m_relaxed);
-        auto t = top_.load(m_relaxed);
-        return static_cast<size_t>(b >= t ? b - t : 0);
-    }
-
     //! checks if queue is empty.
-    bool empty() const { return (this->size() == 0); }
+    bool empty() const
+    {
+        return (bottom_.load(m_relaxed) <= top_.load(m_relaxed));
+    }
 
     //! clears the queue.
     void clear()
     {
+        std::lock_guard<std::mutex> lk(mutex_); // prevents concurrent push
         auto buf_ptr = buffer_.load();
         auto b = bottom_.load(m_relaxed);
         int t;
         while (true) {
+            // try until we can set top = bottom; this might fail if someone
+            // pops concurrently
             t = top_.load(m_relaxed);
             if (top_.compare_exchange_weak(t, b, m_release, m_relaxed))
                 break;
         }
         for (int i = t; i < b; ++i)
-            delete buf_ptr->get_entry(i);
+            delete buf_ptr->get_entry(i); // free memory for unpopped items
     }
 
     //! pushes a task to the bottom of the queue; returns false if queue is
     //! currently locked; enlarges the queue if full.
     bool try_push(Task&& task)
     {
-        // must hold lock in case there are multiple producers, abort if already
-        // taken, so we can check out next queue
-        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
-        if (!lk)
-            return false;
-        this->push_unsafe(std::forward<Task>(task));
-        lk.unlock();
+        { // must hold lock in case of multiple producers
+            std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
+            // abort if already taken, so we can check out next queue
+            if (!lk)
+                return false;
+            this->push_unsafe(std::forward<Task>(task));
+        }
         cv_.notify_one();
         return true;
     }
 
     //! pushes a task to the bottom of the queue; enlarges the queue if full.
-    void push(Task&& task)
+    void force_push(Task&& task)
     {
-        // must hold lock in case there are multiple producers
-        std::unique_lock<std::mutex> lk(mutex_);
-        this->push_unsafe(std::forward<Task>(task));
-        lk.unlock();
+        { // must hold lock in case of multiple producers
+            std::lock_guard<std::mutex> lk(mutex_);
+            this->push_unsafe(std::forward<Task>(task));
+        }
         cv_.notify_one();
     }
 
+    //! pushes a task without locking the queue (enough for single producer)
     void push_unsafe(Task&& task)
     {
         auto b = bottom_.load(m_relaxed);
@@ -237,11 +229,12 @@ class TaskQueue
         RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
 
         if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
+            // buffer is full, must create enlarged copy beforing pushing
             old_buffers_.emplace_back(
-              exchange(buf_ptr, buf_ptr->enlarge(b, t)));
+              exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
             buffer_.store(buf_ptr, m_relaxed);
         }
-
+        
         Task* task_ptr = new Task{ std::forward<Task>(task) };
         buf_ptr->set_entry(b, task_ptr);
         bottom_.store(b + 1, m_release);
@@ -250,10 +243,6 @@ class TaskQueue
     //! pops a task from the top of the queue; returns false if lost race.
     bool try_pop(Task& task)
     {
-        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
-        if (!lk)
-            return false;
-
         auto t = top_.load(m_acquire);
         std::atomic_thread_fence(m_seq_cst);
         auto b = bottom_.load(m_acquire);
@@ -280,7 +269,7 @@ class TaskQueue
     void stop()
     {
         {
-            std::unique_lock<std::mutex> lk(mutex_);
+            std::lock_guard<std::mutex> lk(mutex_);
             stopped_ = true;
         }
         cv_.notify_all();
@@ -293,14 +282,13 @@ class TaskQueue
     std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
     std::mutex mutex_;
     std::condition_variable cv_;
-    bool stopped_;
+    std::atomic<bool> stopped_;
 
     // convenience aliases
     static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
     static constexpr std::memory_order m_acquire = std::memory_order_acquire;
     static constexpr std::memory_order m_release = std::memory_order_release;
     static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
-    static constexpr std::memory_order m_consume = std::memory_order_consume;
 };
 
 //! Task manager based on work stealing
@@ -322,20 +310,10 @@ struct TaskManager
     {
         size_t count = 0;
         while (!stopped_ && (count++ < num_queues_)) {
-            auto id = push_idx_++;
-            if (queues_[id % num_queues_].try_push(task))
+            if (queues_[push_idx_++ % num_queues_].try_push(task))
                 return;
         }
-        queues_[push_idx_++ % num_queues_].push(task);
-    }
-
-    bool empty()
-    {
-        for (auto& q : queues_) {
-            if (!q.empty())
-                return false;
-        }
-        return true;
+        queues_[push_idx_++ % num_queues_].force_push(task);
     }
 
     template<typename Task>
