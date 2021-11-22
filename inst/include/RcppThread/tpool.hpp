@@ -30,70 +30,70 @@
 //! tpool namespace
 namespace tpool {
 
-//! @brief Finish line - a synchronization primitive.
-//!
-//! Lets some threads wait until others reach a control point. Start a runner
-//! with `FinishLine::start()`, and wait for all runners to finish with
-//! `FinishLine::wait()`.
-class FinishLine
+//! @brief Todo list - a synchronization primitive.
+//! @details Add a task with `add()`, cross it off with `cross()`, and wait for
+//! all tasks to complete with `wait()`.
+class TodoList
 {
   public:
-    //! constructs a finish line.
-    //! @param runners number of initial runners.
-    FinishLine(size_t runners = 0) noexcept
-      : runners_(runners)
+    //! constructs the todo list.
+    //! @param num_tasks initial number of tasks.
+    TodoList(size_t num_tasks = 0) noexcept
+      : num_tasks_(num_tasks)
     {}
 
-    //! adds runners.
-    //! @param runners adds runners to the race.
-    void add(size_t runners = 1) noexcept { runners_ = runners_ + runners; }
+    //! adds tasks to the list.
+    //! @param num_tasks add that many tasks to the list.
+    void add(size_t num_tasks = 1) noexcept { num_tasks_.fetch_add(num_tasks); }
 
-    //! adds a single runner.
-    void start() noexcept { ++runners_; }
-
-    //! indicates that a runner has crossed the finish line.
-    void cross() noexcept
+    //! crosses tasks from the list.
+    //! @param num_tasks cross that many tasks to the list.
+    void cross(size_t num_tasks = 1)
     {
-        if (--runners_ <= 0) {
+        num_tasks_.fetch_sub(num_tasks);
+        if (num_tasks_ <= 0) {
+            {
+                std::lock_guard<std::mutex> lk(mtx_); // must lock before signal
+            }
             cv_.notify_all();
         }
     }
 
-    //! waits for all active runners to cross the finish line.
-    void wait() noexcept
+    //! checks whether list is empty.
+    bool empty() const noexcept { return num_tasks_ == 0; }
+
+    //! waits for the list to be empty.
+    //! @param millis if > 0; waiting aborts after waiting that many
+    //! milliseconds.
+    void wait(size_t millis = 0)
     {
+        std::this_thread::yield();
+        auto wake_up = [this] { return (num_tasks_ <= 0) || exception_ptr_; };
         std::unique_lock<std::mutex> lk(mtx_);
-        while ((runners_ > 0) && !exception_ptr_)
-            cv_.wait(lk);
+        if (millis == 0) {
+            cv_.wait(lk, wake_up);
+        } else {
+            cv_.wait_for(lk, std::chrono::milliseconds(millis), wake_up);
+        }
         if (exception_ptr_)
             std::rethrow_exception(exception_ptr_);
     }
 
-    //! waits for all active runners to cross the finish line.
-    //! @param duration maximal waiting time (as `std::chrono::duration`).
-    template<typename Duration>
-    void wait_for(const Duration& duration) noexcept
-    {
-        std::unique_lock<std::mutex> lk(mtx_);
-        while ((runners_ > 0) && !exception_ptr_)
-            cv_.wait_for(lk, duration);
-        if (exception_ptr_)
-            std::rethrow_exception(exception_ptr_);
-    }
-
-    //! aborts the race.
+    //! clears the list.
     //! @param eptr (optional) pointer to an active exception to be rethrown by
     //! a waiting thread; typically retrieved from `std::current_exception()`.
-    void abort(std::exception_ptr eptr = nullptr) noexcept
+    void clear(std::exception_ptr eptr = nullptr) noexcept
     {
-        std::lock_guard<std::mutex> lk(mtx_);
-        runners_ = 0;
-        exception_ptr_ = eptr;
+        {
+            std::lock_guard<std::mutex> lk(mtx_);
+            num_tasks_ = 0;
+            exception_ptr_ = eptr;
+        }
         cv_.notify_all();
     }
 
   private:
-    alignas(64) std::atomic<size_t> runners_;
+    alignas(64) std::atomic_int num_tasks_{ 0 };
     std::mutex mtx_;
     std::condition_variable cv_;
     std::exception_ptr exception_ptr_{ nullptr };
@@ -108,9 +108,10 @@ class RingBuffer
 {
   public:
     explicit RingBuffer(size_t capacity)
-      : capacity_{ capacity }
+      : buffer_{ std::unique_ptr<T[]>(new T[capacity]) }
+      , capacity_{ capacity }
       , mask_{ capacity - 1 }
-      , buffer_{ std::unique_ptr<T[]>(new T[capacity]) }
+
     {
         if (capacity_ & (capacity_ - 1))
             throw std::runtime_error("capacity must be a power of two");
@@ -118,16 +119,15 @@ class RingBuffer
 
     size_t capacity() const { return capacity_; }
 
-    void store(size_t i, T&& x) { buffer_[i & mask_] = std::move(x); }
+    void set_entry(size_t i, T val) { buffer_[i & mask_] = val; }
 
-    T load(size_t i) const { return buffer_[i & mask_]; }
+    T get_entry(size_t i) const { return buffer_[i & mask_]; }
 
-    // creates a new ring buffer with pointers to current elements.
-    RingBuffer<T>* enlarge(size_t bottom, size_t top) const
+    RingBuffer<T>* enlarged_copy(size_t bottom, size_t top) const
     {
         RingBuffer<T>* new_buffer = new RingBuffer{ 2 * capacity_ };
         for (size_t i = top; i != bottom; ++i)
-            new_buffer->store(i, this->load(i));
+            new_buffer->set_entry(i, this->get_entry(i));
         return new_buffer;
     }
 
@@ -139,12 +139,12 @@ class RingBuffer
 
 // exchange is not available in C++11, use implementatino from
 // https://en.cppreference.com/w/cpp/utility/exchange
-template<class T, class U = T>
+template<class T>
 T
-exchange(T& obj, U&& new_value) noexcept
+exchange(T& obj, T&& new_value) noexcept
 {
     T old_value = std::move(obj);
-    obj = std::forward<U>(new_value);
+    obj = std::forward<T>(new_value);
     return old_value;
 }
 
@@ -154,63 +154,91 @@ class TaskQueue
     using Task = std::function<void()>;
 
   public:
-    //! constructs the que with a given capacity.
+    //! constructs the queue with a given capacity.
     //! @param capacity must be a power of two.
     TaskQueue(size_t capacity = 256)
-      : buffer_{ new RingBuffer<Task>(capacity) }
+      : buffer_{ new RingBuffer<Task*>(capacity) }
     {}
 
-    ~TaskQueue() noexcept { delete buffer_.load(); }
+    ~TaskQueue() noexcept
+    {
+        // must free memory allocated by push(), but not deallocated by pop()
+        auto buf_ptr = buffer_.load();
+        for (int i = top_; i < bottom_.load(m_relaxed); ++i)
+            delete buf_ptr->get_entry(i);
+        delete buf_ptr;
+    }
+
     TaskQueue(TaskQueue const& other) = delete;
     TaskQueue& operator=(TaskQueue const& other) = delete;
 
-    //! queries the size.
-    size_t size() const
-    {
-        auto b = bottom_.load(m_relaxed);
-        auto t = top_.load(m_relaxed);
-        return static_cast<size_t>(b >= t ? b - t : 0);
-    }
-
-    //! queries the capacity.
-    size_t capacity() const { return buffer_.load(m_relaxed)->capacity(); }
-
     //! checks if queue is empty.
-    bool empty() const { return (this->size() == 0); }
+    bool empty() const
+    {
+        return (bottom_.load(m_relaxed) <= top_.load(m_relaxed));
+    }
 
     //! clears the queue.
     void clear()
     {
+        std::lock_guard<std::mutex> lk(mutex_); // prevents concurrent push
+        auto buf_ptr = buffer_.load();
         auto b = bottom_.load(m_relaxed);
-        top_.store(b, m_release);
+        int t;
+        while (true) {
+            // try until we can set top = bottom; this might fail if someone
+            // pops concurrently
+            t = top_.load(m_relaxed);
+            if (top_.compare_exchange_weak(t, b, m_release, m_relaxed))
+                break;
+        }
+        for (int i = t; i < b; ++i)
+            delete buf_ptr->get_entry(i); // free memory for unpopped items
     }
 
     //! pushes a task to the bottom of the queue; returns false if queue is
     //! currently locked; enlarges the queue if full.
     bool try_push(Task&& task)
     {
-        // must hold lock in case there are multiple producers, abort if already
-        // taken, so we can check out next queue
-        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
-        if (!lk)
-            return false;
+        {
+            // must hold lock in case of multiple producers, abort if already
+            // taken, so we can check out next queue
+            std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
+            if (!lk)
+                return false;
+            this->push_unsafe(std::forward<Task>(task));
+        }
+        cv_.notify_one();
+        return true;
+    }
 
+    //! pushes a task to the bottom of the queue; enlarges the queue if full.
+    void force_push(Task&& task)
+    {
+        {
+            // must hold lock in case of multiple producers
+            std::lock_guard<std::mutex> lk(mutex_);
+            this->push_unsafe(std::forward<Task>(task));
+        }
+        cv_.notify_one();
+    }
+
+    //! pushes a task without locking the queue (enough for single producer)
+    void push_unsafe(Task&& task)
+    {
         auto b = bottom_.load(m_relaxed);
         auto t = top_.load(m_acquire);
-        RingBuffer<Task>* buf_ptr = buffer_.load(m_relaxed);
+        RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
 
-        if (buf_ptr->capacity() < (b - t) + 1) {
+        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
+            // buffer is full, create enlarged copy before continuing
             old_buffers_.emplace_back(
-              exchange(buf_ptr, buf_ptr->enlarge(b, t)));
+              exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
             buffer_.store(buf_ptr, m_relaxed);
         }
 
-        buf_ptr->store(b, std::move(task));
-
-        std::atomic_thread_fence(m_release);
-        bottom_.store(b + 1, m_relaxed);
-
-        return true;
+        buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
+        bottom_.store(b + 1, m_release);
     }
 
     //! pops a task from the top of the queue; returns false if lost race.
@@ -221,69 +249,81 @@ class TaskQueue
         auto b = bottom_.load(m_acquire);
 
         if (t < b) {
-            // must load task pointer before acquiring the slot
-            task = buffer_.load(m_consume)->load(t);
+            // must load task pointer before acquiring the slot, because it
+            // could be overwritten immediately after
+            auto task_ptr = buffer_.load(m_acquire)->get_entry(t);
+
             if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
-                return true; // won race
+                task = std::move(*task_ptr); // won race, get task
+                delete task_ptr; // fre memory allocated in push_unsafe()
+                return true;
             }
         }
         return false; // queue is empty or lost race
     }
 
+    void wait()
+    {
+        std::unique_lock<std::mutex> lk(mutex_);
+        cv_.wait(lk, [this] { return !this->empty() || stopped_; });
+    }
+
+    void stop()
+    {
+        {
+            std::lock_guard<std::mutex> lk(mutex_);
+            stopped_ = true;
+        }
+        cv_.notify_all();
+    }
+
   private:
-    alignas(64) std::atomic_ptrdiff_t top_{ 0 };
-    alignas(64) std::atomic_ptrdiff_t bottom_{ 0 };
-    alignas(64) std::atomic<RingBuffer<Task>*> buffer_{ nullptr };
-    std::vector<std::unique_ptr<RingBuffer<Task>>> old_buffers_;
+    alignas(64) std::atomic_int top_{ 0 };
+    alignas(64) std::atomic_int bottom_{ 0 };
+    alignas(64) std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
+    std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
     std::mutex mutex_;
+    std::condition_variable cv_;
+    std::atomic<bool> stopped_;
 
     // convenience aliases
     static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
     static constexpr std::memory_order m_acquire = std::memory_order_acquire;
     static constexpr std::memory_order m_release = std::memory_order_release;
     static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
-    static constexpr std::memory_order m_consume = std::memory_order_consume;
 };
 
 //! Task manager based on work stealing
 struct TaskManager
 {
     std::vector<TaskQueue> queues_;
-    std::mutex m_;
-    std::condition_variable cv_;
-    std::atomic_bool stopped_{ false };
-    alignas(64) std::atomic_size_t push_idx_;
-    alignas(64) std::atomic_size_t pop_idx_;
     size_t num_queues_;
+    alignas(64) std::atomic_size_t push_idx_{ 0 };
+    std::atomic_bool stopped_{ false };
+    std::atomic_size_t todo_list_{ 0 };
 
-    TaskManager(size_t num_queues = 1)
-      : num_queues_{ num_queues }
-      , queues_{ std::vector<TaskQueue>(num_queues) }
+    explicit TaskManager(size_t num_queues)
+      : queues_{ std::vector<TaskQueue>(num_queues) }
+      , num_queues_{ num_queues }
     {}
 
     template<typename Task>
     void push(Task&& task)
     {
-        while (!queues_[push_idx_++ % num_queues_].try_push(task))
-            continue;
-        cv_.notify_one();
-    }
-
-    bool empty()
-    {
-        for (auto& q : queues_) {
-            if (!q.empty())
-                return false;
+        for (size_t count = 0; count < num_queues_ * 20; count++) {
+            if (queues_[push_idx_++ % num_queues_].try_push(task))
+                return;
         }
-        return true;
+        queues_[push_idx_++ % num_queues_].force_push(task);
     }
 
-    bool try_pop(std::function<void()>& task)
+    template<typename Task>
+    bool try_pop(Task& task, size_t worker_id = 0)
     {
-        do {
-            if (queues_[pop_idx_++ % num_queues_].try_pop(task))
+        for (size_t k = 0; k <= num_queues_; k++) {
+            if (queues_[(worker_id + k) % num_queues_].try_pop(task))
                 return true;
-        } while (!this->empty());
+        }
         return false;
     }
 
@@ -293,208 +333,18 @@ struct TaskManager
             q.clear();
     }
 
-    bool stopped() { return stopped_; }
-
-    void wait_for_jobs()
-    {
-        std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [this] { return !this->empty() || stopped_; });
-    }
+    void wait_for_jobs(size_t id) { queues_[id].wait(); }
 
     void stop()
     {
-        {
-            std::lock_guard<std::mutex> lk(m_);
-            stopped_ = true;
-        }
-        cv_.notify_all();
-        this->clear();
+        for (auto& q : queues_)
+            q.stop();
+        stopped_ = true;
     }
+
+    bool stopped() { return stopped_; }
 };
 
 } // end namespace detail
 
-//! A work stealing thread pool.
-class ThreadPool
-{
-  public:
-    //! constructs a thread pool.
-    //! @param n_workers number of worker threads to create; defaults to number
-    //! of available (virtual) hardware cores.
-    explicit ThreadPool(
-      size_t num_threads = std::thread::hardware_concurrency());
-
-    ThreadPool(ThreadPool&&) = delete;
-    ThreadPool(const ThreadPool&) = delete;
-    ThreadPool& operator=(const ThreadPool&) = delete;
-    ThreadPool& operator=(ThreadPool&& other) = delete;
-    ~ThreadPool() noexcept;
-
-    //! @brief returns a reference to the global thread pool instance.
-    static ThreadPool& global_instance()
-    {
-        static ThreadPool instance_;
-        return instance_;
-    }
-
-    //! @brief pushes a job to the thread pool.
-    //! @param f a function.
-    //! @param args (optional) arguments passed to `f`.
-    template<class Function, class... Args>
-    void push(Function&& f, Args&&... args);
-
-    //! @brief executes a job asynchronously the global thread pool.
-    //! @param f a function.
-    //! @param args (optional) arguments passed to `f`.
-    //! @return A `std::future` for the task. Call `future.get()` to retrieve
-    //! the results at a later point in time (blocking).
-    template<class Function, class... Args>
-    auto async(Function&& f, Args&&... args)
-      -> std::future<decltype(f(args...))>;
-
-    //! @brief waits for all jobs currently running on the global thread pool.
-    void wait();
-    //! @brief clears all jobs currently running on the global thread pool.
-    void clear();
-
-  private:
-    void start_worker();
-    void join_workers();
-    template<class Task>
-    void execute_safely(Task& task);
-
-    std::vector<std::thread> workers_;
-    detail::TaskManager task_manager_;
-    size_t n_workers_;
-    std::exception_ptr error_ptr_{ nullptr };
-    FinishLine finish_line_{ 0 };
-};
-
-inline ThreadPool::ThreadPool(size_t n_workers)
-  : n_workers_{ n_workers }
-{
-    for (size_t id = 0; id < n_workers; ++id)
-        this->start_worker();
-}
-
-inline ThreadPool::~ThreadPool() noexcept
-{
-    try {
-        task_manager_.stop();
-        this->join_workers();
-    } catch (...) {
-        // destructors should never throw
-    }
-}
-
-template<class Function, class... Args>
-void
-ThreadPool::push(Function&& f, Args&&... args)
-{
-    task_manager_.push(
-      std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
-}
-
-template<class Function, class... Args>
-auto
-ThreadPool::async(Function&& f, Args&&... args)
-  -> std::future<decltype(f(args...))>
-{
-    using task = std::packaged_task<decltype(f(args...))()>;
-    auto pack =
-      std::bind(std::forward<Function>(f), std::forward<Args>(args)...);
-    auto task_ptr = std::make_shared<task>(std::move(pack));
-    task_manager_.push([task_ptr] { (*task_ptr)(); });
-    return task_ptr->get_future();
-}
-
-void
-ThreadPool::wait()
-{
-    while (!task_manager_.empty())
-        finish_line_.wait();
-}
-
-void
-ThreadPool::clear()
-{
-    task_manager_.clear();
-}
-
-inline void
-ThreadPool::start_worker()
-{
-    workers_.emplace_back([this] {
-        std::function<void()> task;
-        while (!task_manager_.stopped()) {
-            task_manager_.wait_for_jobs();
-
-            finish_line_.start();
-            while (task_manager_.try_pop(task))
-                execute_safely(task);
-            finish_line_.cross();
-        }
-    });
-}
-
-template<class Task>
-inline void
-ThreadPool::execute_safely(Task& task)
-{
-    try {
-        task();
-    } catch (...) {
-        finish_line_.abort(std::current_exception());
-    }
-}
-
-inline void
-ThreadPool::join_workers()
-{
-    for (auto& worker : workers_) {
-        if (worker.joinable())
-            worker.join();
-    }
-}
-
-//! Direct access to the global thread pool ------------------------------------
-
-//! @brief push a job to the global thread pool.
-//! @param f a function.
-//! @param args (optional) arguments passed to `f`.
-template<class Function, class... Args>
-void
-push(Function&& f, Args&&... args)
-{
-    ThreadPool::global_instance().push(std::forward<Function>(f),
-                                       std::forward<Args>(args)...);
-}
-
-//! @brief executes a job asynchronously the global thread pool.
-//! @param f a function.
-//! @param args (optional) arguments passed to `f`.
-//! @return A `std::future` for the task. Call `future.get()` to retrieve the
-//! results at a later point in time (blocking).
-template<class Function, class... Args>
-auto
-async(Function&& f, Args&&... args) -> std::future<decltype(f(args...))>
-{
-    return ThreadPool::global_instance().async(std::forward<Function>(f),
-                                               std::forward<Args>(args)...);
-}
-
-//! @brief waits for all jobs currently running on the global thread pool.
-void
-wait()
-{
-    ThreadPool::global_instance().wait();
-}
-
-//! @brief clears all jobs currently running on the global thread pool.
-void
-clear()
-{
-    ThreadPool::global_instance().clear();
-}
-
-}
+} // end namespace tpool

@@ -22,16 +22,6 @@
 
 namespace RcppThread {
 
-namespace util {
-void
-waitAndSync(tpool::FinishLine& finishLine)
-{
-    finishLine.wait_for(std::chrono::milliseconds(50));
-    Rcout << "";
-    checkUserInterrupt();
-}
-}
-
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool
 {
@@ -45,13 +35,6 @@ class ThreadPool
 
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
-
-    //! @brief returns a reference to the global thread pool instance.
-    static ThreadPool& globalInstance()
-    {
-        static ThreadPool instance_;
-        return instance_;
-    }
 
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
@@ -76,21 +59,13 @@ class ThreadPool
     void clear();
 
   private:
-    void startWorker();
     void joinWorkers();
+    void execute(std::function<void()>& task);
 
-    template<class Task>
-    void executeSafely(Task& task);
-
-    bool allJobsDone();
-    void waitForEvents();
-    void rethrowExceptions();
-
-    std::vector<std::thread> workers_;
-    size_t nWorkers_;
-    // variables for synchronization between workers
+    // variables for synchronization between workers (destructed last)
     tpool::detail::TaskManager taskManager_;
-    tpool::FinishLine finishLine_{ 0 };
+    tpool::TodoList todoList_;
+    std::vector<std::thread> workers_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -102,10 +77,21 @@ inline ThreadPool::ThreadPool()
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
-  : nWorkers_(nWorkers)
+  : taskManager_{ nWorkers }
 {
-    for (size_t w = 0; w < nWorkers_; w++)
-        this->startWorker();
+    for (size_t id = 0; id < nWorkers; id++) {
+        workers_.emplace_back([this, id] {
+            std::function<void()> task;
+            while (!taskManager_.stopped()) {
+                taskManager_.wait_for_jobs(id);
+                do {
+                    // use inner while to save a few cash misses calling done()
+                    while (taskManager_.try_pop(task, id))
+                        execute(task);
+                } while (!todoList_.empty());
+            }
+        });
+    }
 }
 
 //! destructor joins all threads if possible.
@@ -129,9 +115,10 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    if (nWorkers_ == 0) {
+    if (workers_.size() == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
+        todoList_.add();
         taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
@@ -148,11 +135,11 @@ auto
 ThreadPool::pushReturn(F&& f, Args&&... args)
   -> std::future<decltype(f(args...))>
 {
-    using task = std::packaged_task<decltype(f(args...))()>;
-    auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-    auto taskPtr = std::make_shared<task>(std::move(pack));
-    taskManager_.push([taskPtr] { (*taskPtr)(); });
-    return taskPtr->get_future();
+    auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+    using pack_t = std::packaged_task<decltype(f(args...))()>;
+    auto ptr = std::make_shared<pack_t>(std::move(task));
+    this->push([ptr] { (*ptr)(); });
+    return ptr->get_future();
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
@@ -202,7 +189,7 @@ ThreadPool::parallelFor(ptrdiff_t begin, size_t size, F&& f, size_t nBatches)
         for (ptrdiff_t i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, size, nWorkers_, nBatches);
+    auto batches = createBatches(begin, size, workers_.size(), nBatches);
     auto pushJob = [=] {
         for (const auto& batch : batches)
             this->push(doBatch, batch);
@@ -244,8 +231,12 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (!taskManager_.empty())
-        util::waitAndSync(finishLine_);
+    while (!todoList_.empty()) {
+        todoList_.wait(50);
+        Rcout << "";
+        checkUserInterrupt();
+    }
+    Rcout << "";
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -264,31 +255,14 @@ ThreadPool::clear()
     taskManager_.clear();
 }
 
-//! spawns a worker thread waiting for jobs to arrive.
 inline void
-ThreadPool::startWorker()
-{
-    workers_.emplace_back([this] {
-        std::function<void()> task;
-        while (!taskManager_.stopped()) {
-            taskManager_.wait_for_jobs();
-
-            finishLine_.start();
-            while (taskManager_.try_pop(task))
-                executeSafely(task);
-            finishLine_.cross();
-        }
-    });
-}
-
-template<class Task>
-inline void
-ThreadPool::executeSafely(Task& task)
+ThreadPool::execute(std::function<void()>& task)
 {
     try {
         task();
+        todoList_.cross();
     } catch (...) {
-        finishLine_.abort(std::current_exception());
+        todoList_.clear(std::current_exception());
     }
 }
 

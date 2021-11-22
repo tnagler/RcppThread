@@ -6,3 +6,4 @@ revdep
 __pycache__
 .vscode/
 new-benchmarks.R
+bench*
