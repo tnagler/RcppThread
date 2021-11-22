@@ -88,7 +88,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
                     // use inner while to save a few cash misses calling done()
                     while (taskManager_.try_pop(task, id))
                         execute(task);
-                } while (!todoList_.done());
+                } while (!todoList_.empty());
             }
         });
     }
@@ -231,7 +231,7 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (!todoList_.done()) {
+    while (!todoList_.empty()) {
         todoList_.wait(50);
         Rcout << "";
         checkUserInterrupt();
