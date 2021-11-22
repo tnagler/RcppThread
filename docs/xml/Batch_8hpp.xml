@@ -28,7 +28,6 @@
         <label>cstddef</label>
       </node>
     </incdepgraph>
-    <innerclass refid="structRcppThread_1_1Batch" prot="public">RcppThread::Batch</innerclass>
     <innernamespace refid="namespaceRcppThread">RcppThread</innernamespace>
     <briefdescription>
     </briefdescription>

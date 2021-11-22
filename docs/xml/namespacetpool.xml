@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespacetpool" kind="namespace" language="C++">
+    <compoundname>tpool</compoundname>
+    <innerclass refid="classtpool_1_1TodoList" prot="public">tpool::TodoList</innerclass>
+    <innernamespace refid="namespacetpool_1_1detail">tpool::detail</innernamespace>
+    <briefdescription>
+<para>tpool namespace </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="31" column="15"/>
+  </compounddef>
+</doxygen>

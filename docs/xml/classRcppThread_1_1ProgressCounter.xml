@@ -42,7 +42,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="126" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="126" bodyend="128"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="132" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="132" bodyend="134"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-func">
@@ -59,7 +59,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="133" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="133" bodyend="142"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="139" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="139" bodyend="147"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -92,7 +92,7 @@
         </childnode>
       </node>
     </collaborationgraph>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="120" column="45" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="120" bodyend="143"/>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="126" column="45" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="126" bodyend="148"/>
     <listofallmembers>
       <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>formatTime</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>isDone_</name></member>
@@ -106,7 +106,7 @@
       <member refid="classRcppThread_1_1ProgressCounter_1af0ab5e21bb89fd8fd499f7ac6443a10d" prot="private" virt="virtual"><scope>RcppThread::ProgressCounter</scope><name>printProgress</name></member>
       <member refid="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressCounter</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a71e9e5034d220b4fc75648545554b401" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressPrinter</name></member>
-      <member refid="classRcppThread_1_1ProgressPrinter_1a851b2b836517eab09fd15c0933e92e9c" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>remaingTimeString</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1ac4f5d2a6d465f9e6b67256ef73d34dad" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>progressString</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a0fac2a44d886424a2693e4b9d7fb4d58" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>remainingSecs</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1abb8c055119f7a19bf2672e6614b04f14" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>startTime_</name></member>
     </listofallmembers>

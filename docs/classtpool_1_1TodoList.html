@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RcppThread::ProgressPrinter class | RcppThread R-friendly
+  <title>tpool::TodoList class | RcppThread R-friendly
 threading
 in
 C++</title>
@@ -51,44 +51,27 @@ C++</a>
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
-          <span class="m-breadcrumb"><a href="namespaceRcppThread.html">RcppThread</a>::<wbr/></span>ProgressPrinter <span class="m-thin">class</span>
+          <span class="m-breadcrumb"><a href="namespacetpool.html">tpool</a>::<wbr/></span>TodoList <span class="m-thin">class</span>
         </h1>
-        <p>Abstract class for printing progress.</p>
+        <p>Todo list - a synchronization primitive.</p>
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
             <li>
               Reference
               <ul>
-                <li><a href="#derived-classes">Derived classes</a></li>
                 <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
                 <li><a href="#pub-methods">Public functions</a></li>
-                <li><a href="#pro-methods">Protected functions</a></li>
-                <li><a href="#pro-attribs">Protected variables</a></li>
               </ul>
             </li>
           </ul>
         </div>
-<p>This class contains most of the logic for tracking progress in a parallel loop. Child classes must define a method <code>void printProgress()</code> that is called whenever an update is required.</p>
-        <section id="derived-classes">
-          <h2><a href="#derived-classes">Derived classes</a></h2>
-          <dl class="m-doc">
-            <dt>
-              class <a href="classRcppThread_1_1ProgressBar.html" class="m-doc">ProgressBar</a>
-            </dt>
-            <dd>A progress bar showing progress in percent.</dd>
-            <dt>
-              class <a href="classRcppThread_1_1ProgressCounter.html" class="m-doc">ProgressCounter</a>
-            </dt>
-            <dd>A counter showing progress in percent.</dd>
-          </dl>
-        </section>
+<p>Add a task with <code>add()</code>, cross it off with <code>cross()</code>, and wait for all tasks to complete with <code>wait()</code>.</p>
         <section id="typeless-methods">
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a71e9e5034d220b4fc75648545554b401" class="m-doc">ProgressPrinter</a>(</span><span class="m-doc-wrap">size_t numIt,
-              size_t printEvery = 1)</span>
+              <span class="m-doc-wrap-bumper"><a href="#ad900c395f0ce371f6773206dda4e5407" class="m-doc">TodoList</a>(</span><span class="m-doc-wrap">size_t num_tasks = 0) <span class="m-label m-flat m-success">noexcept</span></span>
             </dt>
             <dd></dd>
           </dl>
@@ -96,76 +79,33 @@ C++</a>
         <section id="pub-methods">
           <h2><a href="#pub-methods">Public functions</a></h2>
           <dl class="m-doc">
-            <dt id="a9fbe8e4d867cf9e03dd7e67ab3240419">
-              <span class="m-doc-wrap-bumper">void <a href="#a9fbe8e4d867cf9e03dd7e67ab3240419" class="m-doc-self">printProgress</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-warning">pure virtual</span></span>
-            </dt>
-            <dd>prints progress whenever an update is necessary.</dd>
-            <dt id="a9b92bd795df45b246a578e66d10e2d50">
-              <span class="m-doc-wrap-bumper">auto <a href="#a9b92bd795df45b246a578e66d10e2d50" class="m-doc-self">operator++</a>(</span><span class="m-doc-wrap">) -&gt; size_t</span>
-            </dt>
-            <dd>pre-increment operator</dd>
-            <dt id="a2d7146dd49c3df81a45d0537489826c3">
-              <span class="m-doc-wrap-bumper">auto <a href="#a2d7146dd49c3df81a45d0537489826c3" class="m-doc-self">operator++</a>(</span><span class="m-doc-wrap">int) -&gt; size_t</span>
-            </dt>
-            <dd>post-increment operator</dd>
-          </dl>
-        </section>
-        <section id="pro-methods">
-          <h2><a href="#pro-methods">Protected functions</a></h2>
-          <dl class="m-doc">
-            <dt id="a4158cf794e210d88200676e308828008">
-              <span class="m-doc-wrap-bumper">auto <a href="#a4158cf794e210d88200676e308828008" class="m-doc-self">needsPrint</a>(</span><span class="m-doc-wrap">) -&gt; bool</span>
-            </dt>
-            <dd>checks whether it&#x27;s time for an update.</dd>
-            <dt id="a0fac2a44d886424a2693e4b9d7fb4d58">
-              <span class="m-doc-wrap-bumper">auto <a href="#a0fac2a44d886424a2693e4b9d7fb4d58" class="m-doc-self">remainingSecs</a>(</span><span class="m-doc-wrap">) -&gt; size_t</span>
-            </dt>
-            <dd>estimates the remaining time in seconds.</dd>
-            <dt id="ac4f5d2a6d465f9e6b67256ef73d34dad">
-              <span class="m-doc-wrap-bumper">auto <a href="#ac4f5d2a6d465f9e6b67256ef73d34dad" class="m-doc-self">progressString</a>(</span><span class="m-doc-wrap">) -&gt; std::string</span>
-            </dt>
-            <dd>prints either remaining time or that the computation is done.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a7a8c8d7b7ea582dd260768a47893c19f" class="m-doc">formatTime</a>(</span><span class="m-doc-wrap">size_t secs) -&gt; std::string</span>
+              <span class="m-doc-wrap-bumper">void <a href="#adb2aa12f95bd70c0d68dab45eb73e19e" class="m-doc">add</a>(</span><span class="m-doc-wrap">size_t num_tasks = 1) <span class="m-label m-flat m-success">noexcept</span></span>
             </dt>
             <dd></dd>
-          </dl>
-        </section>
-        <section id="pro-attribs">
-          <h2><a href="#pro-attribs">Protected variables</a></h2>
-          <dl class="m-doc">
-            <dt id="a28e410b643798f36a59bcef22b9d1dbd">
-              std::atomic_size_t <a href="#a28e410b643798f36a59bcef22b9d1dbd" class="m-doc-self">it_</a>
-            </dt>
-            <dd>iteration counter</dd>
-            <dt id="a1aa7189b1a757bc6089966886443b49d">
-              std::atomic_size_t <a href="#a1aa7189b1a757bc6089966886443b49d" class="m-doc-self">numUpdates_</a>
-            </dt>
-            <dd>counter for the number of updates</dd>
-            <dt id="aacbd938eed528c3cd165b1b9277e7892">
-              std::atomic_bool <a href="#aacbd938eed528c3cd165b1b9277e7892" class="m-doc-self">isDone_</a>
-            </dt>
-            <dd>flag indicating end of iterations</dd>
-            <dt id="a9529bc02365f45586db36b903b4f1e9f">
-              size_t <a href="#a9529bc02365f45586db36b903b4f1e9f" class="m-doc-self">numIt_</a>
-            </dt>
-            <dd>total number of iterations</dd>
             <dt>
-              size_t <a href="#a9a0af32f5d66762e6b3993e085b90cf7" class="m-doc">printEvery_</a>
+              <span class="m-doc-wrap-bumper">void <a href="#ad23ce5136b646788f476843bd4d2ef54" class="m-doc">cross</a>(</span><span class="m-doc-wrap">size_t num_tasks = 1)</span>
             </dt>
             <dd></dd>
-            <dt id="abb8c055119f7a19bf2672e6614b04f14">
-              std::chrono::time_point&lt;std::chrono::steady_clock&gt; <a href="#abb8c055119f7a19bf2672e6614b04f14" class="m-doc-self">startTime_</a>
+            <dt id="a4fd16a01633911f5b82c80857ce66527">
+              <span class="m-doc-wrap-bumper">auto <a href="#a4fd16a01633911f5b82c80857ce66527" class="m-doc-self">empty</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
             </dt>
-            <dd>time at start</dd>
+            <dd>checks whether list is empty.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#a6711794e2f9f91e1d34f64f82b6cf7f2" class="m-doc">wait</a>(</span><span class="m-doc-wrap">size_t millis = 0)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#a80d8d12098fb46df66f76bc7c6156e7f" class="m-doc">clear</a>(</span><span class="m-doc-wrap">std::exception_ptr eptr = nullptr) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
           </dl>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a71e9e5034d220b4fc75648545554b401"><div>
+          <section class="m-doc-details" id="ad900c395f0ce371f6773206dda4e5407"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> RcppThread::<wbr />ProgressPrinter::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a71e9e5034d220b4fc75648545554b401" class="m-doc-self">ProgressPrinter</a>(</span><span class="m-doc-wrap">size_t numIt,
-              size_t printEvery = 1)</span></span>
+              <span class="m-doc-wrap-bumper"> tpool::<wbr />TodoList::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ad900c395f0ce371f6773206dda4e5407" class="m-doc-self">TodoList</a>(</span><span class="m-doc-wrap">size_t num_tasks = 0) <span class="m-label m-success">noexcept</span></span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
               <thead>
@@ -173,20 +113,16 @@ C++</a>
               </thead>
               <tbody>
                 <tr>
-                  <td style="width: 1%">numIt</td>
-                  <td>total number of iterations.</td>
-                </tr>
-                <tr>
-                  <td>printEvery</td>
-                  <td>how regularly to print updates (in seconds).</td>
+                  <td style="width: 1%">num_tasks</td>
+                  <td>initial number of tasks.</td>
                 </tr>
               </tbody>
             </table>
-<p>Constructor for abstract class <code>ProgressPrinter</code>.</p>
+<p>constructs the todo list.</p>
           </div></section>
-          <section class="m-doc-details" id="a7a8c8d7b7ea582dd260768a47893c19f"><div>
+          <section class="m-doc-details" id="adb2aa12f95bd70c0d68dab45eb73e19e"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">std::string RcppThread::<wbr />ProgressPrinter::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a7a8c8d7b7ea582dd260768a47893c19f" class="m-doc-self">formatTime</a>(</span><span class="m-doc-wrap">size_t secs) <span class="m-label m-warning">protected</span></span></span>
+              <span class="m-doc-wrap-bumper">void tpool::<wbr />TodoList::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#adb2aa12f95bd70c0d68dab45eb73e19e" class="m-doc-self">add</a>(</span><span class="m-doc-wrap">size_t num_tasks = 1) <span class="m-label m-success">noexcept</span></span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
               <thead>
@@ -194,21 +130,63 @@ C++</a>
               </thead>
               <tbody>
                 <tr>
-                  <td style="width: 1%">secs</td>
-                  <td>in seconds.</td>
+                  <td style="width: 1%">num_tasks</td>
+                  <td>add that many tasks to the list.</td>
                 </tr>
               </tbody>
             </table>
-<p>formats time into {days}d{hours}h{minutes}m{seconds}s.</p>
+<p>adds tasks to the list.</p>
           </div></section>
-        </section>
-        <section>
-          <h2>Variable documentation</h2>
-          <section class="m-doc-details" id="a9a0af32f5d66762e6b3993e085b90cf7"><div>
+          <section class="m-doc-details" id="ad23ce5136b646788f476843bd4d2ef54"><div>
             <h3>
-              size_t RcppThread::<wbr />ProgressPrinter::<wbr /><a href="#a9a0af32f5d66762e6b3993e085b90cf7" class="m-doc-self">printEvery_</a> <span class="m-label m-warning">protected</span>
+              <span class="m-doc-wrap-bumper">void tpool::<wbr />TodoList::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ad23ce5136b646788f476843bd4d2ef54" class="m-doc-self">cross</a>(</span><span class="m-doc-wrap">size_t num_tasks = 1)</span></span>
             </h3>
-<p>update frequency</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">num_tasks</td>
+                  <td>cross that many tasks to the list.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>crosses tasks from the list.</p>
+          </div></section>
+          <section class="m-doc-details" id="a6711794e2f9f91e1d34f64f82b6cf7f2"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void tpool::<wbr />TodoList::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6711794e2f9f91e1d34f64f82b6cf7f2" class="m-doc-self">wait</a>(</span><span class="m-doc-wrap">size_t millis = 0)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">millis</td>
+                  <td>if &gt; 0; waiting aborts after waiting that many milliseconds.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>waits for the list to be empty.</p>
+          </div></section>
+          <section class="m-doc-details" id="a80d8d12098fb46df66f76bc7c6156e7f"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void tpool::<wbr />TodoList::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a80d8d12098fb46df66f76bc7c6156e7f" class="m-doc-self">clear</a>(</span><span class="m-doc-wrap">std::exception_ptr eptr = nullptr) <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">eptr</td>
+                  <td>(optional) pointer to an active exception to be rethrown by a waiting thread; typically retrieved from <code>std::current_exception()</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>clears the list.</p>
           </div></section>
         </section>
       </div>

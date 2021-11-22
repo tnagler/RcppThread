@@ -46,8 +46,8 @@ class ThreadPool
     void map(F&& f, I&& items);
 
     template<class F>
-    inline void parallelFor(ptrdiff_t begin,
-                            size_t size,
+    inline void parallelFor(int begin,
+                            int end,
                             F&& f,
                             size_t nBatches = 0);
 
@@ -183,13 +183,13 @@ ThreadPool::map(F&& f, I&& items)
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
 inline void
-ThreadPool::parallelFor(ptrdiff_t begin, size_t size, F&& f, size_t nBatches)
+ThreadPool::parallelFor(int begin, int end, F&& f, size_t nBatches)
 {
     auto doBatch = [f](const Batch& b) {
-        for (ptrdiff_t i = b.begin; i < b.end; i++)
+        for (int i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, size, workers_.size(), nBatches);
+    auto batches = createBatches(begin, end - begin, workers_.size(), nBatches);
     auto pushJob = [=] {
         for (const auto& batch : batches)
             this->push(doBatch, batch);

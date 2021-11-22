@@ -42,7 +42,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="155" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="155" bodyend="157"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="160" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="160" bodyend="162"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-func">
@@ -59,7 +59,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="162" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="162" bodyend="172"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="167" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="167" bodyend="176"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressBar_1ab2369495912d2c12ab5dbd810048e3de" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>std::string</type>
@@ -99,7 +99,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="177" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="177" bodyend="187"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="181" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="181" bodyend="191"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -132,7 +132,7 @@
         <link refid="classRcppThread_1_1ProgressPrinter"/>
       </node>
     </collaborationgraph>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="149" column="41" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="149" bodyend="188"/>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="154" column="41" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="154" bodyend="192"/>
     <listofallmembers>
       <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>formatTime</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>isDone_</name></member>
@@ -147,7 +147,7 @@
       <member refid="classRcppThread_1_1ProgressBar_1a39f9b31c61cd22cc7548abea097336ce" prot="private" virt="virtual"><scope>RcppThread::ProgressBar</scope><name>printProgress</name></member>
       <member refid="classRcppThread_1_1ProgressBar_1a09bdaf2e551442af08b10b7ef19ab7ba" prot="public" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>ProgressBar</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a71e9e5034d220b4fc75648545554b401" prot="public" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>ProgressPrinter</name></member>
-      <member refid="classRcppThread_1_1ProgressPrinter_1a851b2b836517eab09fd15c0933e92e9c" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>remaingTimeString</name></member>
+      <member refid="classRcppThread_1_1ProgressPrinter_1ac4f5d2a6d465f9e6b67256ef73d34dad" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>progressString</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a0fac2a44d886424a2693e4b9d7fb4d58" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>remainingSecs</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1abb8c055119f7a19bf2672e6614b04f14" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>startTime_</name></member>
     </listofallmembers>

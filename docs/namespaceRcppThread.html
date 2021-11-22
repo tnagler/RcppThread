@@ -109,8 +109,8 @@ C++</a>
           <dl class="m-doc">
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#aa3df09a8db84ae183abe663af8f928c1" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">ptrdiff_t begin,
-              ptrdiff_t size,
+              <span class="m-doc-wrap-bumper">void <a href="#af856bb0a0c8b88b8116a5eb0dc12a204" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
               F&amp;&amp; f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span>
@@ -149,13 +149,13 @@ C++</a>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="aa3df09a8db84ae183abe663af8f928c1"><div>
+          <section class="m-doc-details" id="af856bb0a0c8b88b8116a5eb0dc12a204"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aa3df09a8db84ae183abe663af8f928c1" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">ptrdiff_t begin,
-              ptrdiff_t size,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#af856bb0a0c8b88b8116a5eb0dc12a204" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
               F&amp;&amp; f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span></span>
@@ -170,8 +170,8 @@ C++</a>
                   <td>first index of the loop.</td>
                 </tr>
                 <tr>
-                  <td>size</td>
-                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
+                  <td>end</td>
+                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>
@@ -193,7 +193,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::parallelFor()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
           <section class="m-doc-details" id="a1c246ba8e53889c0cd5c1c24e8c6cc85"><div>
             <h3>
@@ -234,7 +234,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="o">&amp;</span><span class="w"> </span><span class="n">xx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
-<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::forEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::parallelForEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
           <section class="m-doc-details" id="ae48d2e823f3ac43fb87a2795f242e3df"><div>
             <h3>
