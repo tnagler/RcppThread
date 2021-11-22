@@ -67,7 +67,7 @@ class ThreadPool
 
     // variables for synchronization between workers
     tpool::detail::TaskManager taskManager_;
-    tpool::FinishLine finishLine_{ 0 };
+    tpool::TodoList todoList_{ 0 };
 
     std::vector<std::thread> workers_;
     size_t nWorkers_;
@@ -93,7 +93,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
                 do {
                     if (taskManager_.try_pop(task, id))
                         executeSafely(task);
-                } while (!finishLine_.all_finished());
+                } while (!todoList_.done());
             }
         });
     }
@@ -123,7 +123,7 @@ ThreadPool::push(F&& f, Args&&... args)
     if (nWorkers_ == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
-        finishLine_.start();
+        todoList_.add();
         taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
@@ -237,8 +237,8 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (!finishLine_.all_finished()) {
-        finishLine_.wait_for(std::chrono::milliseconds(50));
+    while (!todoList_.done()) {
+        todoList_.wait(50);
         Rcout << "";
         checkUserInterrupt();
     }
@@ -267,9 +267,9 @@ ThreadPool::executeSafely(Task& task)
 {
     try {
         task();
-        finishLine_.cross();
+        todoList_.cross();
     } catch (...) {
-        finishLine_.abort(std::current_exception());
+        todoList_.clear(std::current_exception());
     }
 }
 

@@ -30,75 +30,77 @@
 //! tpool namespace
 namespace tpool {
 
-//! @brief Finish line - a synchronization primitive.
+//! @brief Todo list - a synchronization primitive.
 //!
-//! Lets some threads wait until others reach a control point. Start a runner
-//! with `FinishLine::start()`, and wait for all runners to finish with
-//! `FinishLine::wait()`.>
-class FinishLine
+//! Lets some threads wait until others reach a control point. Add a task
+//! with `TodoList::add()`, cross it of with `TodoList::cross()`, and wait for
+//! all tasks to compelte with `TodoList::wait()`.>
+class TodoList
 {
   public:
-    //! constructs a finish line.
-    //! @param runners number of initial runners.
-    FinishLine(size_t runners = 0) noexcept
-      : runners_(runners)
+    //! constructs the todo list.
+    //! @param num_tasks initial number of tasks.
+    TodoList(size_t num_tasks = 0) noexcept
+      : num_tasks_{ num_tasks }
     {}
 
-    //! adds runners.
-    //! @param runners adds runners to the race.
-    void add(size_t runners = 1) noexcept { runners_ = runners_ + runners; }
-
-    //! adds a single runner.
-    void start() noexcept { ++runners_; }
-
-    //! indicates that a runner has crossed the finish line.
-    void cross() noexcept
+    //! adds tasks.
+    //! @param num_tasks add that many tasks to the list.
+    void add(size_t num_tasks = 1) noexcept
     {
-        if (--runners_ <= 0) {
+        num_tasks_.fetch_add(num_tasks);
+    }
+
+    //! cross tasks from the list.
+    //! @param num_tasks cross that many tasks to the list.
+    void cross(size_t num_tasks = 1) noexcept
+    {
+
+        num_tasks_.fetch_sub(num_tasks);
+        if (num_tasks_ <= 0) {
             std::lock_guard<std::mutex> lk(mtx_);
             cv_.notify_all();
         }
     }
 
-    bool all_finished() const { return runners_ <= 0; }
+    bool done() const noexcept
+    {
+        // std::cout << "still " << num_tasks_ << std::endl;
+        return num_tasks_ <= 0;
+    }
 
     //! waits for all active runners to cross the finish line.
-    void wait() noexcept
+    //! @param millis if > 0; waiting aborts after waiting that many
+    //! milliseconds.
+    void wait(size_t millis = 0)
     {
         std::this_thread::yield();
+        auto wake_up = [this] { return (num_tasks_ <= 0) || exception_ptr_; };
         std::unique_lock<std::mutex> lk(mtx_);
-        while ((runners_ > 0) && !exception_ptr_)
-            cv_.wait(lk);
-
+        if (millis == 0) {
+            cv_.wait(lk, wake_up);
+        } else {
+            cv_.wait_for(lk, std::chrono::milliseconds(millis), wake_up);
+        }
         if (exception_ptr_)
             std::rethrow_exception(exception_ptr_);
     }
 
-    //! waits for all active runners to cross the finish line.
-    //! @param duration maximal waiting time (as `std::chrono::duration`).
-    template<typename Duration>
-    void wait_for(const Duration& duration) noexcept
-    {
-        std::unique_lock<std::mutex> lk(mtx_);
-        cv_.wait_for(
-          lk, duration, [this] { return (runners_ == 0) || exception_ptr_; });
-        if (exception_ptr_)
-            std::rethrow_exception(exception_ptr_);
-    }
-
-    //! aborts the race.
+    //! clears the list.
     //! @param eptr (optional) pointer to an active exception to be rethrown by
     //! a waiting thread; typically retrieved from `std::current_exception()`.
-    void abort(std::exception_ptr eptr = nullptr) noexcept
+    void clear(std::exception_ptr eptr = nullptr) noexcept
     {
-        std::lock_guard<std::mutex> lk(mtx_);
-        runners_ = 0;
-        exception_ptr_ = eptr;
+        {
+            std::lock_guard<std::mutex> lk(mtx_);
+            num_tasks_ = 0;
+            exception_ptr_ = eptr;
+        }
         cv_.notify_all();
     }
 
   private:
-    alignas(64) std::atomic<size_t> runners_;
+    alignas(64) std::atomic<size_t> num_tasks_;
     std::mutex mtx_;
     std::condition_variable cv_;
     std::exception_ptr exception_ptr_{ nullptr };
