@@ -1,46 +1,32 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
-  <compounddef id="ThreadPool_8hpp" kind="file" language="C++">
-    <compoundname>ThreadPool.hpp</compoundname>
-    <includes refid="Batch_8hpp" local="yes">RcppThread/Batch.hpp</includes>
-    <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
-    <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
-    <includes refid="quickpool_8hpp" local="yes">RcppThread/quickpool.hpp</includes>
+  <compounddef id="quickpool_8hpp" kind="file" language="C++">
+    <compoundname>quickpool.hpp</compoundname>
     <includes local="no">atomic</includes>
     <includes local="no">condition_variable</includes>
+    <includes local="no">exception</includes>
     <includes local="no">functional</includes>
     <includes local="no">future</includes>
-    <includes local="no">memory</includes>
     <includes local="no">mutex</includes>
     <includes local="no">thread</includes>
     <includes local="no">vector</includes>
-    <includedby refid="parallelFor_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp</includedby>
-    <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
+    <includedby refid="ThreadPool_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</includedby>
     <incdepgraph>
       <node id="2">
         <label>atomic</label>
       </node>
-      <node id="4">
+      <node id="5">
         <label>functional</label>
+      </node>
+      <node id="4">
+        <label>exception</label>
       </node>
       <node id="3">
         <label>condition_variable</label>
       </node>
-      <node id="5">
-        <label>future</label>
-      </node>
-      <node id="9">
-        <label>vector</label>
-      </node>
-      <node id="7">
-        <label>mutex</label>
-      </node>
-      <node id="8">
-        <label>thread</label>
-      </node>
       <node id="1">
-        <label>/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</label>
-        <link refid="ThreadPool_8hpp"/>
+        <label>/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp</label>
+        <link refid="quickpool_8hpp"/>
         <childnode refid="2" relation="include">
         </childnode>
         <childnode refid="3" relation="include">
@@ -59,15 +45,22 @@
         </childnode>
       </node>
       <node id="6">
-        <label>memory</label>
+        <label>future</label>
+      </node>
+      <node id="9">
+        <label>vector</label>
+      </node>
+      <node id="7">
+        <label>mutex</label>
+      </node>
+      <node id="8">
+        <label>thread</label>
       </node>
     </incdepgraph>
-    <innerclass refid="classRcppThread_1_1ThreadPool" prot="public">RcppThread::ThreadPool</innerclass>
-    <innernamespace refid="namespaceRcppThread">RcppThread</innernamespace>
     <briefdescription>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp"/>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp"/>
   </compounddef>
 </doxygen>
