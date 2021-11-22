@@ -108,10 +108,11 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
         workers_.emplace_back([this, id] {
             std::function<void()> task;
             while (!taskManager_.stopped()) {
-                taskManager_.wait_for_jobs();
-
-                while (taskManager_.try_pop(task, id))
-                    executeSafely(task);
+                taskManager_.wait_for_jobs(id);
+                do {
+                    if (taskManager_.try_pop(task, id))
+                        executeSafely(task);
+                } while (!finishLine_.all_finished());
             }
         });
     }
@@ -162,7 +163,8 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
     auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
     auto taskPtr = std::make_shared<task>(std::move(pack));
     this->push([taskPtr] { (*taskPtr)(); });
-    return taskPtr->get_future();;
+    return taskPtr->get_future();
+    ;
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.

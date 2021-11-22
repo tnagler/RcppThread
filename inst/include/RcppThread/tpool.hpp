@@ -30,6 +30,62 @@
 //! tpool namespace
 namespace tpool {
 
+class Semaphore
+{
+  public:
+    Semaphore(ptrdiff_t count) noexcept
+      : count_(count)
+    {}
+
+    void post() noexcept
+    {
+        {
+            std::unique_lock<std::mutex> lock(mtx_);
+            ++count_;
+        }
+        cv_.notify_all();
+    }
+
+    void wait() noexcept
+    {
+        std::unique_lock<std::mutex> lock(mtx_);
+        cv_.wait(lock, [&]() { return count_ > 0; });
+        --count_;
+    }
+
+  private:
+    alignas(64) std::atomic<int> count_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
+};
+
+class Benaphore
+{
+  public:
+    Benaphore(ptrdiff_t count) noexcept
+      : count_(count)
+      , semaphore_(0)
+    {}
+
+    void post() noexcept
+    {
+        auto count = count_.fetch_add(1, std::memory_order_release);
+        if (count < 0)
+            semaphore_.post();
+    }
+
+    void wait() noexcept
+    {
+        auto count = count_.fetch_sub(1, std::memory_order_acquire);
+        if (count < 1)
+            semaphore_.wait();
+    }
+
+  private:
+    alignas(64) std::atomic<int> count_;
+    Semaphore semaphore_;
+};
+
 //! @brief Finish line - a synchronization primitive.
 //!
 //! Lets some threads wait until others reach a control point. Start a runner
@@ -80,8 +136,8 @@ class FinishLine
     void wait_for(const Duration& duration) noexcept
     {
         std::unique_lock<std::mutex> lk(mtx_);
-        while ((runners_ > 0) && !exception_ptr_)
-            cv_.wait_for(lk, duration);
+        cv_.wait_for(
+          lk, duration, [this] { return (runners_ == 0) || exception_ptr_; });
         if (exception_ptr_)
             std::rethrow_exception(exception_ptr_);
     }
@@ -225,9 +281,37 @@ class TaskQueue
 
         Task* task_ptr = new Task{ std::forward<Task>(task) };
         buf_ptr->set_entry(b, task_ptr);
+        bottom_.store(b + 1, m_release);
+        lk.unlock();
 
-        std::atomic_thread_fence(m_release);
-        bottom_.store(b + 1, m_relaxed);
+        cv_.notify_one();
+
+        return true;
+    }
+
+    //! pushes a task to the bottom of the queue; returns false if queue is
+    //! currently locked; enlarges the queue if full.
+    bool push(Task&& task)
+    {
+        // must hold lock in case there are multiple producers, abort if already
+        // taken, so we can check out next queue
+        std::unique_lock<std::mutex> lk(mutex_);
+        auto b = bottom_.load(m_relaxed);
+        auto t = top_.load(m_acquire);
+        RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
+
+        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
+            old_buffers_.emplace_back(
+              exchange(buf_ptr, buf_ptr->enlarge(b, t)));
+            buffer_.store(buf_ptr, m_relaxed);
+        }
+
+        Task* task_ptr = new Task{ std::forward<Task>(task) };
+        buf_ptr->set_entry(b, task_ptr);
+        bottom_.store(b + 1, m_release);
+        lk.unlock();
+
+        cv_.notify_one();
 
         return true;
     }
@@ -235,6 +319,10 @@ class TaskQueue
     //! pops a task from the top of the queue; returns false if lost race.
     bool try_pop(Task& task)
     {
+        std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
+        if (!lk)
+            return false;
+
         auto t = top_.load(m_acquire);
         std::atomic_thread_fence(m_seq_cst);
         auto b = bottom_.load(m_acquire);
@@ -245,10 +333,26 @@ class TaskQueue
             if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
                 task = std::move(*task_ptr);
                 delete task_ptr;
+                cv_.notify_all();
                 return true; // won race
             }
         }
         return false; // queue is empty or lost race
+    }
+
+    void wait()
+    {
+        std::unique_lock<std::mutex> lk(mutex_);
+        cv_.wait(lk, [this] { return !this->empty() || stopped_; });
+    }
+
+    void stop()
+    {
+        {
+            std::unique_lock<std::mutex> lk(mutex_);
+            stopped_ = true;
+        }
+        cv_.notify_all();
     }
 
   private:
@@ -257,6 +361,8 @@ class TaskQueue
     alignas(64) std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
     std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
     std::mutex mutex_;
+    std::condition_variable cv_;
+    bool stopped_;
 
     // convenience aliases
     static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
@@ -272,9 +378,8 @@ struct TaskManager
     std::vector<TaskQueue> queues_;
     size_t num_queues_;
     alignas(64) std::atomic_size_t push_idx_{ 0 };
-    std::condition_variable cv_;
-    std::mutex m_;
     std::atomic_bool stopped_{ false };
+    std::atomic_size_t todo_list_{ 0 };
 
     TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
@@ -284,9 +389,13 @@ struct TaskManager
     template<typename Task>
     void push(Task&& task)
     {
-        while (!stopped_ && !queues_[push_idx_++ % num_queues_].try_push(task))
-            continue;
-        cv_.notify_all();
+        size_t count = 0;
+        while (!stopped_ && (count++ < num_queues_)) {
+            auto id = push_idx_++;
+            if (queues_[id % num_queues_].try_push(task))
+                return;
+        }
+        queues_[push_idx_++ % num_queues_].push(task);
     }
 
     bool empty()
@@ -301,10 +410,11 @@ struct TaskManager
     template<typename Task>
     bool try_pop(Task& task, size_t worker_id = 0)
     {
-        do {
-            if (!stopped_ && queues_[worker_id++ % num_queues_].try_pop(task))
+        for (size_t k = 0; k < num_queues_; k++) {
+            if (!stopped_ &&
+                queues_[(worker_id + k) % num_queues_].try_pop(task))
                 return true;
-        } while (!this->empty() && !stopped_);
+        }
         return false;
     }
 
@@ -316,22 +426,15 @@ struct TaskManager
 
     bool stopped() { return stopped_; }
 
-    void wait_for_jobs()
-    {
-        std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [this] { return !this->empty() || stopped_; });
-    }
+    void wait_for_jobs(size_t id) { queues_[id].wait(); }
 
     void stop()
     {
-        {
-            std::lock_guard<std::mutex> lk(m_);
-            stopped_ = true;
-        }
-        cv_.notify_all();
+        stopped_ = true;
+        for (auto& q : queues_)
+            q.stop();
     }
 };
 
 } // end namespace detail
-
 }
