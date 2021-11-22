@@ -31,10 +31,8 @@
 namespace tpool {
 
 //! @brief Todo list - a synchronization primitive.
-//!
-//! Lets some threads wait until others reach a control point. Add a task
-//! with `TodoList::add()`, cross it of with `TodoList::cross()`, and wait for
-//! all tasks to compelte with `TodoList::wait()`.>
+//! @details Add a task with `add()`, cross it off with `cross()`, and wait for
+//! all tasks to complete with `wait()`.
 class TodoList
 {
   public:
@@ -52,7 +50,6 @@ class TodoList
     //! @param num_tasks cross that many tasks to the list.
     void cross(size_t num_tasks = 1)
     {
-
         num_tasks_.fetch_sub(num_tasks);
         if (num_tasks_ <= 0) {
             std::lock_guard<std::mutex> lk(mtx_);
@@ -200,9 +197,10 @@ class TaskQueue
     //! currently locked; enlarges the queue if full.
     bool try_push(Task&& task)
     {
-        { // must hold lock in case of multiple producers
+        {
+            // must hold lock in case of multiple producers, abort if already
+            // taken, so we can check out next queue
             std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
-            // abort if already taken, so we can check out next queue
             if (!lk)
                 return false;
             this->push_unsafe(std::forward<Task>(task));
@@ -214,7 +212,8 @@ class TaskQueue
     //! pushes a task to the bottom of the queue; enlarges the queue if full.
     void force_push(Task&& task)
     {
-        { // must hold lock in case of multiple producers
+        {
+            // must hold lock in case of multiple producers
             std::lock_guard<std::mutex> lk(mutex_);
             this->push_unsafe(std::forward<Task>(task));
         }
@@ -229,14 +228,13 @@ class TaskQueue
         RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
 
         if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
-            // buffer is full, must create enlarged copy beforing pushing
+            // buffer is full, create enlarged copy before continuing
             old_buffers_.emplace_back(
               exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
             buffer_.store(buf_ptr, m_relaxed);
         }
-        
-        Task* task_ptr = new Task{ std::forward<Task>(task) };
-        buf_ptr->set_entry(b, task_ptr);
+
+        buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
         bottom_.store(b + 1, m_release);
     }
 
@@ -248,13 +246,14 @@ class TaskQueue
         auto b = bottom_.load(m_acquire);
 
         if (t < b) {
-            // must load task pointer before acquiring the slot
+            // must load task pointer before acquiring the slot, because it
+            // could be overwritten immediately after
             auto task_ptr = buffer_.load(m_acquire)->get_entry(t);
+
             if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
-                task = std::move(*task_ptr);
-                delete task_ptr;
-                cv_.notify_all();
-                return true; // won race
+                task = std::move(*task_ptr); // won race, get task
+                delete task_ptr; // fre memory allocated in push_unsafe()
+                return true;
             }
         }
         return false; // queue is empty or lost race
@@ -308,8 +307,7 @@ struct TaskManager
     template<typename Task>
     void push(Task&& task)
     {
-        size_t count = 0;
-        while (!stopped_ && (count++ < num_queues_)) {
+        for (size_t count = 0; count < num_queues_ * 20; count++) {
             if (queues_[push_idx_++ % num_queues_].try_push(task))
                 return;
         }
@@ -319,9 +317,8 @@ struct TaskManager
     template<typename Task>
     bool try_pop(Task& task, size_t worker_id = 0)
     {
-        for (size_t k = 0; k < num_queues_; k++) {
-            if (!stopped_ &&
-                queues_[(worker_id + k) % num_queues_].try_pop(task))
+        for (size_t k = 0; k <= num_queues_; k++) {
+            if (queues_[(worker_id + k) % num_queues_].try_pop(task))
                 return true;
         }
         return false;
@@ -333,17 +330,18 @@ struct TaskManager
             q.clear();
     }
 
-    bool stopped() { return stopped_; }
-
     void wait_for_jobs(size_t id) { queues_[id].wait(); }
 
     void stop()
     {
-        stopped_ = true;
         for (auto& q : queues_)
             q.stop();
+        stopped_ = true;
     }
+
+    bool stopped() { return stopped_; }
 };
 
 } // end namespace detail
-}
+
+} // end namespace tpool
