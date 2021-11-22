@@ -65,9 +65,7 @@ class ThreadPool
     // variables for synchronization between workers (destructed last)
     tpool::detail::TaskManager taskManager_;
     tpool::TodoList todoList_;
-
     std::vector<std::thread> workers_;
-    size_t nWorkers_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -80,9 +78,8 @@ inline ThreadPool::ThreadPool()
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : taskManager_{ nWorkers }
-  , nWorkers_{ nWorkers }
 {
-    for (size_t id = 0; id < nWorkers_; id++) {
+    for (size_t id = 0; id < nWorkers; id++) {
         workers_.emplace_back([this, id] {
             std::function<void()> task;
             while (!taskManager_.stopped()) {
@@ -119,7 +116,7 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    if (nWorkers_ == 0) {
+    if (workers_.size() == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
         todoList_.add();
@@ -193,7 +190,7 @@ ThreadPool::parallelFor(ptrdiff_t begin, size_t size, F&& f, size_t nBatches)
         for (ptrdiff_t i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, size, nWorkers_, nBatches);
+    auto batches = createBatches(begin, size, workers_.size(), nBatches);
     auto pushJob = [=] {
         for (const auto& batch : batches)
             this->push(doBatch, batch);
