@@ -30,62 +30,6 @@
 //! tpool namespace
 namespace tpool {
 
-class Semaphore
-{
-  public:
-    Semaphore(ptrdiff_t count) noexcept
-      : count_(count)
-    {}
-
-    void post() noexcept
-    {
-        {
-            std::unique_lock<std::mutex> lock(mtx_);
-            ++count_;
-        }
-        cv_.notify_all();
-    }
-
-    void wait() noexcept
-    {
-        std::unique_lock<std::mutex> lock(mtx_);
-        cv_.wait(lock, [&]() { return count_ > 0; });
-        --count_;
-    }
-
-  private:
-    alignas(64) std::atomic<int> count_;
-    std::mutex mtx_;
-    std::condition_variable cv_;
-};
-
-class Benaphore
-{
-  public:
-    Benaphore(ptrdiff_t count) noexcept
-      : count_(count)
-      , semaphore_(0)
-    {}
-
-    void post() noexcept
-    {
-        auto count = count_.fetch_add(1, std::memory_order_release);
-        if (count < 0)
-            semaphore_.post();
-    }
-
-    void wait() noexcept
-    {
-        auto count = count_.fetch_sub(1, std::memory_order_acquire);
-        if (count < 1)
-            semaphore_.wait();
-    }
-
-  private:
-    alignas(64) std::atomic<int> count_;
-    Semaphore semaphore_;
-};
-
 //! @brief Finish line - a synchronization primitive.
 //!
 //! Lets some threads wait until others reach a control point. Start a runner
@@ -268,34 +212,24 @@ class TaskQueue
         std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
         if (!lk)
             return false;
-
-        auto b = bottom_.load(m_relaxed);
-        auto t = top_.load(m_acquire);
-        RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
-
-        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
-            old_buffers_.emplace_back(
-              exchange(buf_ptr, buf_ptr->enlarge(b, t)));
-            buffer_.store(buf_ptr, m_relaxed);
-        }
-
-        Task* task_ptr = new Task{ std::forward<Task>(task) };
-        buf_ptr->set_entry(b, task_ptr);
-        bottom_.store(b + 1, m_release);
+        this->push_unsafe(std::forward<Task>(task));
         lk.unlock();
-
         cv_.notify_one();
-
         return true;
     }
 
-    //! pushes a task to the bottom of the queue; returns false if queue is
-    //! currently locked; enlarges the queue if full.
-    bool push(Task&& task)
+    //! pushes a task to the bottom of the queue; enlarges the queue if full.
+    void push(Task&& task)
     {
-        // must hold lock in case there are multiple producers, abort if already
-        // taken, so we can check out next queue
+        // must hold lock in case there are multiple producers
         std::unique_lock<std::mutex> lk(mutex_);
+        this->push_unsafe(std::forward<Task>(task));
+        lk.unlock();
+        cv_.notify_one();
+    }
+
+    void push_unsafe(Task&& task)
+    {
         auto b = bottom_.load(m_relaxed);
         auto t = top_.load(m_acquire);
         RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
@@ -309,11 +243,6 @@ class TaskQueue
         Task* task_ptr = new Task{ std::forward<Task>(task) };
         buf_ptr->set_entry(b, task_ptr);
         bottom_.store(b + 1, m_release);
-        lk.unlock();
-
-        cv_.notify_one();
-
-        return true;
     }
 
     //! pops a task from the top of the queue; returns false if lost race.

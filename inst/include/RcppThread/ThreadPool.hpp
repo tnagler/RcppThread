@@ -22,21 +22,6 @@
 
 namespace RcppThread {
 
-namespace util {
-
-void
-waitAndSync(tpool::FinishLine& finishLine)
-{
-    while (!finishLine.all_finished()) {
-        finishLine.wait_for(std::chrono::milliseconds(50));
-        Rcout << "";
-        checkUserInterrupt();
-    }
-    Rcout << "";
-}
-
-}
-
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool
 {
@@ -79,10 +64,6 @@ class ThreadPool
 
     template<class Task>
     void executeSafely(Task& task);
-
-    bool allJobsDone();
-    void waitForEvents();
-    void rethrowExceptions();
 
     // variables for synchronization between workers
     tpool::detail::TaskManager taskManager_;
@@ -256,7 +237,12 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    util::waitAndSync(finishLine_);
+    while (!finishLine_.all_finished()) {
+        finishLine_.wait_for(std::chrono::milliseconds(50));
+        Rcout << "";
+        checkUserInterrupt();
+    }
+    Rcout << "";
 }
 
 //! waits for all jobs to finish and joins all threads.
