@@ -59,15 +59,12 @@ class ThreadPool
     void clear();
 
   private:
-    void startWorker();
     void joinWorkers();
+    void execute(std::function<void()>& task);
 
-    template<class Task>
-    void executeSafely(Task& task);
-
-    // variables for synchronization between workers
+    // variables for synchronization between workers (destructed last)
     tpool::detail::TaskManager taskManager_;
-    tpool::TodoList todoList_{ 0 };
+    tpool::TodoList todoList_;
 
     std::vector<std::thread> workers_;
     size_t nWorkers_;
@@ -91,8 +88,10 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
             while (!taskManager_.stopped()) {
                 taskManager_.wait_for_jobs(id);
                 do {
-                    if (taskManager_.try_pop(task, id))
-                        executeSafely(task);
+                    // use inner while to save a few cash misses calling
+                    // todoList_.done()
+                    while (taskManager_.try_pop(task, id))
+                        execute(task);
                 } while (!todoList_.done());
             }
         });
@@ -140,12 +139,11 @@ auto
 ThreadPool::pushReturn(F&& f, Args&&... args)
   -> std::future<decltype(f(args...))>
 {
-    using task = std::packaged_task<decltype(f(args...))()>;
-    auto pack = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-    auto taskPtr = std::make_shared<task>(std::move(pack));
-    this->push([taskPtr] { (*taskPtr)(); });
-    return taskPtr->get_future();
-    ;
+    auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+    using pack_t = std::packaged_task<decltype(f(args...))()>;
+    auto ptr = std::make_shared<pack_t>(std::move(task));
+    this->push([ptr] { (*ptr)(); });
+    return ptr->get_future();
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
@@ -261,9 +259,8 @@ ThreadPool::clear()
     taskManager_.clear();
 }
 
-template<class Task>
 inline void
-ThreadPool::executeSafely(Task& task)
+ThreadPool::execute(std::function<void()>& task)
 {
     try {
         task();
