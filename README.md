@@ -29,6 +29,8 @@ or the [API documentation](https://tnagler.github.io/RcppThread/).
 
 Since then, the following features have been added:
 
+- Faster runtimes thanks to a work stealing queue with lock-free pops (from [tpool](https://github.com/tnagler/tpool)).
+
 - An R function `RcppThread::detectCores()` to determine the number of (logical)
   cores on your machine.
 

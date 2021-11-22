@@ -181,7 +181,7 @@ private:
     std::string makeBar(size_t pct, size_t numBars = 40) {
         std::ostringstream msg;
         msg << "[";
-        int i = 0;
+        size_t i = 0;
         for (; i < pct / 100.0 * numBars; i++)
             msg << "=";
         for (; i < numBars; i++)
