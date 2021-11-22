@@ -302,7 +302,7 @@ struct TaskManager
     std::atomic_bool stopped_{ false };
     std::atomic_size_t todo_list_{ 0 };
 
-    TaskManager(size_t num_queues)
+    explicit TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
     {}
