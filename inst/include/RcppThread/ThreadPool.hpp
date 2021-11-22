@@ -85,8 +85,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
             while (!taskManager_.stopped()) {
                 taskManager_.wait_for_jobs(id);
                 do {
-                    // use inner while to save a few cash misses calling
-                    // todoList_.done()
+                    // use inner while to save a few cash misses calling done()
                     while (taskManager_.try_pop(task, id))
                         execute(task);
                 } while (!todoList_.done());

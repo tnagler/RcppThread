@@ -30,16 +30,13 @@
 //! tpool namespace
 namespace tpool {
 
-//! @brief Todo list - a synchronization primitive.
-//! @details Add a task with `add()`, cross it off with `cross()`, and wait for
-//! all tasks to complete with `wait()`.
 class TodoList
 {
   public:
     //! constructs the todo list.
     //! @param num_tasks initial number of tasks.
     TodoList(size_t num_tasks = 0) noexcept
-      : num_tasks_{ num_tasks }
+      : num_tasks_{ static_cast<int>(num_tasks) }
     {}
 
     //! adds tasks to the list.
@@ -90,7 +87,7 @@ class TodoList
     }
 
   private:
-    alignas(64) std::atomic<size_t> num_tasks_;
+    alignas(64) std::atomic_int num_tasks_{ 0 };
     std::mutex mtx_;
     std::condition_variable cv_;
     std::exception_ptr exception_ptr_{ nullptr };
