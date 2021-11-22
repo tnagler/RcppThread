@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
-  <compounddef id="structtpool_1_1detail_1_1TaskManager" kind="struct" language="C++" prot="public">
-    <compoundname>tpool::detail::TaskManager</compoundname>
-    <includes local="no">tpool.hpp</includes>
+  <compounddef id="structquickpool_1_1detail_1_1TaskManager" kind="struct" language="C++" prot="public">
+    <compoundname>quickpool::detail::TaskManager</compoundname>
+    <includes local="no">quickpool.hpp</includes>
       <sectiondef kind="public-attrib">
-      <memberdef kind="variable" id="structtpool_1_1detail_1_1TaskManager_1a1b2fa19da1623e67136010c7ad542252" prot="public" static="no" mutable="no">
-        <type>std::vector&lt; <ref refid="classtpool_1_1detail_1_1TaskQueue" kindref="compound">TaskQueue</ref> &gt;</type>
-        <definition>std::vector&lt;TaskQueue&gt; tpool::detail::TaskManager::queues_</definition>
+      <memberdef kind="variable" id="structquickpool_1_1detail_1_1TaskManager_1a1b2fa19da1623e67136010c7ad542252" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classquickpool_1_1detail_1_1TaskQueue" kindref="compound">TaskQueue</ref> &gt;</type>
+        <definition>std::vector&lt;TaskQueue&gt; quickpool::detail::TaskManager::queues_</definition>
         <argsstring></argsstring>
         <name>queues_</name>
         <briefdescription>
@@ -15,11 +15,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="299" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="299" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="299" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="299" bodyend="-1"/>
       </memberdef>
-      <memberdef kind="variable" id="structtpool_1_1detail_1_1TaskManager_1a21cf3a32dc7abfd0ed06d73c7ed5b9c5" prot="public" static="no" mutable="no">
+      <memberdef kind="variable" id="structquickpool_1_1detail_1_1TaskManager_1a21cf3a32dc7abfd0ed06d73c7ed5b9c5" prot="public" static="no" mutable="no">
         <type>size_t</type>
-        <definition>size_t tpool::detail::TaskManager::num_queues_</definition>
+        <definition>size_t quickpool::detail::TaskManager::num_queues_</definition>
         <argsstring></argsstring>
         <name>num_queues_</name>
         <briefdescription>
@@ -28,11 +28,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="300" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="300" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="300" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="300" bodyend="-1"/>
       </memberdef>
-      <memberdef kind="variable" id="structtpool_1_1detail_1_1TaskManager_1a7d3727ea07b2e7d0196cab3cacfa5362" prot="public" static="no" mutable="no">
+      <memberdef kind="variable" id="structquickpool_1_1detail_1_1TaskManager_1a7d3727ea07b2e7d0196cab3cacfa5362" prot="public" static="no" mutable="no">
         <type>std::atomic_size_t</type>
-        <definition>std::atomic_size_t tpool::detail::TaskManager::push_idx_</definition>
+        <definition>std::atomic_size_t quickpool::detail::TaskManager::push_idx_</definition>
         <argsstring></argsstring>
         <name>push_idx_</name>
         <initializer>{ 0 }</initializer>
@@ -42,11 +42,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="301" column="32" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="301" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="301" column="32" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="301" bodyend="-1"/>
       </memberdef>
-      <memberdef kind="variable" id="structtpool_1_1detail_1_1TaskManager_1ab8055c9db2a6c1b246a70bce04c8b8a8" prot="public" static="no" mutable="no">
+      <memberdef kind="variable" id="structquickpool_1_1detail_1_1TaskManager_1ab8055c9db2a6c1b246a70bce04c8b8a8" prot="public" static="no" mutable="no">
         <type>std::atomic_bool</type>
-        <definition>std::atomic_bool tpool::detail::TaskManager::stopped_</definition>
+        <definition>std::atomic_bool quickpool::detail::TaskManager::stopped_</definition>
         <argsstring></argsstring>
         <name>stopped_</name>
         <initializer>{ false }</initializer>
@@ -56,11 +56,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="302" column="22" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="302" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="302" column="22" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="302" bodyend="-1"/>
       </memberdef>
-      <memberdef kind="variable" id="structtpool_1_1detail_1_1TaskManager_1afa66bbd44e20707db8d90e5dfc2b6c20" prot="public" static="no" mutable="no">
+      <memberdef kind="variable" id="structquickpool_1_1detail_1_1TaskManager_1afa66bbd44e20707db8d90e5dfc2b6c20" prot="public" static="no" mutable="no">
         <type>std::atomic_size_t</type>
-        <definition>std::atomic_size_t tpool::detail::TaskManager::todo_list_</definition>
+        <definition>std::atomic_size_t quickpool::detail::TaskManager::todo_list_</definition>
         <argsstring></argsstring>
         <name>todo_list_</name>
         <initializer>{ 0 }</initializer>
@@ -70,13 +70,13 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="303" column="24" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="303" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="303" column="24" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="303" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1aaf7eef0bba6e345ed26434facb5f7d3f" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1aaf7eef0bba6e345ed26434facb5f7d3f" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
         <type></type>
-        <definition>tpool::detail::TaskManager::TaskManager</definition>
+        <definition>quickpool::detail::TaskManager::TaskManager</definition>
         <argsstring>(size_t num_queues)</argsstring>
         <name>TaskManager</name>
         <param>
@@ -89,16 +89,16 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="305" column="14" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="305" bodyend="308"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="305" column="14" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="305" bodyend="308"/>
       </memberdef>
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1ad99c240da3e84545319575b09a642572" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1ad99c240da3e84545319575b09a642572" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
           <param>
             <type>typename Task</type>
           </param>
         </templateparamlist>
         <type>void</type>
-        <definition>void tpool::detail::TaskManager::push</definition>
+        <definition>void quickpool::detail::TaskManager::push</definition>
         <argsstring>(Task &amp;&amp;task)</argsstring>
         <name>push</name>
         <param>
@@ -111,16 +111,16 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="311" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="311" bodyend="318"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="311" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="311" bodyend="318"/>
       </memberdef>
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1a17326d9170d754d401bd930b5d1520e6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1a17326d9170d754d401bd930b5d1520e6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
           <param>
             <type>typename Task</type>
           </param>
         </templateparamlist>
         <type>bool</type>
-        <definition>bool tpool::detail::TaskManager::try_pop</definition>
+        <definition>bool quickpool::detail::TaskManager::try_pop</definition>
         <argsstring>(Task &amp;task, size_t worker_id=0)</argsstring>
         <name>try_pop</name>
         <param>
@@ -138,11 +138,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="321" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="321" bodyend="328"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="321" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="321" bodyend="328"/>
       </memberdef>
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1a5dd2f43ae8bbe286b45e786afdea4d75" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1a5dd2f43ae8bbe286b45e786afdea4d75" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
-        <definition>void tpool::detail::TaskManager::clear</definition>
+        <definition>void quickpool::detail::TaskManager::clear</definition>
         <argsstring>()</argsstring>
         <name>clear</name>
         <briefdescription>
@@ -151,11 +151,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="330" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="330" bodyend="334"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="330" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="330" bodyend="334"/>
       </memberdef>
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1aa754fb2b20c27d32b6c3a911146a7446" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1aa754fb2b20c27d32b6c3a911146a7446" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
-        <definition>void tpool::detail::TaskManager::wait_for_jobs</definition>
+        <definition>void quickpool::detail::TaskManager::wait_for_jobs</definition>
         <argsstring>(size_t id)</argsstring>
         <name>wait_for_jobs</name>
         <param>
@@ -168,11 +168,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="336" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="336" bodyend="336"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="336" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="336" bodyend="336"/>
       </memberdef>
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1a8be9c37e9241855ed4c8eea1c029b44b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1a8be9c37e9241855ed4c8eea1c029b44b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
-        <definition>void tpool::detail::TaskManager::stop</definition>
+        <definition>void quickpool::detail::TaskManager::stop</definition>
         <argsstring>()</argsstring>
         <name>stop</name>
         <briefdescription>
@@ -181,11 +181,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="338" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="338" bodyend="343"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="338" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="338" bodyend="343"/>
       </memberdef>
-      <memberdef kind="function" id="structtpool_1_1detail_1_1TaskManager_1a1292f62045c365769352b2c5a2def998" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="structquickpool_1_1detail_1_1TaskManager_1a1292f62045c365769352b2c5a2def998" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>bool</type>
-        <definition>bool tpool::detail::TaskManager::stopped</definition>
+        <definition>bool quickpool::detail::TaskManager::stopped</definition>
         <argsstring>()</argsstring>
         <name>stopped</name>
         <briefdescription>
@@ -194,7 +194,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="345" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="345" bodyend="345"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="345" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="345" bodyend="345"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -204,36 +204,36 @@
     </detaileddescription>
     <collaborationgraph>
       <node id="2">
-        <label>std::vector&lt; tpool::detail::TaskQueue &gt;</label>
+        <label>std::vector&lt; quickpool::detail::TaskQueue &gt;</label>
         <childnode refid="3" relation="template-instance">
-          <edgelabel>&lt; tpool::detail::TaskQueue &gt;</edgelabel>
+          <edgelabel>&lt; quickpool::detail::TaskQueue &gt;</edgelabel>
         </childnode>
       </node>
       <node id="3">
         <label>std::vector&lt; T &gt;</label>
       </node>
       <node id="1">
-        <label>tpool::detail::TaskManager</label>
-        <link refid="structtpool_1_1detail_1_1TaskManager"/>
+        <label>quickpool::detail::TaskManager</label>
+        <link refid="structquickpool_1_1detail_1_1TaskManager"/>
         <childnode refid="2" relation="usage">
           <edgelabel>queues_</edgelabel>
         </childnode>
       </node>
     </collaborationgraph>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" line="298" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/tpool.hpp" bodystart="297" bodyend="346"/>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" line="298" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp" bodystart="297" bodyend="346"/>
     <listofallmembers>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a5dd2f43ae8bbe286b45e786afdea4d75" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>clear</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a21cf3a32dc7abfd0ed06d73c7ed5b9c5" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>num_queues_</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1ad99c240da3e84545319575b09a642572" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>push</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a7d3727ea07b2e7d0196cab3cacfa5362" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>push_idx_</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a1b2fa19da1623e67136010c7ad542252" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>queues_</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a8be9c37e9241855ed4c8eea1c029b44b" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>stop</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a1292f62045c365769352b2c5a2def998" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>stopped</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1ab8055c9db2a6c1b246a70bce04c8b8a8" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>stopped_</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1aaf7eef0bba6e345ed26434facb5f7d3f" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>TaskManager</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1afa66bbd44e20707db8d90e5dfc2b6c20" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>todo_list_</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1a17326d9170d754d401bd930b5d1520e6" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>try_pop</name></member>
-      <member refid="structtpool_1_1detail_1_1TaskManager_1aa754fb2b20c27d32b6c3a911146a7446" prot="public" virt="non-virtual"><scope>tpool::detail::TaskManager</scope><name>wait_for_jobs</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a5dd2f43ae8bbe286b45e786afdea4d75" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>clear</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a21cf3a32dc7abfd0ed06d73c7ed5b9c5" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>num_queues_</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1ad99c240da3e84545319575b09a642572" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>push</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a7d3727ea07b2e7d0196cab3cacfa5362" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>push_idx_</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a1b2fa19da1623e67136010c7ad542252" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>queues_</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a8be9c37e9241855ed4c8eea1c029b44b" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>stop</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a1292f62045c365769352b2c5a2def998" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>stopped</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1ab8055c9db2a6c1b246a70bce04c8b8a8" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>stopped_</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1aaf7eef0bba6e345ed26434facb5f7d3f" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>TaskManager</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1afa66bbd44e20707db8d90e5dfc2b6c20" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>todo_list_</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1a17326d9170d754d401bd930b5d1520e6" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>try_pop</name></member>
+      <member refid="structquickpool_1_1detail_1_1TaskManager_1aa754fb2b20c27d32b6c3a911146a7446" prot="public" virt="non-virtual"><scope>quickpool::detail::TaskManager</scope><name>wait_for_jobs</name></member>
     </listofallmembers>
   </compounddef>
 </doxygen>

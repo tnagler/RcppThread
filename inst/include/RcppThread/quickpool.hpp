@@ -60,7 +60,7 @@ class TodoList
     }
 
     //! checks whether list is empty.
-    bool empty() const noexcept { return num_tasks_ == 0; }
+    bool empty() const noexcept { return num_tasks_ <= 0; }
 
     //! waits for the list to be empty.
     //! @param millis if > 0; waiting aborts after waiting that many
@@ -79,14 +79,16 @@ class TodoList
             std::rethrow_exception(exception_ptr_);
     }
 
-    //! clears the list.
+    //! stops the list; it will forever look empty from now on.
     //! @param eptr (optional) pointer to an active exception to be rethrown by
     //! a waiting thread; typically retrieved from `std::current_exception()`.
-    void clear(std::exception_ptr eptr = nullptr) noexcept
+    void stop(std::exception_ptr eptr = nullptr) noexcept
     {
         {
             std::lock_guard<std::mutex> lk(mtx_);
-            num_tasks_ = 0;
+            // Some threads may add() or cross() after we stop. The large
+            // negative number prevents num_tasks_ from becoming positive again.
+            num_tasks_ = std::numeric_limits<int>::min() / 2;
             exception_ptr_ = eptr;
         }
         cv_.notify_all();
@@ -112,10 +114,7 @@ class RingBuffer
       , capacity_{ capacity }
       , mask_{ capacity - 1 }
 
-    {
-        if (capacity_ & (capacity_ - 1))
-            throw std::runtime_error("capacity must be a power of two");
-    }
+    {}
 
     size_t capacity() const { return capacity_; }
 
@@ -176,24 +175,6 @@ class TaskQueue
     bool empty() const
     {
         return (bottom_.load(m_relaxed) <= top_.load(m_relaxed));
-    }
-
-    //! clears the queue.
-    void clear()
-    {
-        std::lock_guard<std::mutex> lk(mutex_); // prevents concurrent push
-        auto buf_ptr = buffer_.load();
-        auto b = bottom_.load(m_relaxed);
-        int t;
-        while (true) {
-            // try until we can set top = bottom; this might fail if someone
-            // pops concurrently
-            t = top_.load(m_relaxed);
-            if (top_.compare_exchange_weak(t, b, m_release, m_relaxed))
-                break;
-        }
-        for (int i = t; i < b; ++i)
-            delete buf_ptr->get_entry(i); // free memory for unpopped items
     }
 
     //! pushes a task to the bottom of the queue; returns false if queue is
@@ -310,6 +291,8 @@ struct TaskManager
     template<typename Task>
     void push(Task&& task)
     {
+        if (stopped_)
+            return;
         for (size_t count = 0; count < num_queues_ * 20; count++) {
             if (queues_[push_idx_++ % num_queues_].try_push(task))
                 return;
@@ -320,17 +303,13 @@ struct TaskManager
     template<typename Task>
     bool try_pop(Task& task, size_t worker_id = 0)
     {
+        if (stopped_)
+            return false;
         for (size_t k = 0; k <= num_queues_; k++) {
             if (queues_[(worker_id + k) % num_queues_].try_pop(task))
                 return true;
         }
         return false;
-    }
-
-    void clear()
-    {
-        for (auto& q : queues_)
-            q.clear();
     }
 
     void wait_for_jobs(size_t id) { queues_[id].wait(); }
@@ -346,5 +325,139 @@ struct TaskManager
 };
 
 } // end namespace detail
+
+//! A work stealing thread pool.
+class ThreadPool
+{
+  public:
+    //! constructs a thread pool with as many workers as there are cores.
+    ThreadPool()
+      : ThreadPool(std::thread::hardware_concurrency())
+    {}
+
+    //! constructs a thread pool.
+    //! @param n_workers number of worker threads to create; defaults to
+    //! number of available (virtual) hardware cores.
+    explicit ThreadPool(size_t n_workers)
+      : task_manager_{ n_workers }
+    {
+        for (size_t id = 0; id < n_workers; ++id) {
+            workers_.emplace_back([this, id] {
+                std::function<void()> task;
+                while (!task_manager_.stopped()) {
+                    task_manager_.wait_for_jobs(id);
+                    do {
+                        // inner while to save a few cash misses calling empty()
+                        if (task_manager_.try_pop(task, id))
+                            this->execute_safely(task);
+                    } while (!todo_list_.empty());
+                }
+            });
+        }
+    }
+
+    ~ThreadPool()
+    {
+        task_manager_.stop();
+        for (auto& worker : workers_) {
+            if (worker.joinable())
+                worker.join();
+        }
+    }
+
+    ThreadPool(ThreadPool&&) = delete;
+    ThreadPool(const ThreadPool&) = delete;
+    ThreadPool& operator=(const ThreadPool&) = delete;
+    ThreadPool& operator=(ThreadPool&& other) = delete;
+
+    //! @brief returns a reference to the global thread pool instance.
+    static ThreadPool& global_instance()
+    {
+        static ThreadPool instance_;
+        return instance_;
+    }
+
+    //! @brief pushes a job to the thread pool.
+    //! @param f a function.
+    //! @param args (optional) arguments passed to `f`.
+    template<class Function, class... Args>
+    void push(Function&& f, Args&&... args)
+    {
+        if (workers_.size() == 0)
+            return f(args...);
+        todo_list_.add();
+        task_manager_.push(
+          std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
+    }
+
+    //! @brief executes a job asynchronously the global thread pool.
+    //! @param f a function.
+    //! @param args (optional) arguments passed to `f`.
+    //! @return A `std::future` for the task. Call `future.get()` to retrieve
+    //! the results at a later point in time (blocking).
+    template<class Function, class... Args>
+    auto async(Function&& f, Args&&... args)
+      -> std::future<decltype(f(args...))>
+    {
+        auto pack =
+          std::bind(std::forward<Function>(f), std::forward<Args>(args)...);
+        using pack_t = std::packaged_task<decltype(f(args...))()>;
+        auto task_ptr = std::make_shared<pack_t>(std::move(pack));
+        this->push([task_ptr] { (*task_ptr)(); });
+        return task_ptr->get_future();
+    }
+
+    //! @brief waits for all jobs currently running on the global thread pool.
+    void wait() { todo_list_.wait(); }
+
+  private:
+    void execute_safely(std::function<void()>& task)
+    {
+        try {
+            task();
+            todo_list_.cross();
+        } catch (...) {
+            todo_list_.stop(std::current_exception());
+            task_manager_.stop();
+        }
+    }
+
+    detail::TaskManager task_manager_;
+    TodoList todo_list_{ 0 };
+    std::vector<std::thread> workers_;
+};
+
+//! Direct access to the global thread pool -------------------
+
+//! @brief push a job to the global thread pool.
+//! @param f a function.
+//! @param args (optional) arguments passed to `f`.
+template<class Function, class... Args>
+void
+push(Function&& f, Args&&... args)
+{
+    ThreadPool::global_instance().push(std::forward<Function>(f),
+                                       std::forward<Args>(args)...);
+}
+
+//! @brief executes a job asynchronously the global thread pool.
+//! @param f a function.
+//! @param args (optional) arguments passed to `f`.
+//! @return A `std::future` for the task. Call `future.get()` to retrieve the
+//! results at a later point in time (blocking).
+template<class Function, class... Args>
+auto
+async(Function&& f, Args&&... args) -> std::future<decltype(f(args...))>
+{
+    return ThreadPool::global_instance().async(std::forward<Function>(f),
+                                               std::forward<Args>(args)...);
+}
+
+//! @brief waits for all jobs currently running on the global thread pool.
+inline void
+wait()
+{
+    ThreadPool::global_instance().wait();
+}
 
 } // end namespace quickpool

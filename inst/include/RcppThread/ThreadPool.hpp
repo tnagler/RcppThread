@@ -9,7 +9,7 @@
 #include "RcppThread/Batch.hpp"
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
-#include "RcppThread/tpool.hpp"
+#include "RcppThread/quickpool.hpp"
 
 #include <atomic>
 #include <condition_variable>
@@ -46,25 +46,21 @@ class ThreadPool
     void map(F&& f, I&& items);
 
     template<class F>
-    inline void parallelFor(int begin,
-                            int end,
-                            F&& f,
-                            size_t nBatches = 0);
+    inline void parallelFor(int begin, int end, F&& f, size_t nBatches = 0);
 
     template<class F, class I>
     inline void parallelForEach(I& items, F&& f, size_t nBatches = 0);
 
     void wait();
     void join();
-    void clear();
 
   private:
     void joinWorkers();
     void execute(std::function<void()>& task);
 
     // variables for synchronization between workers (destructed last)
-    tpool::detail::TaskManager taskManager_;
-    tpool::TodoList todoList_;
+    quickpool::detail::TaskManager taskManager_;
+    quickpool::TodoList todoList_;
     std::vector<std::thread> workers_;
 };
 
@@ -248,13 +244,6 @@ ThreadPool::join()
     this->joinWorkers();
 }
 
-//! clears the pool from all open jobs.
-inline void
-ThreadPool::clear()
-{
-    taskManager_.clear();
-}
-
 inline void
 ThreadPool::execute(std::function<void()>& task)
 {
@@ -262,7 +251,8 @@ ThreadPool::execute(std::function<void()>& task)
         task();
         todoList_.cross();
     } catch (...) {
-        todoList_.clear(std::current_exception());
+        todoList_.stop(std::current_exception());
+        taskManager_.stop();
     }
 }
 

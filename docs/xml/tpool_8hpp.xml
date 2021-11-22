@@ -10,7 +10,6 @@
     <includes local="no">mutex</includes>
     <includes local="no">thread</includes>
     <includes local="no">vector</includes>
-    <includedby refid="ThreadPool_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</includedby>
     <incdepgraph>
       <node id="2">
         <label>atomic</label>

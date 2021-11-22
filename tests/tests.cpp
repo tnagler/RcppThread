@@ -362,7 +362,8 @@ testNestedParallelForEach()
 // }
 
 // [[Rcpp::export]]
-void testThreadPoolInterruptJoin()
+void
+testThreadPoolInterruptJoin()
 {
     ThreadPool pool;
     auto dummy = [] {
@@ -376,7 +377,8 @@ void testThreadPoolInterruptJoin()
 }
 
 // [[Rcpp::export]]
-void testThreadPoolInterruptWait()
+void
+testThreadPoolInterruptWait()
 {
     ThreadPool pool;
     auto dummy = [] {
@@ -388,6 +390,29 @@ void testThreadPoolInterruptWait()
     }
     pool.wait();
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+}
+
+// [[Rcpp::export]]
+void
+testThreadPoolExceptionHandling()
+{
+
+    RcppThread::ThreadPool pool;
+    pool.push([] { throw std::runtime_error("test"); });
+    for (size_t i = 0; i < 200; i++) {
+        pool.push(
+          [&] { std::this_thread::sleep_for(std::chrono::milliseconds(20)); });
+    }
+
+    try {
+        pool.wait();
+    } catch (const std::exception& e) {
+        if (e.what() == std::string("test")) {
+            // std::cout << "OK" << std::endl;
+        } else {
+            throw std::runtime_error("exception not rethrown");
+        }
+    }
 }
 
 // [[Rcpp::export]]

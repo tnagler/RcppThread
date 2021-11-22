@@ -4,9 +4,9 @@
     <compoundname>RcppThread::ThreadPool</compoundname>
     <includes local="no">ThreadPool.hpp</includes>
       <sectiondef kind="private-attrib">
-      <memberdef kind="variable" id="classRcppThread_1_1ThreadPool_1a1640f602829b3482cb58acac4eb8eb98" prot="private" static="no" mutable="no">
-        <type>tpool::detail::TaskManager</type>
-        <definition>tpool::detail::TaskManager RcppThread::ThreadPool::taskManager_</definition>
+      <memberdef kind="variable" id="classRcppThread_1_1ThreadPool_1aae4f7bfd6bc3146587d3d43f8a215385" prot="private" static="no" mutable="no">
+        <type>quickpool::detail::TaskManager</type>
+        <definition>quickpool::detail::TaskManager RcppThread::ThreadPool::taskManager_</definition>
         <argsstring></argsstring>
         <name>taskManager_</name>
         <briefdescription>
@@ -15,11 +15,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="66" column="32" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="66" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="62" column="36" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="62" bodyend="-1"/>
       </memberdef>
-      <memberdef kind="variable" id="classRcppThread_1_1ThreadPool_1aa07961e74a5cc30c2e46074b38e0812c" prot="private" static="no" mutable="no">
-        <type>tpool::TodoList</type>
-        <definition>tpool::TodoList RcppThread::ThreadPool::todoList_</definition>
+      <memberdef kind="variable" id="classRcppThread_1_1ThreadPool_1afe2c7e90bfcd2d1e90c32827fa4ad29f" prot="private" static="no" mutable="no">
+        <type>quickpool::TodoList</type>
+        <definition>quickpool::TodoList RcppThread::ThreadPool::todoList_</definition>
         <argsstring></argsstring>
         <name>todoList_</name>
         <briefdescription>
@@ -28,7 +28,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="67" column="21" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="67" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="63" column="25" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="63" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1ThreadPool_1a55d6e5030c0839bafdf5c5e9e8e3c337" prot="private" static="no" mutable="no">
         <type>std::vector&lt; std::thread &gt;</type>
@@ -41,7 +41,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="68" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="68" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="64" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="64" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -89,7 +89,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="31" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="72" bodyend="74"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="31" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="68" bodyend="70"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1af12763cf29f5d75331a7dafb3bae1750" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
         <type></type>
@@ -116,7 +116,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="32" column="14" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="79" bodyend="95"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="32" column="14" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="75" bodyend="91"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1aca522b3487e549852bbf73a41c4ed7cd" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
         <type></type>
@@ -130,7 +130,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="34" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="98" bodyend="106"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="34" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="94" bodyend="102"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a4cda48aa1b12efd9e84302f2e3f463a7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type><ref refid="classRcppThread_1_1ThreadPool" kindref="compound">ThreadPool</ref> &amp;</type>
@@ -212,7 +212,7 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="40" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="116" bodyend="125"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="40" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="112" bodyend="121"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <templateparamlist>
@@ -263,7 +263,7 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="43" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="135" bodyend="143"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="43" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="131" bodyend="139"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <templateparamlist>
@@ -310,7 +310,7 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="46" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="152" bodyend="159"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="46" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="148" bodyend="155"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a74ac81f099d31e7d785ee6aab60247f3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -389,7 +389,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="49" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="186" bodyend="198"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="49" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="182" bodyend="194"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a44b177dbf1297cb38019eee3343b2319" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -459,7 +459,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="55" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="224" bodyend="227"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="52" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="220" bodyend="223"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a6c93f9e84fadfdc1a3357770d47a738a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -473,7 +473,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="57" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="232" bodyend="240"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="54" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="228" bodyend="236"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -487,21 +487,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="58" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="244" bodyend="249"/>
-      </memberdef>
-      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a3a26cfd27907154d54a76a2240940507" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
-        <type>void</type>
-        <definition>void RcppThread::ThreadPool::clear</definition>
-        <argsstring>()</argsstring>
-        <name>clear</name>
-        <briefdescription>
-<para>clears the pool from all open jobs. </para>
-        </briefdescription>
-        <detaileddescription>
-        </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="59" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="253" bodyend="256"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="55" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="240" bodyend="245"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-func">
@@ -517,7 +503,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="62" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="271" bodyend="277"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="58" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="261" bodyend="267"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a3cfa909b6bf4db9df8eeb95e93f739b4" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -534,7 +520,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="63" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="259" bodyend="267"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="59" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="248" bodyend="257"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -542,9 +528,8 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="27" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="26" bodyend="69"/>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="27" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="26" bodyend="65"/>
     <listofallmembers>
-      <member refid="classRcppThread_1_1ThreadPool_1a3a26cfd27907154d54a76a2240940507" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>clear</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a3cfa909b6bf4db9df8eeb95e93f739b4" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>execute</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>join</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a6ce441827ce6f4d052ad43a28b46b46b" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>joinWorkers</name></member>
@@ -555,12 +540,12 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
       <member refid="classRcppThread_1_1ThreadPool_1a44b177dbf1297cb38019eee3343b2319" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelForEach</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1af1c8048954f42b41d19bd8fa9133490a" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>push</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>pushReturn</name></member>
-      <member refid="classRcppThread_1_1ThreadPool_1a1640f602829b3482cb58acac4eb8eb98" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>taskManager_</name></member>
+      <member refid="classRcppThread_1_1ThreadPool_1aae4f7bfd6bc3146587d3d43f8a215385" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>taskManager_</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a83ffe33d4d776b62baf312a1c4965c08" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>ThreadPool</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a524ee4a9d217cba6cbdfd3405515376b" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>ThreadPool</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a66eb5407d41494582e7c456834e027b8" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>ThreadPool</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1af12763cf29f5d75331a7dafb3bae1750" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>ThreadPool</name></member>
-      <member refid="classRcppThread_1_1ThreadPool_1aa07961e74a5cc30c2e46074b38e0812c" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>todoList_</name></member>
+      <member refid="classRcppThread_1_1ThreadPool_1afe2c7e90bfcd2d1e90c32827fa4ad29f" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>todoList_</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a6c93f9e84fadfdc1a3357770d47a738a" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>wait</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a55d6e5030c0839bafdf5c5e9e8e3c337" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>workers_</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1aca522b3487e549852bbf73a41c4ed7cd" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>~ThreadPool</name></member>
