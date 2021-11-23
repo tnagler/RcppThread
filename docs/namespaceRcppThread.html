@@ -109,8 +109,8 @@ C++</a>
           <dl class="m-doc">
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#af856bb0a0c8b88b8116a5eb0dc12a204" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              int end,
+              <span class="m-doc-wrap-bumper">void <a href="#a800a2ece44553db6da00c76d617b8223" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              size_t size,
               F&amp;&amp; f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span>
@@ -149,13 +149,13 @@ C++</a>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="af856bb0a0c8b88b8116a5eb0dc12a204"><div>
+          <section class="m-doc-details" id="a800a2ece44553db6da00c76d617b8223"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#af856bb0a0c8b88b8116a5eb0dc12a204" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              int end,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a800a2ece44553db6da00c76d617b8223" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              size_t size,
               F&amp;&amp; f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span></span>
@@ -170,8 +170,8 @@ C++</a>
                   <td>first index of the loop.</td>
                 </tr>
                 <tr>
-                  <td>end</td>
-                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
+                  <td>size</td>
+                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>

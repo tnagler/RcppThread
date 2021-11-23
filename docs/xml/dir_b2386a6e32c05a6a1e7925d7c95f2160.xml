@@ -10,7 +10,6 @@
     <innerfile refid="RMonitor_8hpp">RMonitor.hpp</innerfile>
     <innerfile refid="Thread_8hpp">Thread.hpp</innerfile>
     <innerfile refid="ThreadPool_8hpp">ThreadPool.hpp</innerfile>
-    <innerfile refid="tpool_8hpp">tpool.hpp</innerfile>
     <briefdescription>
     </briefdescription>
     <detaileddescription>

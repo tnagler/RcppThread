@@ -83,7 +83,7 @@
     <member refid="classRcppThread_1_1ThreadPool_1af1c8048954f42b41d19bd8fa9133490a" kind="function"><name>push</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" kind="function"><name>pushReturn</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" kind="function"><name>map</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1a74ac81f099d31e7d785ee6aab60247f3" kind="function"><name>parallelFor</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1ac3f2a25288cfbfcc62e885b7fb72fe73" kind="function"><name>parallelFor</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a44b177dbf1297cb38019eee3343b2319" kind="function"><name>parallelForEach</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a6c93f9e84fadfdc1a3357770d47a738a" kind="function"><name>wait</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" kind="function"><name>join</name></member>
@@ -96,7 +96,7 @@
   <compound refid="namespaceRcppThread" kind="namespace"><name>RcppThread</name>
     <member refid="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" kind="variable"><name>Rcout</name></member>
     <member refid="namespaceRcppThread_1ada4c397edb2f1f4150f8dc1ab899d324" kind="variable"><name>mainThreadID</name></member>
-    <member refid="namespaceRcppThread_1af856bb0a0c8b88b8116a5eb0dc12a204" kind="function"><name>parallelFor</name></member>
+    <member refid="namespaceRcppThread_1a800a2ece44553db6da00c76d617b8223" kind="function"><name>parallelFor</name></member>
     <member refid="namespaceRcppThread_1a1c246ba8e53889c0cd5c1c24e8c6cc85" kind="function"><name>parallelForEach</name></member>
     <member refid="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" kind="function"><name>checkUserInterrupt</name></member>
     <member refid="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" kind="function"><name>isInterrupted</name></member>
@@ -125,8 +125,6 @@
     <member refid="Thread_8hpp_1a1351fd152dbc25ac91b5d3ea8c3abdff" kind="define"><name>RCPPTHREAD_OVERRIDE_THREAD</name></member>
   </compound>
   <compound refid="ThreadPool_8hpp" kind="file"><name>ThreadPool.hpp</name>
-  </compound>
-  <compound refid="tpool_8hpp" kind="file"><name>tpool.hpp</name>
   </compound>
   <compound refid="overrides" kind="page"><name>overrides</name>
   </compound>

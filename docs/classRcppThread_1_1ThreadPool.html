@@ -106,8 +106,8 @@ C++</a>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a74ac81f099d31e7d785ee6aab60247f3" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              int end,
+              <span class="m-doc-wrap-bumper">void <a href="#ac3f2a25288cfbfcc62e885b7fb72fe73" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              size_t end,
               F&amp;&amp; f,
               size_t nBatches = 0)</span>
             </dt>
@@ -230,13 +230,13 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
             </table>
 <p>maps a function on a list of items, possibly running tasks in parallel.</p>
           </div></section>
-          <section class="m-doc-details" id="a74ac81f099d31e7d785ee6aab60247f3"><div>
+          <section class="m-doc-details" id="ac3f2a25288cfbfcc62e885b7fb72fe73"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a74ac81f099d31e7d785ee6aab60247f3" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              int end,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac3f2a25288cfbfcc62e885b7fb72fe73" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              size_t end,
               F&amp;&amp; f,
               size_t nBatches = 0)</span></span>
             </h3>
@@ -251,7 +251,7 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
                 </tr>
                 <tr>
                   <td>end</td>
-                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
+                  <td></td>
                 </tr>
                 <tr>
                   <td>f</td>

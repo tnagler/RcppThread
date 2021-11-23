@@ -13,7 +13,7 @@ namespace RcppThread {
 
 //! computes an index-based for loop in parallel batches.
 //! @param begin first index of the loop.
-//! @param end the loop runs in the range `[begin, end)`.
+//! @param size the loop runs in the range `[begin, begin + size)`.
 //! @param f a function (the 'loop body').
 //! @param nThreads the number of threads to use; the default uses the number
 //!   of cores in the machine;  if `nThreads = 0`, all work will be done in the
@@ -42,18 +42,16 @@ namespace RcppThread {
 template<class F>
 inline void
 parallelFor(int begin,
-            int end,
+            size_t size,
             F&& f,
             size_t nThreads = std::thread::hardware_concurrency(),
             size_t nBatches = 0)
 {
-    if (end < begin)
-        throw std::runtime_error("can only run forward loops");
-    if (end == begin)
+    if (size == 0)
         return;
 
     ThreadPool pool(nThreads);
-    pool.parallelFor(begin, end, std::forward<F>(f), nBatches);
+    pool.parallelFor(begin, size, std::forward<F>(f), nBatches);
     pool.join();
 }
 

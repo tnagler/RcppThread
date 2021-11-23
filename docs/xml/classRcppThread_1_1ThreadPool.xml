@@ -312,7 +312,7 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </inbodydescription>
         <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="46" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="148" bodyend="155"/>
       </memberdef>
-      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a74ac81f099d31e7d785ee6aab60247f3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1ac3f2a25288cfbfcc62e885b7fb72fe73" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
           <param>
             <type>class F</type>
@@ -320,15 +320,16 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </templateparamlist>
         <type>void</type>
         <definition>void RcppThread::ThreadPool::parallelFor</definition>
-        <argsstring>(int begin, int end, F &amp;&amp;f, size_t nBatches=0)</argsstring>
+        <argsstring>(int begin, size_t end, F &amp;&amp;f, size_t nBatches=0)</argsstring>
         <name>parallelFor</name>
         <param>
           <type>int</type>
           <declname>begin</declname>
         </param>
         <param>
-          <type>int</type>
+          <type>size_t</type>
           <declname>end</declname>
+          <defname>size</defname>
         </param>
         <param>
           <type>F &amp;&amp;</type>
@@ -352,10 +353,10 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
 </parameteritem>
 <parameteritem>
 <parameternamelist>
-<parametername>end</parametername>
+<parametername>size</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the loop runs in the range <computeroutput>[begin, end)</computeroutput>. </para>
+<para>the loop runs in the range <computeroutput>[begin, begin + size)</computeroutput>. </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -536,7 +537,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
       <member refid="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>map</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a4cda48aa1b12efd9e84302f2e3f463a7" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>operator=</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a6f3c66741b4c18ab9c096ec0f04da289" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>operator=</name></member>
-      <member refid="classRcppThread_1_1ThreadPool_1a74ac81f099d31e7d785ee6aab60247f3" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelFor</name></member>
+      <member refid="classRcppThread_1_1ThreadPool_1ac3f2a25288cfbfcc62e885b7fb72fe73" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelFor</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a44b177dbf1297cb38019eee3343b2319" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelForEach</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1af1c8048954f42b41d19bd8fa9133490a" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>push</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>pushReturn</name></member>
