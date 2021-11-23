@@ -30,6 +30,21 @@
 //! quickpool namespace
 namespace quickpool {
 
+namespace detail {
+template<typename T>
+class aligned_atomic : public std::atomic<T>
+{
+  public:
+    explicit aligned_atomic(T value)
+      : std::atomic<T>(value)
+    {}
+
+  private:
+    using TT = std::atomic<T>;
+    char padding_[64 > sizeof(TT) ? 64 - sizeof(TT) : 1];
+};
+}
+
 //! @brief Todo list - a synchronization primitive.
 //! @details Add a task with `add()`, cross it off with `cross()`, and wait for
 //! all tasks to complete with `wait()`.
@@ -88,14 +103,14 @@ class TodoList
             std::lock_guard<std::mutex> lk(mtx_);
             // Some threads may add() or cross() after we stop. The large
             // negative number prevents num_tasks_ from becoming positive again.
-            num_tasks_ = std::numeric_limits<int>::min() / 2;
+            num_tasks_.store(std::numeric_limits<int>::min() / 2);
             exception_ptr_ = eptr;
         }
         cv_.notify_all();
     }
 
   private:
-    alignas(64) std::atomic_int num_tasks_{ 0 };
+    detail::aligned_atomic<int> num_tasks_{ 0 };
     std::mutex mtx_;
     std::condition_variable cv_;
     std::exception_ptr exception_ptr_{ nullptr };
@@ -259,13 +274,14 @@ class TaskQueue
     }
 
   private:
-    alignas(64) std::atomic_int top_{ 0 };
-    alignas(64) std::atomic_int bottom_{ 0 };
-    alignas(64) std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
+    detail::aligned_atomic<int> top_{ 0 };
+    detail::aligned_atomic<int> bottom_{ 0 };
+    std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
     std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
+
     std::mutex mutex_;
     std::condition_variable cv_;
-    std::atomic<bool> stopped_;
+    std::atomic<bool> stopped_{ false };
 
     // convenience aliases
     static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
@@ -279,8 +295,8 @@ struct TaskManager
 {
     std::vector<TaskQueue> queues_;
     size_t num_queues_;
-    alignas(64) std::atomic_size_t push_idx_{ 0 };
-    std::atomic_bool stopped_{ false };
+    detail::aligned_atomic<size_t> push_idx_{ 0 };
+    std::atomic<bool> stopped_{ false };
     std::atomic_size_t todo_list_{ 0 };
 
     explicit TaskManager(size_t num_queues)
@@ -348,7 +364,7 @@ class ThreadPool
                     task_manager_.wait_for_jobs(id);
                     do {
                         // inner while to save a few cash misses calling empty()
-                        if (task_manager_.try_pop(task, id))
+                        while (task_manager_.try_pop(task, id))
                             this->execute_safely(task);
                     } while (!todo_list_.empty());
                 }
