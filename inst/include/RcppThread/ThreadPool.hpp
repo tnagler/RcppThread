@@ -55,13 +55,15 @@ class ThreadPool
     void join();
 
   private:
-    void joinWorkers();
-    void execute(std::function<void()>& task);
-
     // variables for synchronization between workers (destructed last)
-    quickpool::detail::TaskManager taskManager_;
-    quickpool::TodoList todoList_;
-    std::vector<std::thread> workers_;
+    const size_t nWorkers_;
+    struct Sync
+    {
+        Sync(size_t nWorkers) : taskManager_{ nWorkers } {}
+        quickpool::detail::TaskManager taskManager_;
+        quickpool::TodoList todoList_{ 0 };
+    };
+    std::shared_ptr<Sync> sync_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -73,20 +75,33 @@ inline ThreadPool::ThreadPool()
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
-  : taskManager_{ nWorkers }
+  : nWorkers_{ nWorkers }
+  , sync_{ std::make_shared<Sync>(nWorkers) }
 {
+    auto sync = sync_;
     for (size_t id = 0; id < nWorkers; id++) {
-        workers_.emplace_back([this, id] {
+        std::thread([sync, id] {
+
             std::function<void()> task;
-            while (!taskManager_.stopped()) {
-                taskManager_.wait_for_jobs(id);
+            while (!sync->taskManager_.stopped()) {
+
+                sync->taskManager_.wait_for_jobs(id);
                 do {
                     // use inner while to save a few cash misses calling done()
-                    while (taskManager_.try_pop(task, id))
-                        execute(task);
-                } while (!todoList_.empty());
+                    while (sync->taskManager_.try_pop(task, id)) {
+                        try {
+                            task();
+                            sync->todoList_.cross();
+                        } catch (...) {
+                            sync->todoList_.stop(std::current_exception());
+                            sync->taskManager_.stop();
+                        }
+                    }
+                } while (!sync->todoList_.empty());
+
             }
-        });
+
+        }).detach();
     }
 }
 
@@ -94,8 +109,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 inline ThreadPool::~ThreadPool() noexcept
 {
     try {
-        taskManager_.stop();
-        this->joinWorkers();
+        sync_->taskManager_.stop();
     } catch (...) {
         // destructors should never throw
     }
@@ -111,11 +125,11 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    if (workers_.size() == 0) {
+    if (nWorkers_ == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
-        todoList_.add();
-        taskManager_.push(
+        sync_->todoList_.add();
+        sync_->taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
 }
@@ -185,7 +199,7 @@ ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
         for (int i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, size, workers_.size(), nBatches);
+    auto batches = createBatches(begin, size, nWorkers_, nBatches);
     auto pushJob = [=] {
         for (const auto& batch : batches)
             this->push(doBatch, batch);
@@ -227,8 +241,8 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (!todoList_.empty()) {
-        todoList_.wait(50);
+    while (!sync_->todoList_.empty()) {
+        sync_->todoList_.wait(50);
         Rcout << "";
         checkUserInterrupt();
     }
@@ -240,30 +254,8 @@ inline void
 ThreadPool::join()
 {
     this->wait();
-    taskManager_.stop();
-    this->joinWorkers();
+    sync_->taskManager_.stop();
 }
 
-inline void
-ThreadPool::execute(std::function<void()>& task)
-{
-    try {
-        task();
-        todoList_.cross();
-    } catch (...) {
-        todoList_.stop(std::current_exception());
-        taskManager_.stop();
-    }
-}
-
-//! joins worker threads if possible.
-inline void
-ThreadPool::joinWorkers()
-{
-    for (auto& worker : workers_) {
-        if (worker.joinable())
-            worker.join();
-    }
-}
 
 }
