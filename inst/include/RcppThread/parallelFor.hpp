@@ -99,7 +99,7 @@ parallelForEach(I& items,
     // loop ranges ranges indicate iterator offset
     const auto begin = std::begin(items);
     auto size = std::distance(begin, std::end(items));
-    parallel_for(0, size, [&f, &begin](int i) { f(*(begin + i)); });
+    parallelFor(0, size, [&f, &begin](int i) { f(*(begin + i)); });
 }
 
 }
