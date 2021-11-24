@@ -36,6 +36,12 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
+    static ThreadPool& globalInstance()
+    {
+        static ThreadPool instance_;
+        return instance_;
+    }
+
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
 

@@ -49,10 +49,22 @@ parallelFor(int begin,
 {
     if (size == 0)
         return;
-
-    ThreadPool pool(nThreads);
-    pool.parallelFor(begin, size, std::forward<F>(f), nBatches);
-    pool.join();
+    nThreads = std::thread::hardware_concurrency();
+    auto batches = createBatches(begin, size, nThreads, nBatches);
+    quickpool::TodoList todos(batches.size());
+    auto doBatch = [&](const Batch& b) {
+        for (ptrdiff_t i = b.begin; i < b.end; i++)
+            f(i);
+        todos.cross();
+    };
+    for (const auto& batch : batches)
+        ThreadPool::globalInstance().push(doBatch, batch);
+    while (!todos.empty()) {
+        todos.wait(50);
+        Rcout << "";
+        checkUserInterrupt();
+    }
+    Rcout << "";
 }
 
 //! computes a range-based for loop in parallel batches.
