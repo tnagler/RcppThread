@@ -5,7 +5,11 @@
 * Add classes `ProgressCounter` and `ProgressBar` for tracking progress in long-
   running loops (#49).
 
-* Increased speed due to work-stealing and lock-free pops (#51).
+* Increased speed due to work-stealing and lock-free pops (#51, #52, #53).
+
+* Free-standing `parallelFor()` and `parallelForEach()` functions now dispatch 
+  to a global thread pool that persists for the entire session. This 
+  significantly speeds up programs that repeatedly call these functions. (#54)
 
 
 # RcppThread 1.0.0
