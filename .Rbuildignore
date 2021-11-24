@@ -9,7 +9,7 @@ inst/include/mainpage.h
 ^appveyor\.yml$
 ^codecov\.yml$
 ^cran-comments\.md$
-revdep
+revdep/
 ^\.github$
 ^CRAN-RELEASE$
 .vscode/
