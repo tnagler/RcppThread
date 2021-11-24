@@ -65,7 +65,7 @@ class ThreadPool
     const size_t nWorkers_;
     struct Sync
     {
-        Sync(size_t nWorkers) : taskManager_{ nWorkers } {}
+        explicit Sync(size_t nWorkers) : taskManager_{ nWorkers } {}
         quickpool::detail::TaskManager taskManager_;
         quickpool::TodoList todoList_{ 0 };
     };
