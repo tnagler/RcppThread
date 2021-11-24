@@ -50,9 +50,13 @@ parallelFor(int begin,
     auto batches = createBatches(begin, size, nThreads, nBatches);
     quickpool::TodoList todos(batches.size());
     auto doBatch = [&](const Batch& b) {
-        for (ptrdiff_t i = b.begin; i < b.end; i++)
-            f(i);
-        todos.cross();
+        try {
+            for (ptrdiff_t i = b.begin; i < b.end; i++)
+                f(i);
+            todos.cross();
+        } catch (...) {
+            todos.stop(std::current_exception());
+        }
     };
     for (const auto& batch : batches)
         ThreadPool::globalInstance().push(doBatch, batch);

@@ -68,6 +68,7 @@ class ThreadPool
         explicit Sync(size_t nWorkers) : taskManager_{ nWorkers } {}
         quickpool::detail::TaskManager taskManager_;
         quickpool::TodoList todoList_{ 0 };
+        quickpool::TodoList running_{ 0 };
     };
     std::shared_ptr<Sync> sync_;
 };
@@ -87,6 +88,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
     auto sync = sync_;
     for (size_t id = 0; id < nWorkers; id++) {
         std::thread([sync, id] {
+            sync->running_.add();
 
             std::function<void()> task;
             while (!sync->taskManager_.stopped()) {
@@ -104,9 +106,9 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
                         }
                     }
                 } while (!sync->todoList_.empty());
-
             }
 
+            sync->running_.cross();
         }).detach();
     }
 }
@@ -114,11 +116,8 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
-    try {
-        sync_->taskManager_.stop();
-    } catch (...) {
-        // destructors should never throw
-    }
+    sync_->taskManager_.stop();
+    sync_->running_.wait();
 }
 
 //! pushes jobs to the thread pool.
@@ -261,6 +260,7 @@ ThreadPool::join()
 {
     this->wait();
     sync_->taskManager_.stop();
+    sync_->running_.wait();
 }
 
 
