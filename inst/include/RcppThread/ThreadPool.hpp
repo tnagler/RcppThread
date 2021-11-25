@@ -40,7 +40,13 @@ class ThreadPool
     {
         Rcout << ""; // make sure RMonitor/RPrinter are instantiated *berfore*
         static ThreadPool instance_;
+        std::atexit(globalCleanUp);
         return instance_;
+    }
+
+    static void globalCleanUp()
+    {
+        globalInstance().~ThreadPool();
     }
 
     template<class F, class... Args>
@@ -120,7 +126,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 inline ThreadPool::~ThreadPool() noexcept
 {
     sync_->taskManager_.stop();
-    sync->running_.wait();
+    sync_->running_.wait();
 }
 
 //! pushes jobs to the thread pool.
