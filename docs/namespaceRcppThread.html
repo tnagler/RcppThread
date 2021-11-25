@@ -179,7 +179,7 @@ C++</a>
                 </tr>
                 <tr>
                   <td>nThreads</td>
-                  <td>the number of threads to use; the default uses the number of cores in the machine; if <code>nThreads = 0</code>, all work will be done in the main thread.</td>
+                  <td>deprecated; loop is run on global thread pool.</td>
                 </tr>
                 <tr>
                   <td>nBatches</td>
@@ -193,7 +193,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::parallelFor()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+<span class="p">});</span><span class="w"></span></pre><p>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
           <section class="m-doc-details" id="a1c246ba8e53889c0cd5c1c24e8c6cc85"><div>
             <h3>
@@ -220,7 +220,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
                 </tr>
                 <tr>
                   <td>nThreads</td>
-                  <td>the number of threads to use; the default uses the number of cores in the machine; if <code>nThreads = 0</code>, all work will be done in the main thread.</td>
+                  <td>deprecated; loop is run on global thread pool.</td>
                 </tr>
                 <tr>
                   <td>nBatches</td>
@@ -234,7 +234,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="o">&amp;</span><span class="w"> </span><span class="n">xx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
-<span class="p">});</span><span class="w"></span></pre><p>The function sets up a <code>ThreadPool</code> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <code>ThreadPool</code> yourself and using <code>ThreadPool::parallelForEach()</code>.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+<span class="p">});</span><span class="w"></span></pre><p>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
           <section class="m-doc-details" id="ae48d2e823f3ac43fb87a2795f242e3df"><div>
             <h3>

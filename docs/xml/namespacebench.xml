@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespacebench" kind="namespace" language="C++">
+    <compoundname>bench</compoundname>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="Bench_8hpp_1ac3f0c01c0251666136d8e0813ee1369a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double bench::time_one</definition>
+        <argsstring>(const std::function&lt; void()&gt; &amp;f)</argsstring>
+        <name>time_one</name>
+        <param>
+          <type>const std::function&lt; void()&gt; &amp;</type>
+          <declname>f</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" line="10" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" bodystart="10" bodyend="16"/>
+      </memberdef>
+      <memberdef kind="function" id="Bench_8hpp_1acade5867474f52235f4cec9d2c3740b1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void bench::time_once</definition>
+        <argsstring>(const std::vector&lt; std::function&lt; void()&gt;&gt; &amp;funcs, std::vector&lt; double &gt; &amp;times)</argsstring>
+        <name>time_once</name>
+        <param>
+          <type>const std::vector&lt; std::function&lt; void()&gt;&gt; &amp;</type>
+          <declname>funcs</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; double &gt; &amp;</type>
+          <declname>times</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" line="19" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" bodystart="19" bodyend="25"/>
+      </memberdef>
+      <memberdef kind="function" id="Bench_8hpp_1a8a899c63f112cae6c500c80a5118528d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt;double&gt; bench::benchmark</definition>
+        <argsstring>(std::vector&lt; std::function&lt; void()&gt;&gt; funcs, size_t min_sec=10)</argsstring>
+        <name>benchmark</name>
+        <param>
+          <type>std::vector&lt; std::function&lt; void()&gt;&gt;</type>
+          <declname>funcs</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>min_sec</declname>
+          <defval>10</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" line="28" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" bodystart="28" bodyend="37"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp" line="7" column="15"/>
+  </compounddef>
+</doxygen>

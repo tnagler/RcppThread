@@ -36,6 +36,7 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
+    //! Access to the global thread pool instance.
     static ThreadPool& globalInstance()
     {
 #ifdef _WIN32

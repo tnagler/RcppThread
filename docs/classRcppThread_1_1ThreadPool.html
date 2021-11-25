@@ -60,12 +60,22 @@ C++</a>
             <li>
               Reference
               <ul>
+                <li><a href="#pub-static-methods">Public static functions</a></li>
                 <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
                 <li><a href="#pub-methods">Public functions</a></li>
               </ul>
             </li>
           </ul>
         </div>
+        <section id="pub-static-methods">
+          <h2><a href="#pub-static-methods">Public static functions</a></h2>
+          <dl class="m-doc">
+            <dt id="a17e23c155801f91d2e3434a95e2cef84">
+              <span class="m-doc-wrap-bumper">static auto <a href="#a17e23c155801f91d2e3434a95e2cef84" class="m-doc-self">globalInstance</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classRcppThread_1_1ThreadPool.html" class="m-doc">ThreadPool</a>&amp;</span>
+            </dt>
+            <dd>Access to the global thread pool instance.</dd>
+          </dl>
+        </section>
         <section id="typeless-methods">
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
@@ -313,7 +323,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
             <h3>
               <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6c93f9e84fadfdc1a3357770d47a738a" class="m-doc-self">wait</a>(</span><span class="m-doc-wrap">)</span></span>
             </h3>
-<p>waits for all jobs to finish and checks for interruptions, but does not join the threads.</p>
+<p>waits for all jobs to finish and checks for interruptions, but only from the thread that created the pool.Does nothing when called from other threads.</p>
           </div></section>
         </section>
       </div>
