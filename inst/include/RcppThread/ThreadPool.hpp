@@ -20,11 +20,6 @@
 #include <thread>
 #include <vector>
 
-static std::atomic<bool> gobal_instance_deleted_{ false };
-
-void
-globalCleanUp();
-
 namespace RcppThread {
 
 //! Implemenation of the thread pool pattern based on `Thread`.
@@ -41,13 +36,17 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
-    static ThreadPool& globalInstance() { return *globalInstancePtr(); }
-
-    static ThreadPool* globalInstancePtr()
+    static ThreadPool& globalInstance()
     {
-        static auto ptr = new ThreadPool;
-        // std::atexit(globalCleanUp);
-        return ptr;
+// #ifdef _WIN32
+//         // Must leak resource, because windows + R deadlock otherwise. Memory
+//         // is released on shutdown.
+//         static auto ptr = new ThreadPool;
+//         return *ptr;
+// #else
+        static ThreadPool instance_;
+        return instance_;
+// #endif
     }
 
     template<class F, class... Args>
@@ -115,8 +114,13 @@ inline ThreadPool::~ThreadPool() noexcept
 {
     taskManager_.stop();
     for (auto& worker : workers_) {
-        if (worker.joinable())
+#ifndef _WIN32
+        if (worker.joinable()) {
             worker.join();
+        }
+#else
+        worker.detach();
+#endif
     }
 }
 
@@ -125,13 +129,15 @@ inline ThreadPool::~ThreadPool() noexcept
 //! @param args a comma-seperated list of the other arguments that shall
 //!   be passed to `f`.
 //!
-//! The function returns void; if a job returns a result, use `pushReturn()`.
+//! The function returns void; if a job returns a result, use
+//! `pushReturn()`.
 template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
     if (nWorkers_ == 0) {
-        f(args...); // if there are no workers, do the job in the main thread
+        f(args...); // if there are no workers, do the job in the main
+                    // thread
     } else {
         todoList_.add();
         taskManager_.push(
@@ -266,17 +272,4 @@ ThreadPool::join()
     }
 }
 
-}
-
-void
-globalCleanUp()
-{
-    std::cout << "cleaninung up" << std::endl;
-    auto ptr = RcppThread::ThreadPool::globalInstancePtr();
-    if (!gobal_instance_deleted_) {
-        std::cout << "free memory" << std::endl;
-        delete ptr;
-        std::cout << "done" << std::endl;
-        gobal_instance_deleted_ = true;
-    }
-}
+} // end namespace RcppThread
