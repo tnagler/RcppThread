@@ -20,6 +20,11 @@
 #include <thread>
 #include <vector>
 
+static std::atomic<bool> gobal_instance_deleted_{ false };
+
+void
+globalCleanUp();
+
 namespace RcppThread {
 
 //! Implemenation of the thread pool pattern based on `Thread`.
@@ -36,17 +41,13 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
-    static ThreadPool& globalInstance()
-    {
-        static std::unique_ptr<ThreadPool> instance_(new ThreadPool);
-        // std::atexit(globalCleanUp);
-        return *instance_;
-    }
+    static ThreadPool& globalInstance() { return *globalInstancePtr(); }
 
-    static void globalCleanUp()
+    static ThreadPool* globalInstancePtr()
     {
-        ThreadPool& instance_ = globalInstance();
-        delete &instance_;
+        static auto ptr = new ThreadPool;
+        // std::atexit(globalCleanUp);
+        return ptr;
     }
 
     template<class F, class... Args>
@@ -265,4 +266,17 @@ ThreadPool::join()
     }
 }
 
+}
+
+void
+globalCleanUp()
+{
+    std::cout << "cleaninung up" << std::endl;
+    auto ptr = RcppThread::ThreadPool::globalInstancePtr();
+    if (!gobal_instance_deleted_) {
+        std::cout << "free memory" << std::endl;
+        delete ptr;
+        std::cout << "done" << std::endl;
+        gobal_instance_deleted_ = true;
+    }
 }
