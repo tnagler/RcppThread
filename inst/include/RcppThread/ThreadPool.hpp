@@ -39,7 +39,7 @@ class ThreadPool
     static ThreadPool& globalInstance()
     {
         static ThreadPool instance_;
-        // std::atexit(globalCleanUp);
+        std::atexit(globalCleanUp);
         return instance_;
     }
 

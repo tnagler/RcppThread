@@ -51,7 +51,7 @@ parallelFor(int begin,
     quickpool::TodoList todos(batches.size());
     auto doBatch = [&](const Batch& b) {
         try {
-            for (ptrdiff_t i = b.begin; i < b.end; i++)
+            for (int i = b.begin; i < b.end; i++)
                 f(i);
             todos.cross();
         } catch (...) {
