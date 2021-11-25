@@ -38,16 +38,12 @@ class ThreadPool
 
     static ThreadPool& globalInstance()
     {
-        Rcout << ""; // make sure RMonitor/RPrinter are instantiated *berfore*
         static ThreadPool instance_;
         std::atexit(globalCleanUp);
         return instance_;
     }
 
-    static void globalCleanUp()
-    {
-        globalInstance().~ThreadPool();
-    }
+    static void globalCleanUp() { globalInstance().~ThreadPool(); }
 
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
@@ -70,16 +66,9 @@ class ThreadPool
   private:
     // variables for synchronization between workers (destructed last)
     const size_t nWorkers_;
-    struct Sync
-    {
-        explicit Sync(size_t nWorkers)
-          : taskManager_{ nWorkers }
-        {}
-        quickpool::detail::TaskManager taskManager_;
-        quickpool::TodoList todoList_{ 0 };
-        quickpool::TodoList running_{ 0 };
-    };
-    std::shared_ptr<Sync> sync_;
+    std::vector<std::thread> workers_;
+    quickpool::detail::TaskManager taskManager_;
+    quickpool::TodoList todoList_{ 0 };
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -92,41 +81,38 @@ inline ThreadPool::ThreadPool()
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_{ nWorkers }
-  , sync_{ std::make_shared<Sync>(nWorkers) }
+  , taskManager_{ nWorkers }
 {
-    auto sync = sync_;
+    workers_.reserve(nWorkers);
     for (size_t id = 0; id < nWorkers; id++) {
-        std::thread([sync, id] {
-            sync->running_.add();
-
+        workers_.emplace_back([this, id] {
             std::function<void()> task;
-            while (!sync->taskManager_.stopped()) {
-
-                sync->taskManager_.wait_for_jobs(id);
+            while (!taskManager_.stopped()) {
+                taskManager_.wait_for_jobs(id);
                 do {
-                    while (sync->taskManager_.try_pop(task, id)) {
+                    while (taskManager_.try_pop(task, id)) {
                         try {
                             task();
-                            sync->todoList_.cross();
+                            todoList_.cross();
                         } catch (...) {
-                            sync->todoList_.stop(std::current_exception());
-                            sync->taskManager_.stop();
+                            todoList_.stop(std::current_exception());
+                            taskManager_.stop();
                         }
                     }
-                } while (!sync->todoList_.empty() &&
-                         !sync->taskManager_.stopped());
+                } while (!todoList_.empty() && !taskManager_.stopped());
             }
-
-            sync->running_.cross();
-        }).detach();
+        });
     }
 }
 
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
-    sync_->taskManager_.stop();
-    sync_->running_.wait();
+    taskManager_.stop();
+    for (auto& worker : workers_) {
+        if (worker.joinable())
+            worker.join();
+    }
 }
 
 //! pushes jobs to the thread pool.
@@ -142,8 +128,8 @@ ThreadPool::push(F&& f, Args&&... args)
     if (nWorkers_ == 0) {
         f(args...); // if there are no workers, do the job in the main thread
     } else {
-        sync_->todoList_.add();
-        sync_->taskManager_.push(
+        todoList_.add();
+        taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
 }
@@ -255,8 +241,8 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    while (!sync_->todoList_.empty()) {
-        sync_->todoList_.wait(50);
+    while (!todoList_.empty()) {
+        todoList_.wait(50);
         Rcout << "";
         checkUserInterrupt();
     }
@@ -268,8 +254,11 @@ inline void
 ThreadPool::join()
 {
     this->wait();
-    sync_->taskManager_.stop();
-    sync_->running_.wait();
+    taskManager_.stop();
+    for (auto& worker : workers_) {
+        if (worker.joinable())
+            worker.join();
+    }
 }
 
 }

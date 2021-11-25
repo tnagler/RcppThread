@@ -95,5 +95,3 @@ for (run in seq_len(runs)) {
     })
 
 }
-
-tearDown()
