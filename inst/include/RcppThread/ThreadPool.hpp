@@ -36,6 +36,13 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
+    static ThreadPool& globalInstance()
+    {
+        Rcout << ""; // make sure RMonitor/RPrinter are instantiated *berfore*
+        static ThreadPool instance_;
+        return instance_;
+    }
+
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
 
@@ -256,10 +263,6 @@ ThreadPool::join()
     this->wait();
     sync_->taskManager_.stop();
     sync_->running_.wait();
-}
-
-namespace global {
-static ThreadPool pool{ std::thread::hardware_concurrency() };
 }
 
 }

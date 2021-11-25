@@ -451,10 +451,3 @@ testProgressBar()
         ++bar;
     });
 }
-
-// [[Rcpp::export]]
-void
-    tearDown()
-    {
-        RcppThread::global::pool.~ThreadPool();
-    }
