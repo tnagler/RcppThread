@@ -55,8 +55,9 @@ parallelFor(int begin,
                 f(i);
             todos.cross();
         } catch (...) {
-            todos.stop(std::current_exception());
-            std::rethrow_exception();
+            auto e = std::current_exception();
+            todos.stop(e);
+            std::rethrow_exception(e);
         }
     };
     for (const auto& batch : batches)
