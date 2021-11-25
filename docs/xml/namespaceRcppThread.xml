@@ -107,7 +107,7 @@
 <parametername>nThreads</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the number of threads to use; the default uses the number of cores in the machine; if <computeroutput>nThreads = 0</computeroutput>, all work will be done in the main thread. </para>
+<para>deprecated; loop is run on global thread pool. </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -128,12 +128,12 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <codeline><highlight class="normal"><sp/><sp/><sp/><sp/>x[i]<sp/>=<sp/>i;</highlight></codeline>
 <codeline><highlight class="normal">});</highlight></codeline>
 </programlisting></para>
-<para>The function sets up a <computeroutput>ThreadPool</computeroutput> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <computeroutput>ThreadPool</computeroutput> yourself and using <computeroutput>ThreadPool::parallelFor()</computeroutput>.</para>
+<para>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</para>
 <para><bold>Caution</bold>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="44" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="44" bodyend="56"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="41" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="41" bodyend="49"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1a1c246ba8e53889c0cd5c1c24e8c6cc85" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -190,7 +190,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <parametername>nThreads</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the number of threads to use; the default uses the number of cores in the machine; if <computeroutput>nThreads = 0</computeroutput>, all work will be done in the main thread. </para>
+<para>deprecated; loop is run on global thread pool. </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -211,12 +211,12 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <codeline><highlight class="normal"><sp/><sp/><sp/><sp/>xx<sp/>*=<sp/>2;</highlight></codeline>
 <codeline><highlight class="normal">});</highlight></codeline>
 </programlisting></para>
-<para>The function sets up a <computeroutput>ThreadPool</computeroutput> object to do the scheduling. If you want to run multiple parallel for loops, consider creating a <computeroutput>ThreadPool</computeroutput> yourself and using <computeroutput>ThreadPool::parallelForEach()</computeroutput>.</para>
+<para>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</para>
 <para><bold>Caution</bold>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="88" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="88" bodyend="97"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="78" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="78" bodyend="87"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>

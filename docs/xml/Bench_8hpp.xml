@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="Bench_8hpp" kind="file" language="C++">
+    <compoundname>Bench.hpp</compoundname>
+    <includes local="no">cassert</includes>
+    <includes local="no">chrono</includes>
+    <includes local="no">vector</includes>
+    <incdepgraph>
+      <node id="2">
+        <label>cassert</label>
+      </node>
+      <node id="4">
+        <label>vector</label>
+      </node>
+      <node id="1">
+        <label>/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp</label>
+        <link refid="Bench_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>chrono</label>
+      </node>
+    </incdepgraph>
+    <innernamespace refid="namespacebench">bench</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Bench.hpp"/>
+  </compounddef>
+</doxygen>

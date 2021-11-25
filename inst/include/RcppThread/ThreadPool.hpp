@@ -36,6 +36,20 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
+    //! Access to the global thread pool instance.
+    static ThreadPool& globalInstance()
+    {
+#ifdef _WIN32
+        // Must leak resource, because windows + R deadlock otherwise. Memory
+        // is released on shutdown.
+        static auto ptr = new ThreadPool;
+        return *ptr;
+#else
+        static ThreadPool instance_;
+        return instance_;
+#endif
+    }
+
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
 
@@ -55,13 +69,13 @@ class ThreadPool
     void join();
 
   private:
-    void joinWorkers();
-    void execute(std::function<void()>& task);
-
     // variables for synchronization between workers (destructed last)
-    quickpool::detail::TaskManager taskManager_;
-    quickpool::TodoList todoList_;
+    const size_t nWorkers_;
     std::vector<std::thread> workers_;
+    quickpool::detail::TaskManager taskManager_;
+    quickpool::TodoList todoList_{ 0 };
+
+    std::thread::id ctor_id_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -73,18 +87,27 @@ inline ThreadPool::ThreadPool()
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
-  : taskManager_{ nWorkers }
+  : nWorkers_{ nWorkers }
+  , taskManager_{ nWorkers }
+  , ctor_id_{ std::this_thread::get_id() }
 {
+    workers_.reserve(nWorkers);
     for (size_t id = 0; id < nWorkers; id++) {
         workers_.emplace_back([this, id] {
             std::function<void()> task;
             while (!taskManager_.stopped()) {
                 taskManager_.wait_for_jobs(id);
                 do {
-                    // use inner while to save a few cash misses calling done()
-                    while (taskManager_.try_pop(task, id))
-                        execute(task);
-                } while (!todoList_.empty());
+                    while (taskManager_.try_pop(task, id)) {
+                        try {
+                            task();
+                            todoList_.cross();
+                        } catch (...) {
+                            todoList_.stop(std::current_exception());
+                            taskManager_.stop();
+                        }
+                    }
+                } while (!todoList_.empty() && !taskManager_.stopped());
             }
         });
     }
@@ -93,11 +116,11 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
-    try {
-        taskManager_.stop();
-        this->joinWorkers();
-    } catch (...) {
-        // destructors should never throw
+    taskManager_.stop();
+    for (auto& worker : workers_) {
+        if (worker.joinable()) {
+            worker.join();
+        }
     }
 }
 
@@ -106,13 +129,15 @@ inline ThreadPool::~ThreadPool() noexcept
 //! @param args a comma-seperated list of the other arguments that shall
 //!   be passed to `f`.
 //!
-//! The function returns void; if a job returns a result, use `pushReturn()`.
+//! The function returns void; if a job returns a result, use
+//! `pushReturn()`.
 template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    if (workers_.size() == 0) {
-        f(args...); // if there are no workers, do the job in the main thread
+    if (nWorkers_ == 0) {
+        f(args...); // if there are no workers, do the job in the main
+                    // thread
     } else {
         todoList_.add();
         taskManager_.push(
@@ -181,11 +206,13 @@ template<class F>
 inline void
 ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 {
+    if (size == 0)
+        return;
     auto doBatch = [f](const Batch& b) {
         for (int i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, size, workers_.size(), nBatches);
+    auto batches = createBatches(begin, size, nWorkers_, nBatches);
     auto pushJob = [=] {
         for (const auto& batch : batches)
             this->push(doBatch, batch);
@@ -222,11 +249,16 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
     this->parallelFor(0, items.size(), [&items, f](size_t i) { f(items[i]); });
 }
 
-//! waits for all jobs to finish and checks for interruptions,
-//! but does not join the threads.
+//! waits for all jobs to finish and checks for interruptions, but only from the
+//! thread that created the pool.Does nothing when called from other threads.
 inline void
 ThreadPool::wait()
 {
+    if (std::this_thread::get_id() != ctor_id_) {
+        // Only the thread thread that constructed the pool can wait.
+        return;
+    }
+
     while (!todoList_.empty()) {
         todoList_.wait(50);
         Rcout << "";
@@ -241,29 +273,10 @@ ThreadPool::join()
 {
     this->wait();
     taskManager_.stop();
-    this->joinWorkers();
-}
-
-inline void
-ThreadPool::execute(std::function<void()>& task)
-{
-    try {
-        task();
-        todoList_.cross();
-    } catch (...) {
-        todoList_.stop(std::current_exception());
-        taskManager_.stop();
-    }
-}
-
-//! joins worker threads if possible.
-inline void
-ThreadPool::joinWorkers()
-{
     for (auto& worker : workers_) {
         if (worker.joinable())
             worker.join();
     }
 }
 
-}
+} // end namespace RcppThread

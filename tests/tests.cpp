@@ -398,7 +398,7 @@ testThreadPoolExceptionHandling()
 {
 
     RcppThread::ThreadPool pool;
-    pool.push([] { throw std::runtime_error("test"); });
+    pool.push([] { throw std::runtime_error("test error"); });
     for (size_t i = 0; i < 200; i++) {
         pool.push(
           [&] { std::this_thread::sleep_for(std::chrono::milliseconds(20)); });
@@ -407,11 +407,24 @@ testThreadPoolExceptionHandling()
     try {
         pool.wait();
     } catch (const std::exception& e) {
-        if (e.what() == std::string("test")) {
-            // std::cout << "OK" << std::endl;
-        } else {
+        if (e.what() != std::string("test error"))
             throw std::runtime_error("exception not rethrown");
-        }
+    }
+}
+
+// [[Rcpp::export]]
+void
+parallelForExceptionHandling()
+{
+    try {
+        RcppThread::parallelFor(0, 200,  [&] (int i) {
+            if (i == 0)
+                throw std::runtime_error("test error");
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        });
+    } catch (const std::exception& e) {
+        if (e.what() != std::string("test error"))
+            throw std::runtime_error("exception not rethrown");
     }
 }
 
