@@ -112,7 +112,9 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
+#ifndef _WIN32
     taskManager_.stop();
+#endif
     for (auto& worker : workers_) {
 #ifndef _WIN32
         if (worker.joinable()) {
