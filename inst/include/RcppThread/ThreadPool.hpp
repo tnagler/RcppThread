@@ -36,12 +36,6 @@ class ThreadPool
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
-    static ThreadPool& globalInstance()
-    {
-        static ThreadPool instance_;
-        return instance_;
-    }
-
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
 
@@ -65,7 +59,9 @@ class ThreadPool
     const size_t nWorkers_;
     struct Sync
     {
-        explicit Sync(size_t nWorkers) : taskManager_{ nWorkers } {}
+        explicit Sync(size_t nWorkers)
+          : taskManager_{ nWorkers }
+        {}
         quickpool::detail::TaskManager taskManager_;
         quickpool::TodoList todoList_{ 0 };
         quickpool::TodoList running_{ 0 };
@@ -263,5 +259,8 @@ ThreadPool::join()
     sync_->running_.wait();
 }
 
+namespace global {
+static ThreadPool pool{ std::thread::hardware_concurrency() };
+}
 
 }

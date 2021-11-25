@@ -59,7 +59,7 @@ parallelFor(int begin,
         }
     };
     for (const auto& batch : batches)
-        ThreadPool::globalInstance().push(doBatch, batch);
+        global::pool.push(doBatch, batch);
     while (!todos.empty()) {
         todos.wait(50);
         Rcout << "";
