@@ -44,31 +44,8 @@ parallelFor(int begin,
             size_t nThreads = std::thread::hardware_concurrency(),
             size_t nBatches = 0)
 {
-    if (size == 0)
-        return;
-    nThreads = std::thread::hardware_concurrency();
-    auto batches = createBatches(begin, size, nThreads, nBatches);
-    quickpool::TodoList todos(batches.size());
-    auto doBatch = [&](const Batch& b) {
-        try {
-            for (int i = b.begin; i < b.end; i++)
-                f(i);
-            todos.cross();
-        } catch (...) {
-            auto e = std::current_exception();
-            todos.stop(e);
-            std::rethrow_exception(e);
-        }
-    };
-    for (const auto& batch : batches)
-        ThreadPool::globalInstance().push(doBatch, batch);
-
-    while (!todos.empty()) {
-        todos.wait(50);
-        Rcout << "";
-        checkUserInterrupt();
-    }
-    Rcout << "";
+    ThreadPool::globalInstance().parallelFor(begin, size, f, nBatches);
+    ThreadPool::globalInstance().wait();
 }
 
 //! computes a range-based for loop in parallel batches.
@@ -104,9 +81,9 @@ parallelForEach(I& items,
                 size_t nBatches = 0)
 {
     // loop ranges ranges indicate iterator offset
-    const auto begin = std::begin(items);
+    auto begin = std::begin(items);
     auto size = std::distance(begin, std::end(items));
-    parallelFor(0, size, [&f, &begin](int i) { f(*(begin + i)); });
+    parallelFor(0, size, [f, begin](int i) { f(*(begin + i)); });
 }
 
 }

@@ -2,7 +2,7 @@
 context("Compile test functions")
 Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
-runs <- 1
+runs <- 10
 for (run in seq_len(runs)) {
     context(paste0("---------------------------- run ", run, "/", runs))
     test_that("start", expect_true(TRUE))
@@ -41,17 +41,17 @@ for (run in seq_len(runs)) {
         expect_silent(testThreadPoolParallelFor())
     })
 
-    # test_that("nested parallelFor works", {
-    #     expect_silent(testThreadPoolNestedParallelFor())
-    # })
+    test_that("nested parallelFor works", {
+        expect_silent(testThreadPoolNestedParallelFor())
+    })
 
     test_that("parallelForEach works", {
         expect_silent(testThreadPoolParallelForEach())
     })
 
-    # test_that("nested parallelForEach works", {
-    #     expect_silent(testThreadPoolNestedParallelForEach())
-    # })
+    test_that("nested parallelForEach works", {
+        expect_silent(testThreadPoolNestedParallelForEach())
+    })
 
     test_that("works single threaded", {
         expect_silent(testThreadPoolSingleThreaded())
@@ -72,17 +72,17 @@ for (run in seq_len(runs)) {
         expect_silent(testParallelFor())
     })
 
-    # test_that("nested parallelFor works", {
-    #     expect_silent(testNestedParallelFor())
-    # })
+    test_that("nested parallelFor works", {
+        expect_silent(testNestedParallelFor())
+    })
 
     test_that("parallelForEach works", {
         expect_silent(testParallelForEach())
     })
 
-    # test_that("nested parallelForEach works", {
-    #     expect_silent(testNestedParallelForEach())
-    # })
+    test_that("nested parallelForEach works", {
+        expect_silent(testNestedParallelForEach())
+    })
 
     # ------------------------------------------------------
     context("Progress tracking")

@@ -73,6 +73,8 @@ class ThreadPool
     std::vector<std::thread> workers_;
     quickpool::detail::TaskManager taskManager_;
     quickpool::TodoList todoList_{ 0 };
+
+    std::thread::id ctor_id_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -86,6 +88,7 @@ inline ThreadPool::ThreadPool()
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_{ nWorkers }
   , taskManager_{ nWorkers }
+  , ctor_id_{ std::this_thread::get_id() }
 {
     workers_.reserve(nWorkers);
     for (size_t id = 0; id < nWorkers; id++) {
@@ -202,6 +205,8 @@ template<class F>
 inline void
 ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 {
+    if (size == 0)
+        return;
     auto doBatch = [f](const Batch& b) {
         for (int i = b.begin; i < b.end; i++)
             f(i);
@@ -243,11 +248,16 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
     this->parallelFor(0, items.size(), [&items, f](size_t i) { f(items[i]); });
 }
 
-//! waits for all jobs to finish and checks for interruptions,
-//! but does not join the threads.
+//! waits for all jobs to finish and checks for interruptions, but only from the
+//! thread that created the pool.Does nothing when called from other threads.
 inline void
 ThreadPool::wait()
 {
+    if (std::this_thread::get_id() != ctor_id_) {
+        // Only the thread thread that constructed the pool can wait.
+        return;
+    }
+
     while (!todoList_.empty()) {
         todoList_.wait(50);
         Rcout << "";
