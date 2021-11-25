@@ -91,7 +91,6 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 
                 sync->taskManager_.wait_for_jobs(id);
                 do {
-                    // use inner while to save a few cash misses calling done()
                     while (sync->taskManager_.try_pop(task, id)) {
                         try {
                             task();
@@ -101,7 +100,8 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
                             sync->taskManager_.stop();
                         }
                     }
-                } while (!sync->todoList_.empty());
+                } while (!sync->todoList_.empty() &&
+                         !sync->taskManager_.stopped());
             }
 
             sync->running_.cross();
