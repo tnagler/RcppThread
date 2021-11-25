@@ -38,15 +38,15 @@ class ThreadPool
 
     static ThreadPool& globalInstance()
     {
-// #ifdef _WIN32
-//         // Must leak resource, because windows + R deadlock otherwise. Memory
-//         // is released on shutdown.
-//         static auto ptr = new ThreadPool;
-//         return *ptr;
-// #else
+#ifdef _WIN32
+        // Must leak resource, because windows + R deadlock otherwise. Memory
+        // is released on shutdown.
+        static auto ptr = new ThreadPool;
+        return *ptr;
+#else
         static ThreadPool instance_;
         return instance_;
-// #endif
+#endif
     }
 
     template<class F, class... Args>
@@ -112,17 +112,11 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 //! destructor joins all threads if possible.
 inline ThreadPool::~ThreadPool() noexcept
 {
-#ifndef _WIN32
     taskManager_.stop();
-#endif
     for (auto& worker : workers_) {
-#ifndef _WIN32
         if (worker.joinable()) {
             worker.join();
         }
-#else
-        worker.detach();
-#endif
     }
 }
 
