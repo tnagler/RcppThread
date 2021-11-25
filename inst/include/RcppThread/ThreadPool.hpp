@@ -113,7 +113,6 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 inline ThreadPool::~ThreadPool() noexcept
 {
     sync_->taskManager_.stop();
-    sync_->running_.wait();
 }
 
 //! pushes jobs to the thread pool.
