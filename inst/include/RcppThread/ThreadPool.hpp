@@ -38,12 +38,12 @@ class ThreadPool
 
     static ThreadPool& globalInstance()
     {
-        static ThreadPool instance_;
+        static auto instance_ = new ThreadPool();
         std::atexit(globalCleanUp);
-        return instance_;
+        return *instance_;
     }
 
-    static void globalCleanUp() { globalInstance().~ThreadPool(); }
+    static void globalCleanUp() { delete &globalInstance(); }
 
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
