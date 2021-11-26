@@ -74,8 +74,6 @@ class ThreadPool
     std::vector<std::thread> workers_;
     quickpool::detail::TaskManager taskManager_;
     quickpool::TodoList todoList_{ 0 };
-
-    std::thread::id ctor_id_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -89,7 +87,6 @@ inline ThreadPool::ThreadPool()
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : nWorkers_{ nWorkers }
   , taskManager_{ nWorkers }
-  , ctor_id_{ std::this_thread::get_id() }
 {
     workers_.reserve(nWorkers);
     for (size_t id = 0; id < nWorkers; id++) {
@@ -101,13 +98,12 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
                     while (taskManager_.try_pop(task, id)) {
                         try {
                             task();
-                            todoList_.cross();
+                            taskManager_.report_success();
                         } catch (...) {
-                            todoList_.stop(std::current_exception());
-                            taskManager_.stop();
+                            taskManager_.report_fail(std::current_exception());
                         }
                     }
-                } while (!todoList_.empty() && !taskManager_.stopped());
+                } while (!taskManager_.done());
             }
         });
     }
@@ -139,7 +135,6 @@ ThreadPool::push(F&& f, Args&&... args)
         f(args...); // if there are no workers, do the job in the main
                     // thread
     } else {
-        todoList_.add();
         taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     }
@@ -150,7 +145,7 @@ ThreadPool::push(F&& f, Args&&... args)
 //! @param args a comma-seperated list of the other arguments that shall
 //!   be passed to `f`.
 //! @return an `std::shared_future`, where the user can get the result and
-//!   rethrow the catched exceptions.
+//!   rethrow exceptions.
 template<class F, class... Args>
 auto
 ThreadPool::pushReturn(F&& f, Args&&... args)
@@ -254,17 +249,20 @@ ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    if (std::this_thread::get_id() != ctor_id_) {
-        // Only the thread thread that constructed the pool can wait.
+    if (!taskManager_.called_from_owner_thread()) {
+        // Only the thread that constructed the pool can wait.
         return;
     }
 
-    while (!todoList_.empty()) {
-        todoList_.wait(50);
+    while (!taskManager_.done()) {
+        taskManager_.wait_for_finish(100);
         Rcout << "";
         checkUserInterrupt();
     }
+
+    // release potentially pending msgs and exception
     Rcout << "";
+    taskManager_.rethrow_exception();
 }
 
 //! waits for all jobs to finish and joins all threads.

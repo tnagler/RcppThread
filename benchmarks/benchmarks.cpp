@@ -260,3 +260,13 @@ benchKendall(std::vector<int> ns, size_t d, double min_sec = 10)
 
     return times;
 }
+
+// [[Rcpp::export]]
+void
+pool_err()
+{
+    RcppThread::parallelFor(
+      0, 10, [](int i) { RcppThread::Rcout << i << "\n"; });
+    RcppThread::parallelFor(
+      0, 1, [](int i) { throw std::runtime_error("test error"); });
+}
