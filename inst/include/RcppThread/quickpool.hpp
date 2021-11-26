@@ -202,39 +202,22 @@ class TaskQueue
             std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
             if (!lk)
                 return false;
-            this->push_unsafe(std::forward<Task>(task));
+            auto b = bottom_.load(m_relaxed);
+            auto t = top_.load(m_acquire);
+            RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
+
+            if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
+                // buffer is full, create enlarged copy before continuing
+                old_buffers_.emplace_back(
+                  exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
+                buffer_.store(buf_ptr, m_relaxed);
+            }
+
+            buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
+            bottom_.store(b + 1, m_release);
         }
         cv_.notify_one();
         return true;
-    }
-
-    //! pushes a task to the bottom of the queue; enlarges the queue if full.
-    void force_push(Task&& task)
-    {
-        {
-            // must hold lock in case of multiple producers
-            std::lock_guard<std::mutex> lk(mutex_);
-            this->push_unsafe(std::forward<Task>(task));
-        }
-        cv_.notify_one();
-    }
-
-    //! pushes a task without locking the queue (enough for single producer)
-    void push_unsafe(Task&& task)
-    {
-        auto b = bottom_.load(m_relaxed);
-        auto t = top_.load(m_acquire);
-        RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
-
-        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
-            // buffer is full, create enlarged copy before continuing
-            old_buffers_.emplace_back(
-              exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
-            buffer_.store(buf_ptr, m_relaxed);
-        }
-
-        buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
-        bottom_.store(b + 1, m_release);
     }
 
     //! pops a task from the top of the queue; returns false if lost race.
@@ -281,7 +264,7 @@ class TaskQueue
 
     std::mutex mutex_;
     std::condition_variable cv_;
-    std::atomic<bool> stopped_{ false };
+    bool stopped_{ false };
 
     // convenience aliases
     static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
@@ -309,11 +292,8 @@ struct TaskManager
     {
         if (stopped_)
             return;
-        for (size_t count = 0; count < num_queues_ * 20; count++) {
-            if (queues_[push_idx_++ % num_queues_].try_push(task))
-                return;
-        }
-        queues_[push_idx_++ % num_queues_].force_push(task);
+        while (!stopped_ && !queues_[push_idx_++ % num_queues_].try_push(task))
+            continue; // spin until success
     }
 
     template<typename Task>
