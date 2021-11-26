@@ -157,21 +157,15 @@ class RingBuffer
     size_t mask_;
 };
 
-// exchange is not available in C++11, use implementatino from
-// https://en.cppreference.com/w/cpp/utility/exchange
-template<class T>
-T
-exchange(T& obj, T&& new_value) noexcept
-{
-    T old_value = std::move(obj);
-    obj = std::forward<T>(new_value);
-    return old_value;
-}
-
 //! A multi-producer, multi-consumer queue; pops are lock free.
 class TaskQueue
 {
+    // convenience aliases
     using Task = std::function<void()>;
+    static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
+    static constexpr std::memory_order m_acquire = std::memory_order_acquire;
+    static constexpr std::memory_order m_release = std::memory_order_release;
+    static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
 
   public:
     //! constructs the queue with a given capacity.
@@ -214,8 +208,9 @@ class TaskQueue
 
             if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
                 // buffer is full, create enlarged copy before continuing
-                old_buffers_.emplace_back(
-                  exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
+                auto old_buf = buf_ptr;
+                buf_ptr = std::move(buf_ptr->enlarged_copy(b, t));
+                old_buffers_.emplace_back(old_buf);
                 buffer_.store(buf_ptr, m_relaxed);
             }
 
@@ -247,12 +242,14 @@ class TaskQueue
         return false; // queue is empty or lost race
     }
 
+    //! waits for tasks or stop signal.
     void wait()
     {
         std::unique_lock<std::mutex> lk(mutex_);
         cv_.wait(lk, [this] { return !this->empty() || stopped_; });
     }
 
+    //! stops the queue and wakes up all workers waiting for jobs.
     void stop()
     {
         {
@@ -271,12 +268,6 @@ class TaskQueue
     std::mutex mutex_;
     std::condition_variable cv_;
     bool stopped_{ false };
-
-    // convenience aliases
-    static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
-    static constexpr std::memory_order m_acquire = std::memory_order_acquire;
-    static constexpr std::memory_order m_release = std::memory_order_release;
-    static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
 };
 
 //! Task manager based on work stealing
