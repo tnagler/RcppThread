@@ -450,8 +450,15 @@ class ThreadPool
     //! @brief returns a reference to the global thread pool instance.
     static ThreadPool& global_instance()
     {
+#ifdef _WIN32
+        // Must leak resource, because windows + R deadlock otherwise. Memory
+        // is released on shutdown.
+        static auto ptr = new ThreadPool;
+        return *ptr;
+#else
         static ThreadPool instance_;
         return instance_;
+#endif
     }
 
     //! @brief pushes a job to the thread pool.

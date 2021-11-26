@@ -407,14 +407,16 @@ testThreadPoolExceptionHandling()
         }
     } catch (const std::exception& e) {
         if (e.what() != std::string("test error"))
-            throw e;
+            throw std::runtime_error("exception not rethrown");
     }
 
+    // poool should be functioning again
+    pool.push([] { throw std::runtime_error("test error"); });
     try {
         pool.wait();
     } catch (const std::exception& e) {
         if (e.what() != std::string("test error"))
-            throw e;
+            throw std::runtime_error("exception not rethrown");
     }
 }
 
