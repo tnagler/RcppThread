@@ -54,18 +54,21 @@ class TodoList
     //! constructs the todo list.
     //! @param num_tasks initial number of tasks.
     TodoList(size_t num_tasks = 0) noexcept
-      : num_tasks_(num_tasks)
+      : num_tasks_{ static_cast<int>(num_tasks) }
     {}
 
     //! adds tasks to the list.
     //! @param num_tasks add that many tasks to the list.
-    void add(size_t num_tasks = 1) noexcept { num_tasks_.fetch_add(num_tasks); }
+    void add(size_t num_tasks = 1) noexcept
+    {
+        num_tasks_.fetch_add(static_cast<int>(num_tasks));
+    }
 
     //! crosses tasks from the list.
     //! @param num_tasks cross that many tasks to the list.
     void cross(size_t num_tasks = 1)
     {
-        num_tasks_.fetch_sub(num_tasks);
+        num_tasks_.fetch_sub(static_cast<int>(num_tasks));
         if (num_tasks_ <= 0) {
             {
                 std::lock_guard<std::mutex> lk(mtx_); // must lock before signal
@@ -109,6 +112,13 @@ class TodoList
         cv_.notify_all();
     }
 
+    //! resets the todo list into initial state.
+    void reset() noexcept
+    {
+        exception_ptr_ = nullptr;
+        num_tasks_.store(0);
+    }
+
   private:
     detail::aligned_atomic<int> num_tasks_{ 0 };
     std::mutex mtx_;
@@ -128,7 +138,6 @@ class RingBuffer
       : buffer_{ std::unique_ptr<T[]>(new T[capacity]) }
       , capacity_{ capacity }
       , mask_{ capacity - 1 }
-
     {}
 
     size_t capacity() const { return capacity_; }
@@ -151,21 +160,15 @@ class RingBuffer
     size_t mask_;
 };
 
-// exchange is not available in C++11, use implementatino from
-// https://en.cppreference.com/w/cpp/utility/exchange
-template<class T>
-T
-exchange(T& obj, T&& new_value) noexcept
-{
-    T old_value = std::move(obj);
-    obj = std::forward<T>(new_value);
-    return old_value;
-}
-
 //! A multi-producer, multi-consumer queue; pops are lock free.
 class TaskQueue
 {
+    // convenience aliases
     using Task = std::function<void()>;
+    static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
+    static constexpr std::memory_order m_acquire = std::memory_order_acquire;
+    static constexpr std::memory_order m_release = std::memory_order_release;
+    static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
 
   public:
     //! constructs the queue with a given capacity.
@@ -202,39 +205,23 @@ class TaskQueue
             std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
             if (!lk)
                 return false;
-            this->push_unsafe(std::forward<Task>(task));
+            auto b = bottom_.load(m_relaxed);
+            auto t = top_.load(m_acquire);
+            RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
+
+            if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
+                // buffer is full, create enlarged copy before continuing
+                auto old_buf = buf_ptr;
+                buf_ptr = std::move(buf_ptr->enlarged_copy(b, t));
+                old_buffers_.emplace_back(old_buf);
+                buffer_.store(buf_ptr, m_relaxed);
+            }
+
+            buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
+            bottom_.store(b + 1, m_release);
         }
         cv_.notify_one();
         return true;
-    }
-
-    //! pushes a task to the bottom of the queue; enlarges the queue if full.
-    void force_push(Task&& task)
-    {
-        {
-            // must hold lock in case of multiple producers
-            std::lock_guard<std::mutex> lk(mutex_);
-            this->push_unsafe(std::forward<Task>(task));
-        }
-        cv_.notify_one();
-    }
-
-    //! pushes a task without locking the queue (enough for single producer)
-    void push_unsafe(Task&& task)
-    {
-        auto b = bottom_.load(m_relaxed);
-        auto t = top_.load(m_acquire);
-        RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
-
-        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
-            // buffer is full, create enlarged copy before continuing
-            old_buffers_.emplace_back(
-              exchange(buf_ptr, buf_ptr->enlarged_copy(b, t)));
-            buffer_.store(buf_ptr, m_relaxed);
-        }
-
-        buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
-        bottom_.store(b + 1, m_release);
     }
 
     //! pops a task from the top of the queue; returns false if lost race.
@@ -258,12 +245,14 @@ class TaskQueue
         return false; // queue is empty or lost race
     }
 
+    //! waits for tasks or stop signal.
     void wait()
     {
         std::unique_lock<std::mutex> lk(mutex_);
         cv_.wait(lk, [this] { return !this->empty() || stopped_; });
     }
 
+    //! stops the queue and wakes up all workers waiting for jobs.
     void stop()
     {
         {
@@ -281,46 +270,36 @@ class TaskQueue
 
     std::mutex mutex_;
     std::condition_variable cv_;
-    std::atomic<bool> stopped_{ false };
-
-    // convenience aliases
-    static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
-    static constexpr std::memory_order m_acquire = std::memory_order_acquire;
-    static constexpr std::memory_order m_release = std::memory_order_release;
-    static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
+    bool stopped_{ false };
 };
 
 //! Task manager based on work stealing
-struct TaskManager
+class TaskManager
 {
-    std::vector<TaskQueue> queues_;
-    size_t num_queues_;
-    detail::aligned_atomic<size_t> push_idx_{ 0 };
-    std::atomic<bool> stopped_{ false };
-    std::atomic_size_t todo_list_{ 0 };
-
+  public:
     explicit TaskManager(size_t num_queues)
       : queues_{ std::vector<TaskQueue>(num_queues) }
       , num_queues_{ num_queues }
+      , owner_id_{ std::this_thread::get_id() }
     {}
 
     template<typename Task>
     void push(Task&& task)
     {
-        if (stopped_)
-            return;
-        for (size_t count = 0; count < num_queues_ * 20; count++) {
+        rethrow_exception();
+        todo_list_.add();
+        while (status_ == Status::running) {
             if (queues_[push_idx_++ % num_queues_].try_push(task))
                 return;
         }
-        queues_[push_idx_++ % num_queues_].force_push(task);
     }
 
     template<typename Task>
     bool try_pop(Task& task, size_t worker_id = 0)
     {
-        if (stopped_)
+        if (status_ != Status::running)
             return false;
+
         for (size_t k = 0; k <= num_queues_; k++) {
             if (queues_[(worker_id + k) % num_queues_].try_pop(task))
                 return true;
@@ -328,16 +307,101 @@ struct TaskManager
         return false;
     }
 
-    void wait_for_jobs(size_t id) { queues_[id].wait(); }
+    void wait_for_jobs(size_t id)
+    {
+        if (status_ == Status::errored) {
+            // main thread may be waiting to reset the pool
+            std::lock_guard<std::mutex> lk(err_mtx_);
+            if (++num_waiting_ == num_queues_)
+                err_cv_.notify_all();
+        } else {
+            ++num_waiting_;
+        }
+
+        queues_[id].wait();
+        num_waiting_--;
+    }
+
+    //! @param millis if > 0: stops waiting after millis ms
+    void wait_for_finish(size_t millis = 0)
+    {
+        if (running())
+            todo_list_.wait(millis);
+        rethrow_exception();
+    }
+
+    bool called_from_owner_thread() const
+    {
+        return std::this_thread::get_id() == owner_id_;
+    }
+
+    bool done() const { return todo_list_.empty(); }
+
+    void report_success() { todo_list_.cross(); }
+
+    void report_fail(std::exception_ptr err_ptr)
+    {
+        if (!errored()) { // only catch first exception
+            std::lock_guard<std::mutex> lk(err_mtx_);
+            if (errored()) // double check
+                return;
+            err_ptr_ = err_ptr;
+            status_ = Status::errored;
+            todo_list_.stop();
+        }
+    }
 
     void stop()
     {
+        status_ = Status::stopped;
+        todo_list_.stop();
+        // Worker threads wait on queue-specific mutex -> notify all queues.
         for (auto& q : queues_)
             q.stop();
-        stopped_ = true;
     }
 
-    bool stopped() { return stopped_; }
+    void rethrow_exception()
+    {
+        if (called_from_owner_thread() && errored()) {
+            // wait for all threads to idle
+            std::unique_lock<std::mutex> lk(err_mtx_);
+            err_cv_.wait(lk, [this] { return num_waiting_ == num_queues_; });
+            lk.unlock();
+
+            // before throwing: restore defaults for potential future use
+            todo_list_.reset();
+            status_ = Status::running;
+            auto current_exception = err_ptr_;
+            err_ptr_ = nullptr;
+            std::rethrow_exception(current_exception);
+        }
+    }
+
+    bool running() { return status_ == Status::running; }
+    bool errored() { return status_ == Status::errored; }
+    bool stopped() { return status_ == Status::stopped; }
+
+  private:
+    std::vector<TaskQueue> queues_;
+    size_t num_queues_;
+    const std::thread::id owner_id_;
+
+    // task management
+    detail::aligned_atomic<size_t> num_waiting_{ 0 };
+    detail::aligned_atomic<size_t> push_idx_{ 0 };
+    TodoList todo_list_{ 0 };
+    std::exception_ptr err_ptr_{ nullptr };
+
+    // synchronization in case of error to make pool reusable
+    enum class Status
+    {
+        running,
+        errored,
+        stopped
+    };
+    std::atomic<Status> status_{ Status::running };
+    std::mutex err_mtx_;
+    std::condition_variable err_cv_;
 };
 
 } // end namespace detail
@@ -363,10 +427,10 @@ class ThreadPool
                 while (!task_manager_.stopped()) {
                     task_manager_.wait_for_jobs(id);
                     do {
-                        // inner while to save a few cash misses calling empty()
+                        // inner while to save cash misses when calling done()
                         while (task_manager_.try_pop(task, id))
                             this->execute_safely(task);
-                    } while (!todo_list_.empty());
+                    } while (!task_manager_.done());
                 }
             });
         }
@@ -389,8 +453,15 @@ class ThreadPool
     //! @brief returns a reference to the global thread pool instance.
     static ThreadPool& global_instance()
     {
+#ifdef _WIN32
+        // Must leak resource, because windows + R deadlock otherwise. Memory
+        // is released on shutdown.
+        static auto ptr = new ThreadPool;
+        return *ptr;
+#else
         static ThreadPool instance_;
         return instance_;
+#endif
     }
 
     //! @brief pushes a job to the thread pool.
@@ -424,17 +495,16 @@ class ThreadPool
     }
 
     //! @brief waits for all jobs currently running on the global thread pool.
-    void wait() { todo_list_.wait(); }
+    void wait() { task_manager_.wait_for_finish(); }
 
   private:
     void execute_safely(std::function<void()>& task)
     {
         try {
             task();
-            todo_list_.cross();
+            task_manager_.report_success();
         } catch (...) {
-            todo_list_.stop(std::current_exception());
-            task_manager_.stop();
+            task_manager_.report_fail(std::current_exception());
         }
     }
 

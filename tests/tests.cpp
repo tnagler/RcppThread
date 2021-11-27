@@ -396,19 +396,36 @@ testThreadPoolInterruptWait()
 void
 testThreadPoolExceptionHandling()
 {
-
     RcppThread::ThreadPool pool;
-    pool.push([] { throw std::runtime_error("test error"); });
-    for (size_t i = 0; i < 200; i++) {
-        pool.push(
-          [&] { std::this_thread::sleep_for(std::chrono::milliseconds(20)); });
+    // pool passes exceptions either via wait() or push()
+    std::exception_ptr eptr = nullptr;
+    try {
+        pool.push([] { throw std::runtime_error("test error"); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        for (size_t i = 0; i < 10; i++) {
+            pool.push([&] {});
+        }
+    } catch (...) {
+        eptr = std::current_exception();
     }
 
+    if (!eptr) {
+        throw std::runtime_error("exception not rethrown");
+    } else {
+        eptr = nullptr;
+    }
+
+    // poool should be functional again
+    pool.push([] { throw std::runtime_error("test error"); });
     try {
         pool.wait();
-    } catch (const std::exception& e) {
-        if (e.what() != std::string("test error"))
-            throw std::runtime_error("exception not rethrown");
+    } catch (...) {
+        eptr = std::current_exception();
+    }
+    if (!eptr) {
+        throw std::runtime_error("exception not rethrown");
+    } else {
+        eptr = nullptr;
     }
 }
 
@@ -417,14 +434,14 @@ void
 parallelForExceptionHandling()
 {
     try {
-        RcppThread::parallelFor(0, 200,  [&] (int i) {
+        RcppThread::parallelFor(0, 200, [&](int i) {
             if (i == 0)
                 throw std::runtime_error("test error");
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
         });
     } catch (const std::exception& e) {
         if (e.what() != std::string("test error"))
-            throw std::runtime_error("exception not rethrown");
+            throw e;
     }
 }
 
