@@ -54,18 +54,21 @@ class TodoList
     //! constructs the todo list.
     //! @param num_tasks initial number of tasks.
     TodoList(size_t num_tasks = 0) noexcept
-      : num_tasks_(num_tasks)
+      : num_tasks_{ static_cast<int>(num_tasks) }
     {}
 
     //! adds tasks to the list.
     //! @param num_tasks add that many tasks to the list.
-    void add(size_t num_tasks = 1) noexcept { num_tasks_.fetch_add(num_tasks); }
+    void add(size_t num_tasks = 1) noexcept
+    {
+        num_tasks_.fetch_add(static_cast<int>(num_tasks));
+    }
 
     //! crosses tasks from the list.
     //! @param num_tasks cross that many tasks to the list.
     void cross(size_t num_tasks = 1)
     {
-        num_tasks_.fetch_sub(num_tasks);
+        num_tasks_.fetch_sub(static_cast<int>(num_tasks));
         if (num_tasks_ <= 0) {
             {
                 std::lock_guard<std::mutex> lk(mtx_); // must lock before signal
