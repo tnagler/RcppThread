@@ -415,7 +415,7 @@ testThreadPoolExceptionHandling()
         eptr = nullptr;
     }
 
-    // poool should be functioning again
+    // poool should be functional again
     pool.push([] { throw std::runtime_error("test error"); });
     try {
         pool.wait();
