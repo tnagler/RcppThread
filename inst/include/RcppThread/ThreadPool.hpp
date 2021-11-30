@@ -91,7 +91,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
     workers_.reserve(nWorkers);
     for (size_t id = 0; id < nWorkers; id++) {
         workers_.emplace_back([this, id] {
-            std::function<void()> task;
+            quickpool::detail::Task task;
             while (!taskManager_.stopped()) {
                 taskManager_.wait_for_jobs(id);
                 do {
@@ -203,12 +203,12 @@ ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 {
     if (size == 0)
         return;
-    auto doBatch = [f](const Batch& b) {
+    auto doBatch = [f](Batch b) {
         for (int i = b.begin; i < b.end; i++)
             f(i);
     };
-    auto batches = createBatches(begin, size, nWorkers_, nBatches);
     auto pushJob = [=] {
+        auto batches = createBatches(begin, size, nWorkers_, nBatches);
         for (const auto& batch : batches)
             this->push(doBatch, batch);
     };
