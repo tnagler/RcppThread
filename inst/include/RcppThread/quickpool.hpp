@@ -23,6 +23,7 @@
 #include <exception>
 #include <functional>
 #include <future>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -31,6 +32,12 @@
 namespace quickpool {
 
 namespace detail {
+
+static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
+static constexpr std::memory_order m_acquire = std::memory_order_acquire;
+static constexpr std::memory_order m_release = std::memory_order_release;
+static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
+
 template<typename T>
 class aligned_atomic : public std::atomic<T>
 {
@@ -43,6 +50,246 @@ class aligned_atomic : public std::atomic<T>
     using TT = std::atomic<T>;
     char padding_[64 > sizeof(TT) ? 64 - sizeof(TT) : 1];
 };
+
+struct BlockBase
+{
+    virtual void free_one() = 0;
+};
+
+// a lot from
+// - https://devblogs.microsoft.com/oldnewthing/20200513-00/?p=103745
+// - https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749
+class Task
+{
+  public:
+    Task() = default;
+
+    template<typename T>
+    Task(T&& t)
+    {
+        this->store(std::forward<T>(t), typename callable<T>::is_small());
+    }
+
+    Task& operator=(Task&& other)
+    {
+        std::swap(mother_block_, other.mother_block_);
+        if (other.callable_ == other.storage()) {
+            callable_ = other.callable_->move_to(&storage_);
+            exchange(other.callable_, nullptr)->destroy();
+        } else if (other.callable_) {
+            callable_ = exchange(other.callable_, nullptr);
+        }
+        return *this;
+    }
+
+    template<typename T>
+    void set_task(T&& t)
+    {
+        this->reset();
+        this->store(std::forward<T>(t), typename callable<T>::is_small());
+    }
+
+    void set_mother_block(BlockBase* block) { mother_block_ = block; }
+
+    void operator()()
+    {
+        callable_->invoke();
+        this->reset();
+        mother_block_->free_one();
+    }
+
+    void reset()
+    {
+        if (callable_ != nullptr) {
+            if (callable_ != storage()) {
+                delete callable_;
+            } else {
+                callable_->destroy();
+            }
+            callable_ = nullptr;
+        }
+    }
+
+    ~Task() { this->reset(); }
+
+  private:
+    template<class T, class U = T>
+    T exchange(T& obj, U&& new_value) noexcept
+    {
+        T old_value = std::move(obj);
+        obj = std::forward<U>(new_value);
+        return old_value;
+    }
+
+    void* storage() { return static_cast<void*>(std::addressof(storage_)); }
+
+    template<typename T>
+    void store(T&& t, std::true_type)
+    {
+        callable_ = new (storage()) callable<T>(std::forward<T>(t));
+    }
+
+    template<typename T>
+    void store(T&& t, std::false_type)
+    {
+        callable_ = new callable<T>(std::forward<T>(t));
+    }
+
+    struct callable_base
+    {
+        callable_base() = default;
+        virtual void invoke() = 0;
+        virtual void destroy() = 0;
+        virtual callable_base* move_to(void* address) = 0;
+        virtual ~callable_base() {}
+    };
+
+    static constexpr size_t storage_size_ =
+      64 - sizeof(callable_base*) - sizeof(BlockBase*);
+
+    template<typename F>
+    struct callable : callable_base
+    {
+        using is_small =
+          typename std::integral_constant<bool,
+                                          sizeof(F) <= storage_size_>::type;
+
+        F f_;
+
+        callable(F&& f)
+          : f_(std::move(f))
+        {}
+
+        callable& operator=(callable&& other) { f_ = std::move(other.f_); }
+        callable_base* move_to(void* address)
+        {
+            return new (address) callable(std::move(f_));
+        }
+
+        void invoke() override { f_(); }
+        void destroy() override { f_.~F(); }
+        ~callable() override { destroy(); }
+    };
+
+    char storage_[storage_size_];
+    callable_base* callable_{ nullptr };
+    BlockBase* mother_block_{ nullptr };
+};
+
+// TaskBlock of task slots.
+struct TaskBlock : BlockBase
+{
+    detail::aligned_atomic<uint16_t> num_freed{ 0 };
+    uint16_t idx{ 0 };
+    TaskBlock* next{ nullptr };
+    TaskBlock* prev{ nullptr };
+    const size_t size;
+
+    std::unique_ptr<Task[]> slots;
+
+    TaskBlock(uint16_t size = 1000)
+      : size{ size }
+      , slots{ std::unique_ptr<Task[]>(new Task[size]) }
+    {
+        for (size_t i = 0; i < size; ++i) {
+            slots[i].set_mother_block(this);
+        }
+    }
+
+    Task* get_slot()
+    {
+        if (idx++ < size) {
+            return &slots[idx++];
+        } else {
+            return nullptr;
+        }
+    }
+
+    void free_one() { num_freed.fetch_add(1, m_release); }
+
+    void free_all()
+    {
+        idx = 0;
+        num_freed.store(0, m_relaxed);
+    }
+};
+
+struct TaskAllocator
+{
+    TaskBlock* head;
+    TaskBlock* tail;
+    const size_t block_size;
+
+    TaskAllocator(size_t block_size = 1000)
+      : head{ new TaskBlock(block_size) }
+      , tail{ head }
+      , block_size{ block_size }
+    {}
+
+    template<typename T>
+    Task* allocate(T&& task)
+    {
+        Task* slot = get_slot();
+        slot->set_task(std::move(task));
+        return slot;
+    }
+
+    Task* get_slot()
+    {
+        // try to get memory slot in current block.
+        if (auto slot = head->get_slot())
+            return slot;
+
+        // see if there's a free block ahead
+        if (head->next != nullptr) {
+            head = head->next;
+            return head->get_slot();
+        }
+
+        // see if there are free'd blocks to collect
+        auto old_tail = tail;
+        while (tail->num_freed == block_size) {
+            tail = tail->next;
+        }
+        if (tail != old_tail) {
+            tail->prev->next = nullptr; // detach range [old_tail, tail)
+            tail->prev = nullptr;       // ...
+            this->set_head(old_tail);   // move to head
+            return head->get_slot();
+        }
+
+        // create a new block and put and end of list.
+        this->set_head(new TaskBlock(block_size));
+        return head->get_slot();
+    }
+
+    void set_head(TaskBlock* block)
+    {
+        block->prev = head;
+        head->next = block;
+        head = block;
+    }
+
+    void reset()
+    {
+        auto block = head;
+        do {
+            block->free_all();
+            block = block->next;
+        } while (block != nullptr);
+        head = tail;
+    }
+
+    ~TaskAllocator()
+    {
+        while (tail->next) {
+            tail = tail->next;
+            delete tail->prev;
+        }
+        delete tail;
+    }
+};
+
 }
 
 //! @brief Todo list - a synchronization primitive.
@@ -61,15 +308,15 @@ class TodoList
     //! @param num_tasks add that many tasks to the list.
     void add(size_t num_tasks = 1) noexcept
     {
-        num_tasks_.fetch_add(static_cast<int>(num_tasks));
+        num_tasks_.fetch_add(static_cast<int>(num_tasks), detail::m_release);
     }
 
     //! crosses tasks from the list.
     //! @param num_tasks cross that many tasks to the list.
     void cross(size_t num_tasks = 1)
     {
-        num_tasks_.fetch_sub(static_cast<int>(num_tasks));
-        if (num_tasks_ <= 0) {
+        num_tasks_.fetch_sub(static_cast<int>(num_tasks), detail::m_release);
+        if (num_tasks_.load(detail::m_acquire) <= 0) {
             {
                 std::lock_guard<std::mutex> lk(mtx_); // must lock before signal
             }
@@ -78,7 +325,10 @@ class TodoList
     }
 
     //! checks whether list is empty.
-    bool empty() const noexcept { return num_tasks_ <= 0; }
+    bool empty() const noexcept
+    {
+        return num_tasks_.load(detail::m_acquire) <= 0;
+    }
 
     //! waits for the list to be empty.
     //! @param millis if > 0; waiting aborts after waiting that many
@@ -146,7 +396,7 @@ class RingBuffer
 
     T get_entry(size_t i) const { return buffer_[i & mask_]; }
 
-    RingBuffer<T>* enlarged_copy(size_t bottom, size_t top) const
+    RingBuffer* enlarged_copy(size_t bottom, size_t top) const
     {
         RingBuffer<T>* new_buffer = new RingBuffer{ 2 * capacity_ };
         for (size_t i = top; i != bottom; ++i)
@@ -163,12 +413,6 @@ class RingBuffer
 //! A multi-producer, multi-consumer queue; pops are lock free.
 class TaskQueue
 {
-    // convenience aliases
-    using Task = std::function<void()>;
-    static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
-    static constexpr std::memory_order m_acquire = std::memory_order_acquire;
-    static constexpr std::memory_order m_release = std::memory_order_release;
-    static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
 
   public:
     //! constructs the queue with a given capacity.
@@ -177,17 +421,10 @@ class TaskQueue
       : buffer_{ new RingBuffer<Task*>(capacity) }
     {}
 
-    ~TaskQueue() noexcept
-    {
-        // must free memory allocated by push(), but not deallocated by pop()
-        auto buf_ptr = buffer_.load();
-        for (int i = top_; i < bottom_.load(m_relaxed); ++i)
-            delete buf_ptr->get_entry(i);
-        delete buf_ptr;
-    }
-
     TaskQueue(TaskQueue const& other) = delete;
     TaskQueue& operator=(TaskQueue const& other) = delete;
+
+    ~TaskQueue() { delete buffer_.load(); }
 
     //! checks if queue is empty.
     bool empty() const
@@ -197,7 +434,8 @@ class TaskQueue
 
     //! pushes a task to the bottom of the queue; returns false if queue is
     //! currently locked; enlarges the queue if full.
-    bool try_push(Task&& task)
+    template<typename T>
+    bool try_push(T&& task)
     {
         {
             // must hold lock in case of multiple producers, abort if already
@@ -217,7 +455,7 @@ class TaskQueue
                 buffer_.store(buf_ptr, m_relaxed);
             }
 
-            buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
+            buf_ptr->set_entry(b, mempool_.allocate(std::forward<T>(task)));
             bottom_.store(b + 1, m_release);
         }
         cv_.notify_one();
@@ -238,7 +476,6 @@ class TaskQueue
 
             if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
                 task = std::move(*task_ptr); // won race, get task
-                delete task_ptr; // fre memory allocated in push_unsafe()
                 return true;
             }
         }
@@ -262,11 +499,20 @@ class TaskQueue
         cv_.notify_all();
     }
 
+    void reset()
+    {
+        mempool_.reset();
+        top_.store(0);
+        bottom_.store(0);
+    }
+
   private:
     detail::aligned_atomic<int> top_{ 0 };
     detail::aligned_atomic<int> bottom_{ 0 };
+
     std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
     std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
+    detail::TaskAllocator mempool_;
 
     std::mutex mutex_;
     std::condition_variable cv_;
@@ -278,7 +524,7 @@ class TaskManager
 {
   public:
     explicit TaskManager(size_t num_queues)
-      : queues_{ std::vector<TaskQueue>(num_queues) }
+      : queues_{ new TaskQueue[num_queues] }
       , num_queues_{ num_queues }
       , owner_id_{ std::this_thread::get_id() }
     {}
@@ -319,7 +565,7 @@ class TaskManager
         }
 
         queues_[id].wait();
-        num_waiting_--;
+        --num_waiting_;
     }
 
     //! @param millis if > 0: stops waiting after millis ms
@@ -356,8 +602,8 @@ class TaskManager
         status_ = Status::stopped;
         todo_list_.stop();
         // Worker threads wait on queue-specific mutex -> notify all queues.
-        for (auto& q : queues_)
-            q.stop();
+        for (int i = 0; i < num_queues_; ++i)
+            queues_[i].stop();
     }
 
     void rethrow_exception()
@@ -370,6 +616,8 @@ class TaskManager
 
             // before throwing: restore defaults for potential future use
             todo_list_.reset();
+            for (int i = 0; i < num_queues_; ++i)
+                queues_[i].reset();
             status_ = Status::running;
             auto current_exception = err_ptr_;
             err_ptr_ = nullptr;
@@ -382,7 +630,7 @@ class TaskManager
     bool stopped() { return status_ == Status::stopped; }
 
   private:
-    std::vector<TaskQueue> queues_;
+    std::unique_ptr<TaskQueue[]> queues_;
     size_t num_queues_;
     const std::thread::id owner_id_;
 
@@ -423,7 +671,7 @@ class ThreadPool
     {
         for (size_t id = 0; id < n_workers; ++id) {
             workers_.emplace_back([this, id] {
-                std::function<void()> task;
+                detail::Task task;
                 while (!task_manager_.stopped()) {
                     task_manager_.wait_for_jobs(id);
                     do {
@@ -472,7 +720,6 @@ class ThreadPool
     {
         if (workers_.size() == 0)
             return f(args...);
-        todo_list_.add();
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
     }
@@ -498,7 +745,8 @@ class ThreadPool
     void wait() { task_manager_.wait_for_finish(); }
 
   private:
-    void execute_safely(std::function<void()>& task)
+    template<typename Task>
+    void execute_safely(Task& task)
     {
         try {
             task();
@@ -509,7 +757,6 @@ class ThreadPool
     }
 
     detail::TaskManager task_manager_;
-    TodoList todo_list_{ 0 };
     std::vector<std::thread> workers_;
 };
 
