@@ -48,10 +48,10 @@ class ThreadPool
     void map(F f, I& items);
 
     template<class F>
-    inline void parallelFor(int begin, size_t end, F&& f, size_t nBatches = 0);
+    void parallelFor(int begin, size_t end, F&& f, size_t nBatches = 0);
 
     template<class F, class I>
-    inline void parallelForEach(I& items, F&& f, size_t nBatches = 0);
+    void parallelForEach(I& items, F&& f, size_t nBatches = 0);
 
     void wait();
     void join();
