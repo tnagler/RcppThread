@@ -78,17 +78,9 @@ class BenchMethods
         pool_.wait();
     }
 
-    // void parallelFor(int n)
-    // {
-    //     pool_.parallelFor(0, n, func_);
-    //     pool_.wait();
-    // }
-
     void parallelFor(int n)
     {
-        RcppThread::ThreadPool pool;
-        pool.parallelFor(0, n, func_);
-        pool.join();
+        RcppThread::parallelFor(0, n, func_);
     }
 
     void OpenMP(int n)
@@ -142,7 +134,10 @@ benchEmpty(Rcpp::IntegerVector ns, double min_sec = 10)
 {
     Rcpp::NumericMatrix times(ns.size(), 5);
     for (int i = 0; i < ns.size(); i++) {
-        times(i, Rcpp::_) = benchMark([](int i) {}, ns[i], min_sec);
+        times(i, Rcpp::_) = benchMark([](int j)
+            {
+            // std::cout << "task" << j << std::endl;
+            }, ns[i], min_sec);
     }
 
     colnames(times) = Rcpp::CharacterVector{

@@ -31,24 +31,12 @@ class ThreadPool
     ThreadPool();
     explicit ThreadPool(size_t nWorkers);
 
-    ~ThreadPool() noexcept;
+    ~ThreadPool();
 
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
-    //! Access to the global thread pool instance.
-    static ThreadPool& globalInstance()
-    {
-#ifdef _WIN32
-        // Must leak resource, because windows + R deadlock otherwise. Memory
-        // is released on shutdown.
-        static auto ptr = new ThreadPool;
-        return *ptr;
-#else
-        static ThreadPool instance_;
-        return instance_;
-#endif
-    }
+    static ThreadPool& globalInstance();
 
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
@@ -73,7 +61,6 @@ class ThreadPool
     const size_t nWorkers_;
     std::vector<std::thread> workers_;
     quickpool::detail::TaskManager taskManager_;
-    quickpool::TodoList todoList_{ 0 };
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -110,7 +97,7 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 }
 
 //! destructor joins all threads if possible.
-inline ThreadPool::~ThreadPool() noexcept
+inline ThreadPool::~ThreadPool()
 {
     taskManager_.stop();
     for (auto& worker : workers_) {
@@ -118,6 +105,20 @@ inline ThreadPool::~ThreadPool() noexcept
             worker.join();
         }
     }
+}
+
+//! Access to the global thread pool instance.
+inline ThreadPool& ThreadPool::globalInstance()
+{
+#ifdef _WIN32
+    // Must leak resource, because windows + R deadlock otherwise. Memory
+    // is released on shutdown.
+    static auto ptr = new ThreadPool;
+    return *ptr;
+#else
+    static ThreadPool instance_;
+    return instance_;
+#endif
 }
 
 //! pushes jobs to the thread pool.
@@ -132,8 +133,7 @@ void
 ThreadPool::push(F&& f, Args&&... args)
 {
     if (nWorkers_ == 0) {
-        f(args...); // if there are no workers, do the job in the main
-                    // thread
+        f(args...); // if there are no workers, do job in main thread
     } else {
         taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
@@ -167,11 +167,11 @@ template<class F, class I>
 void
 ThreadPool::map(F&& f, I&& items)
 {
-    auto pushJob = [=] {
+    auto pushJob = [&] {
         for (auto&& item : items)
             this->push(f, item);
     };
-    this->push(pushJob);
+    this->pushReturn(pushJob).wait();
 }
 
 //! computes an index-based for loop in parallel batches.
@@ -203,14 +203,16 @@ ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 {
     if (size == 0)
         return;
-    auto doBatch = [f](Batch b) {
+    auto ff = std::bind(f, std::placeholders::_1);
+    const auto doBatch = [ff](Batch b) {
         for (int i = b.begin; i < b.end; i++)
-            f(i);
+            ff(i);
     };
     auto pushJob = [=] {
-        auto batches = createBatches(begin, size, nWorkers_, nBatches);
-        for (const auto& batch : batches)
+        auto batches = createBatches(begin, size, workers_.size(), nBatches);
+        for (const auto& batch : batches) {
             this->push(doBatch, batch);
+        }
     };
     this->push(pushJob);
 }

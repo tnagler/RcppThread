@@ -142,7 +142,7 @@ testThreadPoolParallelFor()
         x[i] = 2 * x[i];
     };
 
-    pool.parallelFor(0, x.size(), dummy, 1);
+    pool.parallelFor(0, x.size(), dummy);
     pool.join();
 
     size_t count_wrong = 0;
