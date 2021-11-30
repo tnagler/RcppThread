@@ -45,7 +45,7 @@ class ThreadPool
     auto pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>;
 
     template<class F, class I>
-    void map(F&& f, I&& items);
+    void map(F f, I& items);
 
     template<class F>
     inline void parallelFor(int begin, size_t end, F&& f, size_t nBatches = 0);
@@ -165,10 +165,10 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
 //!  `std::end(I)` must be defined).
 template<class F, class I>
 void
-ThreadPool::map(F&& f, I&& items)
+ThreadPool::map(F f, I& items)
 {
     auto pushJob = [&] {
-        for (auto&& item : items)
+        for (auto& item : items)
             this->push(f, item);
     };
     this->pushReturn(pushJob).wait();
