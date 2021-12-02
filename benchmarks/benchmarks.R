@@ -28,40 +28,40 @@ plot_df <- function(df) {
 res <- benchEmpty(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchEmptyThread.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchEmptyThread.pdf"), width = 5.5, height = 3)
 
 
 res <- benchSqrt(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchSqrt.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 5.5, height = 3)
 
 
 res <- benchSqrtWrite(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchSqrtWrite.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 5.5, height = 3)
 
 
 res <- benchKDE(ns, 10, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchKDE-10.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKDE-10.pdf"), width = 5.5, height = 3)
 
 
 res <- benchKDE(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchKDE-100.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKDE-100.pdf"), width = 5.5, height = 3)
 
 
 res <- benchKendall(ns, 10, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchKendall-10.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKendall-10.pdf"), width = 5.5, height = 3)
 
 
 res <- benchKendall(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df)
-ggsave("benchKendall-100.pdf", width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKendall-100.pdf"), width = 5.5, height = 3)
