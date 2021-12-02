@@ -18,113 +18,277 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <exception>
 #include <functional>
 #include <future>
 #include <mutex>
+#include <numeric>
 #include <thread>
 #include <vector>
 
 //! quickpool namespace
 namespace quickpool {
 
-namespace detail {
-template<typename T>
-class aligned_atomic : public std::atomic<T>
-{
-  public:
-    explicit aligned_atomic(T value)
-      : std::atomic<T>(value)
-    {}
+namespace mem {
 
-  private:
-    using TT = std::atomic<T>;
-    char padding_[64 > sizeof(TT) ? 64 - sizeof(TT) : 1];
-};
+//! convenience definitions
+static constexpr std::memory_order relaxed = std::memory_order_relaxed;
+static constexpr std::memory_order acquire = std::memory_order_acquire;
+static constexpr std::memory_order release = std::memory_order_release;
+static constexpr std::memory_order seq_cst = std::memory_order_seq_cst;
+
+namespace padding_impl {
+
+// Padding char[]s always must hold at least one char. We do some template
+// metaprogramming to ensure padding is only added if required.
+
+constexpr size_t
+mod(size_t a, size_t b)
+{
+    return a - b * (a / b);
 }
 
-//! @brief Todo list - a synchronization primitive.
-//! @details Add a task with `add()`, cross it off with `cross()`, and wait for
-//! all tasks to complete with `wait()`.
-class TodoList
+template<class T, size_t Align>
+struct padding_bytes
+{
+    static constexpr size_t free_space =
+      Align - mod(sizeof(std::atomic<T>), Align);
+    static constexpr size_t padding_size_ = free_space > 1 ? free_space : 1;
+    char padding_[padding_size_ + sizeof(void*)];
+};
+
+struct empty_struct
+{};
+
+template<class T, size_t Align>
+struct padding
+  : std::conditional<mod(sizeof(std::atomic<T>), Align) != 0,
+                     padding_bytes<T, Align>,
+                     empty_struct>::type
+{};
+
+} // end namespace padding_impl
+
+template<class T, size_t Align = 64>
+struct alignas(Align) aligned_atomic
+  : public std::atomic<T>
+  , private padding_impl::padding<T, Align>
 {
   public:
-    //! constructs the todo list.
-    //! @param num_tasks initial number of tasks.
-    TodoList(size_t num_tasks = 0) noexcept
-      : num_tasks_{ static_cast<int>(num_tasks) }
+    aligned_atomic() noexcept = default;
+
+    aligned_atomic(T desired) noexcept
+      : std::atomic<T>(desired)
     {}
 
-    //! adds tasks to the list.
-    //! @param num_tasks add that many tasks to the list.
-    void add(size_t num_tasks = 1) noexcept
+    // Assignment operators have been deleted, must redefine.
+    T operator=(T desired) noexcept
     {
-        num_tasks_.fetch_add(static_cast<int>(num_tasks));
+        this->store(desired);
+        return desired;
     }
 
-    //! crosses tasks from the list.
-    //! @param num_tasks cross that many tasks to the list.
-    void cross(size_t num_tasks = 1)
+    T operator=(T desired) volatile noexcept
     {
-        num_tasks_.fetch_sub(static_cast<int>(num_tasks));
-        if (num_tasks_ <= 0) {
-            {
-                std::lock_guard<std::mutex> lk(mtx_); // must lock before signal
-            }
-            cv_.notify_all();
+        this->store(desired);
+        return desired;
+    }
+
+    // The alloc/dealloc mechanism is pretty much
+    // https://www.boost.org/doc/libs/1_76_0/boost/align/detail/aligned_alloc.hpp
+
+    static void* operator new(size_t count) noexcept
+    {
+        // Make sure alignment is at least that of void*.
+        constexpr size_t alignment =
+          (Align >= alignof(void*)) ? Align : alignof(void*);
+
+        // Allocate enough space required for object and a void*.
+        size_t space = count + alignment + sizeof(void*);
+        void* p = std::malloc(space);
+        if (p == nullptr) {
+            return nullptr;
+        }
+
+        // Shift pointer to leave space for void*.
+        void* p_algn = static_cast<char*>(p) + sizeof(void*);
+        space -= sizeof(void*);
+
+        // Shift pointer further to ensure proper alignment.
+        (void)std::align(alignment, count, p_algn, space);
+
+        // Store unaligned pointer with offset sizeof(void*) before aligned
+        // location. Later we'll know where to look for the pointer telling
+        // us where to free what we malloc()'ed above.
+        *(static_cast<void**>(p_algn) - 1) = p;
+
+        return p_algn;
+    }
+
+    static void operator delete(void* ptr)
+    {
+        if (ptr) {
+            std::free(*(static_cast<void**>(ptr) - 1));
         }
     }
+};
 
-    //! checks whether list is empty.
-    bool empty() const noexcept { return num_tasks_ <= 0; }
+// fast atomic with no memory ordering guarantees
+template<typename T>
+struct relaxed_atomic : public aligned_atomic<T>
+{
+    relaxed_atomic(T value)
+      : mem::aligned_atomic<T>(value)
+    {}
 
-    //! waits for the list to be empty.
-    //! @param millis if > 0; waiting aborts after waiting that many
-    //! milliseconds.
-    void wait(size_t millis = 0)
+    operator T() const noexcept { return this->load(mem::relaxed); }
+
+    T operator=(T desired) noexcept
     {
-        std::this_thread::yield();
-        auto wake_up = [this] { return (num_tasks_ <= 0) || exception_ptr_; };
-        std::unique_lock<std::mutex> lk(mtx_);
-        if (millis == 0) {
-            cv_.wait(lk, wake_up);
-        } else {
-            cv_.wait_for(lk, std::chrono::milliseconds(millis), wake_up);
-        }
-        if (exception_ptr_)
-            std::rethrow_exception(exception_ptr_);
+        this->store(desired, mem::relaxed);
+        return desired;
     }
+};
 
-    //! stops the list; it will forever look empty from now on.
-    //! @param eptr (optional) pointer to an active exception to be rethrown by
-    //! a waiting thread; typically retrieved from `std::current_exception()`.
-    void stop(std::exception_ptr eptr = nullptr) noexcept
+}
+
+namespace loop {
+
+struct Range
+{
+    Range(int begin, int end)
+      : pos{ begin }
+      , end{ end }
+    {}
+
+    Range(const Range& other)
+      : pos{ other.pos.load() }
+      , end{ other.end.load() }
+    {}
+
+    bool empty() const { return end - pos < 1; }
+    int size() const { return end - pos; }
+
+    bool try_local_work(int& p)
     {
+        p = pos + 1;
+        pos = p;
+        std::atomic_thread_fence(mem::seq_cst);
+        if (p < end) {
+            p = p - 1;
+            return true;
+        }
+        // conflict detected: rollback under lock
+        pos = p - 1;
         {
-            std::lock_guard<std::mutex> lk(mtx_);
-            // Some threads may add() or cross() after we stop. The large
-            // negative number prevents num_tasks_ from becoming positive again.
-            num_tasks_.store(std::numeric_limits<int>::min() / 2);
-            exception_ptr_ = eptr;
+            std::lock_guard<std::mutex> lk(mutex);
+            p = pos;
+            if (p < end)
+                pos = p + 1;
         }
-        cv_.notify_all();
+
+        if (p < pos)
+            return true;
+        return false;
     }
 
-    //! resets the todo list into initial state.
-    void reset() noexcept
+    bool try_steal_range(Range& other_range)
     {
-        exception_ptr_ = nullptr;
-        num_tasks_.store(0);
+        if (this == &other_range)
+            return false;
+        if (other_range.end < other_range.pos)
+            return false;
+
+        int e, chunk_size;
+        {
+            std::unique_lock<std::mutex> lk_other(other_range.mutex,
+                                                  std::try_to_lock);
+            if (!lk_other) {
+                return false;
+            }
+            e = other_range.end;
+            chunk_size = (e - other_range.pos) / 2;
+            e = e - chunk_size;
+            other_range.end = e;
+            std::atomic_thread_fence(std::memory_order_acq_rel);
+            if (e <= other_range.pos) {
+                // rollback and abort
+                other_range.end = e + chunk_size;
+                return false;
+            }
+        }
+
+        std::lock_guard<std::mutex> lk_self(mutex);
+        pos = e;
+        end = e + chunk_size;
+
+        return true;
+    }
+
+    mem::relaxed_atomic<int> pos;
+    mem::relaxed_atomic<int> end;
+    std::mutex mutex;
+};
+
+class Ranges
+{
+  public:
+    Ranges(int begin, int end, size_t num_ranges)
+    {
+        auto num_tasks = end - begin;
+        ranges_.reserve(num_ranges);
+        for (size_t i = 0; i < num_ranges; i++) {
+            ranges_.emplace_back(begin + num_tasks * i / num_ranges,
+                                 begin + num_tasks * (i + 1) / num_ranges);
+        }
+    }
+
+    Range& operator[](size_t index) { return ranges_[index]; }
+
+    bool seems_empty() const
+    {
+        for (const auto& range : ranges_) {
+            if (!range.empty())
+                return false;
+        }
+        return true;
+    }
+
+    std::vector<size_t> range_order() const
+    {
+        std::vector<size_t> range_sizes;
+        range_sizes.reserve(ranges_.size());
+        for (const auto& range : ranges_)
+            range_sizes.push_back(range.size());
+
+        std::vector<size_t> order(ranges_.size());
+        std::iota(order.begin(), order.end(), 0);
+        std::sort(order.begin(), order.end(), [&](size_t i, size_t j) {
+            return range_sizes[i] > range_sizes[j];
+        });
+
+        return order;
+    }
+
+    void distribute_to(Range& range)
+    {
+        const auto n = ranges_.size();
+        const auto order = range_order();
+        size_t idx = 0;
+        while (!seems_empty()) {
+            if (range.try_steal_range(ranges_[order[idx++ % n]]))
+                break;
+        }
     }
 
   private:
-    detail::aligned_atomic<int> num_tasks_{ 0 };
-    std::mutex mtx_;
-    std::condition_variable cv_;
-    std::exception_ptr exception_ptr_{ nullptr };
+    std::vector<Range> ranges_;
 };
+
+} // end namespace loop
 
 //! Implementation details
 namespace detail {
@@ -165,10 +329,6 @@ class TaskQueue
 {
     // convenience aliases
     using Task = std::function<void()>;
-    static constexpr std::memory_order m_relaxed = std::memory_order_relaxed;
-    static constexpr std::memory_order m_acquire = std::memory_order_acquire;
-    static constexpr std::memory_order m_release = std::memory_order_release;
-    static constexpr std::memory_order m_seq_cst = std::memory_order_seq_cst;
 
   public:
     //! constructs the queue with a given capacity.
@@ -181,7 +341,7 @@ class TaskQueue
     {
         // must free memory allocated by push(), but not deallocated by pop()
         auto buf_ptr = buffer_.load();
-        for (int i = top_; i < bottom_.load(m_relaxed); ++i)
+        for (int i = top_; i < bottom_.load(mem::relaxed); ++i)
             delete buf_ptr->get_entry(i);
         delete buf_ptr;
     }
@@ -192,7 +352,7 @@ class TaskQueue
     //! checks if queue is empty.
     bool empty() const
     {
-        return (bottom_.load(m_relaxed) <= top_.load(m_relaxed));
+        return (bottom_.load(mem::relaxed) <= top_.load(mem::relaxed));
     }
 
     //! pushes a task to the bottom of the queue; returns false if queue is
@@ -205,20 +365,20 @@ class TaskQueue
             std::unique_lock<std::mutex> lk(mutex_, std::try_to_lock);
             if (!lk)
                 return false;
-            auto b = bottom_.load(m_relaxed);
-            auto t = top_.load(m_acquire);
-            RingBuffer<Task*>* buf_ptr = buffer_.load(m_relaxed);
+            auto b = bottom_.load(mem::relaxed);
+            auto t = top_.load(mem::acquire);
+            RingBuffer<Task*>* buf_ptr = buffer_.load(mem::relaxed);
 
             if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
                 // buffer is full, create enlarged copy before continuing
                 auto old_buf = buf_ptr;
                 buf_ptr = std::move(buf_ptr->enlarged_copy(b, t));
                 old_buffers_.emplace_back(old_buf);
-                buffer_.store(buf_ptr, m_relaxed);
+                buffer_.store(buf_ptr, mem::relaxed);
             }
 
             buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
-            bottom_.store(b + 1, m_release);
+            bottom_.store(b + 1, mem::release);
         }
         cv_.notify_one();
         return true;
@@ -227,16 +387,17 @@ class TaskQueue
     //! pops a task from the top of the queue; returns false if lost race.
     bool try_pop(Task& task)
     {
-        auto t = top_.load(m_acquire);
-        std::atomic_thread_fence(m_seq_cst);
-        auto b = bottom_.load(m_acquire);
+        auto t = top_.load(mem::acquire);
+        std::atomic_thread_fence(mem::seq_cst);
+        auto b = bottom_.load(mem::acquire);
 
         if (t < b) {
             // must load task pointer before acquiring the slot, because it
             // could be overwritten immediately after
-            auto task_ptr = buffer_.load(m_acquire)->get_entry(t);
+            auto task_ptr = buffer_.load(mem::acquire)->get_entry(t);
 
-            if (top_.compare_exchange_strong(t, t + 1, m_seq_cst, m_relaxed)) {
+            if (top_.compare_exchange_strong(
+                  t, t + 1, mem::seq_cst, mem::relaxed)) {
                 task = std::move(*task_ptr); // won race, get task
                 delete task_ptr; // fre memory allocated in push_unsafe()
                 return true;
@@ -263,8 +424,8 @@ class TaskQueue
     }
 
   private:
-    detail::aligned_atomic<int> top_{ 0 };
-    detail::aligned_atomic<int> bottom_{ 0 };
+    mem::aligned_atomic<int> top_{ 0 };
+    mem::aligned_atomic<int> bottom_{ 0 };
     std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
     std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
 
@@ -287,9 +448,12 @@ class TaskManager
     void push(Task&& task)
     {
         rethrow_exception();
-        todo_list_.add();
-        while (status_ == Status::running) {
-            if (queues_[push_idx_++ % num_queues_].try_push(task))
+        todo_.fetch_add(1, mem::relaxed);
+
+        size_t q_idx;
+        while (running()) {
+            q_idx = push_idx_.fetch_add(1, mem::relaxed) % num_queues_;
+            if (queues_[q_idx].try_push(task))
                 return;
         }
     }
@@ -297,64 +461,87 @@ class TaskManager
     template<typename Task>
     bool try_pop(Task& task, size_t worker_id = 0)
     {
-        if (status_ != Status::running)
-            return false;
-
         for (size_t k = 0; k <= num_queues_; k++) {
-            if (queues_[(worker_id + k) % num_queues_].try_pop(task))
-                return true;
+            if (queues_[(worker_id + k) % num_queues_].try_pop(task)) {
+                if (running())
+                    return true;
+            }
         }
         return false;
     }
 
     void wait_for_jobs(size_t id)
     {
-        if (status_ == Status::errored) {
+        if (errored()) {
             // main thread may be waiting to reset the pool
-            std::lock_guard<std::mutex> lk(err_mtx_);
+            std::lock_guard<std::mutex> lk(mtx_);
             if (++num_waiting_ == num_queues_)
-                err_cv_.notify_all();
+                cv_.notify_all();
         } else {
             ++num_waiting_;
         }
 
         queues_[id].wait();
-        num_waiting_--;
+        --num_waiting_;
     }
 
     //! @param millis if > 0: stops waiting after millis ms
     void wait_for_finish(size_t millis = 0)
     {
-        if (running())
-            todo_list_.wait(millis);
+        if (running()) {
+            auto wake_up = [this] { return (todo_ <= 0) || !running(); };
+            std::unique_lock<std::mutex> lk(mtx_);
+            if (millis == 0) {
+                cv_.wait(lk, wake_up);
+            } else {
+                cv_.wait_for(lk, std::chrono::milliseconds(millis), wake_up);
+            }
+        }
         rethrow_exception();
     }
 
     bool called_from_owner_thread() const
     {
-        return std::this_thread::get_id() == owner_id_;
+        return (std::this_thread::get_id() == owner_id_);
     }
 
-    bool done() const { return todo_list_.empty(); }
-
-    void report_success() { todo_list_.cross(); }
+    void report_success()
+    {
+        auto n = todo_.fetch_sub(1, mem::relaxed) - 1;
+        if (n <= 0) {
+            // all jobs are done; lock before signal to prevent spurious failure
+            {
+                std::lock_guard<std::mutex> lk{ mtx_ };
+            }
+            cv_.notify_all();
+        }
+    }
 
     void report_fail(std::exception_ptr err_ptr)
     {
-        if (!errored()) { // only catch first exception
-            std::lock_guard<std::mutex> lk(err_mtx_);
-            if (errored()) // double check
-                return;
-            err_ptr_ = err_ptr;
-            status_ = Status::errored;
-            todo_list_.stop();
-        }
+        if (errored()) // only catch first exception
+            return;
+
+        std::lock_guard<std::mutex> lk(mtx_);
+        if (errored()) // double check under lock
+            return;
+
+        // Some threads may add() or cross() after we stop. The large
+        // negative number prevents num_tasks_ from becoming positive
+        // again.
+        err_ptr_ = err_ptr;
+        status_ = Status::errored;
+        todo_.store(std::numeric_limits<int>::min() / 2);
+
+        cv_.notify_all();
     }
 
     void stop()
     {
-        status_ = Status::stopped;
-        todo_list_.stop();
+        {
+            std::lock_guard<std::mutex> lk(mtx_);
+            status_ = Status::stopped;
+        }
         // Worker threads wait on queue-specific mutex -> notify all queues.
         for (auto& q : queues_)
             q.stop();
@@ -364,22 +551,35 @@ class TaskManager
     {
         if (called_from_owner_thread() && errored()) {
             // wait for all threads to idle
-            std::unique_lock<std::mutex> lk(err_mtx_);
-            err_cv_.wait(lk, [this] { return num_waiting_ == num_queues_; });
+            std::unique_lock<std::mutex> lk(mtx_);
+            cv_.wait(lk, [this] { return num_waiting_ == num_queues_; });
             lk.unlock();
 
             // before throwing: restore defaults for potential future use
-            todo_list_.reset();
-            status_ = Status::running;
+            todo_ = 0;
             auto current_exception = err_ptr_;
             err_ptr_ = nullptr;
+            status_ = Status::running;
             std::rethrow_exception(current_exception);
         }
     }
 
-    bool running() { return status_ == Status::running; }
-    bool errored() { return status_ == Status::errored; }
-    bool stopped() { return status_ == Status::stopped; }
+    bool running() const
+    {
+        return status_.load(mem::relaxed) == Status::running;
+    }
+
+    bool errored() const
+    {
+        return status_.load(mem::relaxed) == Status::errored;
+    }
+
+    bool stopped() const
+    {
+        return status_.load(mem::relaxed) == Status::stopped;
+    }
+
+    bool done() const { return (todo_.load(mem::relaxed) <= 0); }
 
   private:
     std::vector<TaskQueue> queues_;
@@ -387,10 +587,9 @@ class TaskManager
     const std::thread::id owner_id_;
 
     // task management
-    detail::aligned_atomic<size_t> num_waiting_{ 0 };
-    detail::aligned_atomic<size_t> push_idx_{ 0 };
-    TodoList todo_list_{ 0 };
-    std::exception_ptr err_ptr_{ nullptr };
+    mem::aligned_atomic<size_t> num_waiting_{ 0 };
+    mem::aligned_atomic<size_t> push_idx_{ 0 };
+    mem::aligned_atomic<int> todo_{ 0 };
 
     // synchronization in case of error to make pool reusable
     enum class Status
@@ -399,9 +598,10 @@ class TaskManager
         errored,
         stopped
     };
-    std::atomic<Status> status_{ Status::running };
-    std::mutex err_mtx_;
-    std::condition_variable err_cv_;
+    mem::aligned_atomic<Status> status_{ Status::running };
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::exception_ptr err_ptr_{ nullptr };
 };
 
 } // end namespace detail
@@ -472,7 +672,6 @@ class ThreadPool
     {
         if (workers_.size() == 0)
             return f(args...);
-        todo_list_.add();
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
     }
@@ -494,6 +693,42 @@ class ThreadPool
         return task_ptr->get_future();
     }
 
+    template<class Function>
+    void parallel_for(int begin,
+                      int end,
+                      Function&& f,
+                      size_t nthreads = std::thread::hardware_concurrency())
+    {
+        if (end <= begin)
+            return;
+        nthreads = std::min(end - begin, static_cast<int>(nthreads));
+
+        // each worker has its dedicated range, but can steal part of another
+        // worker's ranges when done with own
+        auto ranges = std::make_shared<loop::Ranges>(begin, end, nthreads);
+        const auto run_worker = [=](int id) {
+            do {
+                int pos;
+                while ((*ranges)[id].try_local_work(pos)) {
+                    f(pos);
+                };
+                ranges->distribute_to((*ranges)[id]);
+            } while (!(*ranges)[id].empty());
+        };
+
+        for (int k = 0; k < nthreads; k++)
+            this->push(run_worker, k);
+        this->wait();
+    }
+
+    template<class Function, class Items>
+    void parallel_for_each(Items& items, Function&& f)
+    {
+        this->parallel_for(
+          0, items.size(), [&items, &f](size_t i) { f(items[i]); });
+        this->wait();
+    }
+
     //! @brief waits for all jobs currently running on the global thread pool.
     void wait() { task_manager_.wait_for_finish(); }
 
@@ -509,7 +744,6 @@ class ThreadPool
     }
 
     detail::TaskManager task_manager_;
-    TodoList todo_list_{ 0 };
     std::vector<std::thread> workers_;
 };
 
@@ -519,7 +753,7 @@ class ThreadPool
 //! @param f a function.
 //! @param args (optional) arguments passed to `f`.
 template<class Function, class... Args>
-void
+inline void
 push(Function&& f, Args&&... args)
 {
     ThreadPool::global_instance().push(std::forward<Function>(f),
@@ -532,7 +766,7 @@ push(Function&& f, Args&&... args)
 //! @return A `std::future` for the task. Call `future.get()` to retrieve the
 //! results at a later point in time (blocking).
 template<class Function, class... Args>
-auto
+inline auto
 async(Function&& f, Args&&... args) -> std::future<decltype(f(args...))>
 {
     return ThreadPool::global_instance().async(std::forward<Function>(f),
@@ -544,6 +778,24 @@ inline void
 wait()
 {
     ThreadPool::global_instance().wait();
+}
+
+template<class Function>
+inline void
+parallel_for(int begin,
+             int end,
+             Function&& f,
+             size_t nthreads = std::thread::hardware_concurrency())
+{
+    ThreadPool::global_instance().parallel_for(
+      begin, end, std::forward<Function>(f), nthreads);
+}
+
+template<class Function, class Items>
+inline void
+parallel_for_each(Items& items, Function&& f)
+{
+    ThreadPool::global_instance().parallel_for_each(items, f);
 }
 
 } // end namespace quickpool
