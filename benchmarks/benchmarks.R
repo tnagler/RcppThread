@@ -9,7 +9,7 @@ Rcpp::sourceCpp(here::here("benchmarks/benchmarks.cpp"))
 
 ns <- exp(seq.int(log(50), log(10^5), length = 7))
 
-wait_for <- 5
+wait_for <- 3
 
 plot_df <- function(df) {
   p <- df %>%
@@ -20,7 +20,8 @@ plot_df <- function(df) {
     labs(color = "", linetype = "") +
     ggthemes::theme_pander() +
     theme(legend.margin = margin(1, 1, 1, 1)) +
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom") +
+    scale_x_log10()
   print(p)
 }
 
