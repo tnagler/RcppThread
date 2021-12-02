@@ -221,7 +221,7 @@ benchKDE(std::vector<int> ns, size_t d, double min_sec = 10)
     for (int i = 0; i < ns.size(); i++) {
         MatrixXd x = MatrixXd(ns[i], d).setRandom();
         times(i, Rcpp::_) =
-          benchMark([&](int i) { kde(x.col(i)); }, ns[i], min_sec);
+          benchMark([&](int i) { kde(x.col(i)); }, d, min_sec);
     }
 
     colnames(times) = Rcpp::CharacterVector{
