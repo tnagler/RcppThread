@@ -78,17 +78,9 @@ class BenchMethods
         pool_.wait();
     }
 
-    // void parallelFor(int n)
-    // {
-    //     pool_.parallelFor(0, n, func_);
-    //     pool_.wait();
-    // }
-
     void parallelFor(int n)
     {
-        RcppThread::ThreadPool pool;
-        pool.parallelFor(0, n, func_);
-        pool.join();
+        RcppThread::parallelFor(0, n, func_);
     }
 
     void OpenMP(int n)
