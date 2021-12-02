@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "RcppThread/Batch.hpp"
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
 #include "RcppThread/quickpool.hpp"
@@ -37,18 +36,7 @@ class ThreadPool
     ThreadPool& operator=(ThreadPool&& other) = delete;
 
     //! Access to the global thread pool instance.
-    static ThreadPool& globalInstance()
-    {
-#ifdef _WIN32
-        // Must leak resource, because windows + R deadlock otherwise. Memory
-        // is released on shutdown.
-        static auto ptr = new ThreadPool;
-        return *ptr;
-#else
-        static ThreadPool instance_;
-        return instance_;
-#endif
-    }
+    static ThreadPool& globalInstance();
 
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
@@ -73,7 +61,6 @@ class ThreadPool
     const size_t nWorkers_;
     std::vector<std::thread> workers_;
     quickpool::detail::TaskManager taskManager_;
-    quickpool::TodoList todoList_{ 0 };
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -118,6 +105,21 @@ inline ThreadPool::~ThreadPool() noexcept
             worker.join();
         }
     }
+}
+
+//! Access to the global thread pool instance.
+inline ThreadPool&
+ThreadPool::globalInstance()
+{
+#ifdef _WIN32
+    // Must leak resource, because windows + R deadlock otherwise. Memory
+    // is released on shutdown.
+    static auto ptr = new ThreadPool;
+    return *ptr;
+#else
+    static ThreadPool instance_;
+    return instance_;
+#endif
 }
 
 //! pushes jobs to the thread pool.
@@ -201,18 +203,25 @@ template<class F>
 inline void
 ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 {
-    if (size == 0)
-        return;
-    auto doBatch = [f](const Batch& b) {
-        for (int i = b.begin; i < b.end; i++)
-            f(i);
+
+    // each worker has its dedicated range, but can steal part of another
+    // worker's ranges when done with own
+    auto nWorkers = std::min(size, workers_.size());
+    auto ranges =
+      std::make_shared<quickpool::loop::Ranges>(begin, begin + size, nWorkers);
+    const auto runWorker = [=](int id) {
+        do {
+            int pos;
+            while ((*ranges)[id].try_local_work(pos)) {
+                f(pos);
+            };
+            ranges->distribute_to((*ranges)[id]);
+        } while (!(*ranges)[id].empty());
     };
-    auto batches = createBatches(begin, size, nWorkers_, nBatches);
-    auto pushJob = [=] {
-        for (const auto& batch : batches)
-            this->push(doBatch, batch);
-    };
-    this->push(pushJob);
+
+    for (int k = 0; k < nWorkers; k++)
+        this->push(runWorker, k);
+    this->wait();
 }
 
 //! computes a for-each loop in parallel batches.
