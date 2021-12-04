@@ -56,7 +56,6 @@ class BenchMethods
 {
     size_t n_;
     std::function<void(int)> func_;
-    RcppThread::ThreadPool pool_;
 
   public:
     BenchMethods(size_t n, std::function<void(int)> func)
@@ -74,8 +73,8 @@ class BenchMethods
     void ThreadPool(int n)
     {
         for (size_t i = 0; i < n; ++i)
-            pool_.push(func_, i);
-        pool_.wait();
+            RcppThread::push(func_, i);
+        RcppThread::wait();
     }
 
     void parallelFor(int n)
@@ -83,12 +82,18 @@ class BenchMethods
         RcppThread::parallelFor(0, n, func_);
     }
 
-    void OpenMP(int n)
+    void OpenMP_static(int n)
     {
-        omp_set_num_threads(std::thread::hardware_concurrency());
-#pragma omp parallel for
+#pragma omp parallel for schedule(static)
         for (size_t i = 0; i < n; ++i)
             func_(i);
+    }
+
+    void OpenMP_dynamic(int n)
+    {
+#pragma omp parallel for schedule(dynamic)
+      for (size_t i = 0; i < n; ++i)
+        func_(i);
     }
 
     void RcppParallelFor(int n)
@@ -115,7 +120,8 @@ benchMark(std::function<void(int i)> task, size_t n, double min_sec = 10)
                                [&] { methods.singleThreaded(n); },
                                [&] { methods.ThreadPool(n); },
                                [&] { methods.parallelFor(n); },
-                               [&] { methods.OpenMP(n); },
+                               [&] { methods.OpenMP_static(n); },
+                               [&] { methods.OpenMP_dynamic(n); },
                                [&] { methods.RcppParallelFor(n); },
                              },
                              min_sec);
@@ -138,7 +144,9 @@ benchEmpty(Rcpp::IntegerVector ns, double min_sec = 10)
     }
 
     colnames(times) = Rcpp::CharacterVector{
-        "single", "ThreadPool", "parallelFor", "OpenMP", "RcppParallel"
+        "single", "quickpool::push", "quickpool::parallel_for",
+        "OpenMP static", "OpenMP dynamic",
+        "RcppParallel"
     };
 
     return times;

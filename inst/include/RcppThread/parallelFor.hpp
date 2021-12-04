@@ -86,4 +86,29 @@ parallelForEach(I& items,
     parallelFor(0, size, [f, begin](int i) { f(*(begin + i)); });
 }
 
+template<class F, class... Args>
+void push(F&& f, Args&&... args)
+{
+    ThreadPool::globalInstance().push(std::forward<F>(f),
+                                      std::forward<Args>(args)...);
+}
+
+template<class F, class... Args>
+auto pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
+{
+    return ThreadPool::globalInstance().pushReturn(
+            std::forward<F>(f), std::forward<Args>(args)...);
+}
+
+template<class F, class... Args>
+auto async(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
+{
+    return pushReturn(std::forward<F>(f), std::forward<Args>(args)...);
+}
+
+void wait()
+{
+    ThreadPool::globalInstance().wait();
+}
+
 }
