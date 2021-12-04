@@ -45,7 +45,7 @@ class ThreadPool
     auto pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>;
 
     template<class F, class I>
-    void map(F&& f, I&& items);
+    void map(F&& f, I& items);
 
     template<class F>
     inline void parallelFor(int begin, size_t end, F&& f, size_t nBatches = 0);
@@ -60,7 +60,7 @@ class ThreadPool
     // variables for synchronization between workers (destructed last)
     const size_t nWorkers_;
     std::vector<std::thread> workers_;
-    quickpool::detail::TaskManager taskManager_;
+    quickpool::sched::TaskManager taskManager_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -167,13 +167,9 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
 //!  `std::end(I)` must be defined).
 template<class F, class I>
 void
-ThreadPool::map(F&& f, I&& items)
+ThreadPool::map(F&& f, I& items)
 {
-    auto pushJob = [=] {
-        for (auto&& item : items)
-            this->push(f, item);
-    };
-    this->push(pushJob);
+    this->parallelForEach(items, std::forward<F>(f));
 }
 
 //! computes an index-based for loop in parallel batches.
@@ -203,25 +199,13 @@ template<class F>
 inline void
 ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 {
-
-    // each worker has its dedicated range, but can steal part of another
-    // worker's ranges when done with own
-    auto nWorkers = std::min(size, workers_.size());
-    auto ranges =
-      std::make_shared<quickpool::loop::Ranges>(begin, begin + size, nWorkers);
-    const auto runWorker = [=](int id) {
-        do {
-            int pos;
-            while ((*ranges)[id].try_local_work(pos)) {
-                f(pos);
-            };
-            ranges->distribute_to((*ranges)[id]);
-        } while (!(*ranges)[id].empty());
-    };
-
-    for (int k = 0; k < nWorkers; k++)
-        this->push(runWorker, k);
-    this->wait();
+  // each worker has its dedicated range, but can steal part of another
+  // worker's ranges when done with own
+  auto workers = quickpool::loop::create_workers<F>(
+      std::forward<F>(f), begin, begin + size, nWorkers_);
+  for (int k = 0; k < nWorkers_; k++) {
+    this->push([=] { workers->at(k).run(workers); });
+  }
 }
 
 //! computes a for-each loop in parallel batches.

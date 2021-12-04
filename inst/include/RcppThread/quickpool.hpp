@@ -252,7 +252,7 @@ struct Worker
         do {
             Worker& other = find_victim(workers);
             State s = other.state;
-            if (s.pos >= s.end - 1) {
+            if (s.pos >= s.end) {
                 continue; // other range is empty by now
             }
 
@@ -388,7 +388,6 @@ class TaskQueue
     {
         // Must hold lock in case of multiple producers.
         std::unique_lock<std::mutex> lk(mutex_);
-
         auto b = bottom_.load(mem::relaxed);
         auto t = top_.load(mem::acquire);
         RingBuffer<Task*>* buf_ptr = buffer_.load(mem::relaxed);
@@ -536,7 +535,7 @@ class TaskManager
     //! @param millis if > 0: stops waiting after millis ms
     void wait_for_finish(size_t millis = 0)
     {
-        if (is_running()) {
+        if (called_from_owner_thread() && is_running()) {
             auto wake_up = [this] { return (todo_ <= 0) || !is_running(); };
             std::unique_lock<std::mutex> lk(mtx_);
             if (millis == 0) {
@@ -555,8 +554,9 @@ class TaskManager
 
     void report_success()
     {
+
         auto n = todo_.fetch_sub(1, mem::release) - 1;
-        if (n <= 0) {
+        if (n == 0) {
             // all jobs are done; lock before signal to prevent spurious failure
             {
                 std::lock_guard<std::mutex> lk{ mtx_ };
@@ -625,16 +625,7 @@ class TaskManager
         return status_.load(mem::relaxed) == Status::stopped;
     }
 
-    bool done() const
-    {
-        if (todo_.load(mem::relaxed) <= 0)
-            return true;
-        for (auto& q : queues_) {
-            if (!q.empty())
-                return false;
-        }
-        return true;
-    }
+    bool done() const { return (todo_.load(mem::relaxed) <= 0); }
 
   private:
     //! worker queues
@@ -760,19 +751,15 @@ class ThreadPool
     //! @param begin first index of the loop.
     //! @param end the loop runs in the range `[begin, end)`.
     //! @param f a function taking `int` argument (the 'loop body').
-    //! @param nthreads optional; limits the number of threads.
     template<class UnaryFunction>
-    void parallel_for(int begin,
-                      int end,
-                      UnaryFunction f,
-                      size_t nthreads = std::thread::hardware_concurrency())
+    void parallel_for(int begin, int end, UnaryFunction f)
     {
         // each worker has its dedicated range, but can steal part of another
         // worker's ranges when done with own
-        nthreads = std::min(end - begin, static_cast<int>(nthreads));
-        nthreads = std::min(nthreads, workers_.size());
-        auto workers =
-          loop::create_workers<UnaryFunction>(f, begin, end, nthreads);
+        auto nthreads =
+          std::min(end - begin, static_cast<int>(workers_.size()));
+        auto workers = loop::create_workers<UnaryFunction>(
+          std::forward<UnaryFunction>(f), begin, end, nthreads);
         for (int k = 0; k < nthreads; k++) {
             this->push([=] { workers->at(k).run(workers); });
         }
@@ -788,19 +775,17 @@ class ThreadPool
     //! @param items an object allowing for `std::begin()` and `std::end()`.
     //! @param f function to be applied as `f(*it)` for the iterator in the
     //! range `[begin, end)` (the 'loop body').
-    //! @param nthreads optional; limits the number of threads.
     template<class Items, class UnaryFunction>
-    inline void parallel_for_each(
-      Items& items,
-      UnaryFunction&& f,
-      size_t nthreads = std::thread::hardware_concurrency())
+    inline void parallel_for_each(Items& items, UnaryFunction&& f)
     {
         auto begin = std::begin(items);
         auto size = std::distance(begin, std::end(items));
-        this->parallel_for(0, size, [=](int i) { f(begin[i]); }, nthreads);
+        this->parallel_for(0, size, [=](int i) { f(begin[i]); });
     }
 
     //! @brief waits for all jobs currently running on the global thread pool.
+    //! Has no effect when called from threads other than the one that created
+    //! the pool.
     //! @param millis if > 0: stops waiting after millis ms.
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
@@ -848,6 +833,7 @@ async(Function&& f, Args&&... args) -> std::future<decltype(f(args...))>
 }
 
 //! @brief waits for all jobs currently running on the global thread pool.
+//! Has no effect when not called from main thread.
 inline void
 wait()
 {
@@ -863,16 +849,12 @@ wait()
 //! @param begin first index of the loop.
 //! @param end the loop runs in the range `[begin, end)`.
 //! @param f a function taking `int` argument (the 'loop body').
-//! @param nthreads optional; limits the number of threads.
 template<class Function>
 inline void
-parallel_for(int begin,
-             int end,
-             Function&& f,
-             size_t nthreads = std::thread::hardware_concurrency())
+parallel_for(int begin, int end, Function&& f)
 {
     ThreadPool::global_instance().parallel_for(
-      begin, end, std::forward<Function>(f), nthreads);
+      begin, end, std::forward<Function>(f));
 }
 
 //! @brief computes a iterator-based parallel for loop.
@@ -884,14 +866,12 @@ parallel_for(int begin,
 //! @param items an object allowing for `std::begin()` and `std::end()`.
 //! @param f function to be applied as `f(*it)` for the iterator in the
 //! range `[begin, end)` (the 'loop body').
-//! @param nthreads optional; limits the number of threads.
 template<class Items, class UnaryFunction>
 inline void
-parallel_for_each(Items& items,
-                  UnaryFunction&& f,
-                  size_t nthreads = std::thread::hardware_concurrency())
+parallel_for_each(Items& items, UnaryFunction&& f)
 {
-    ThreadPool::global_instance().parallel_for_each(items, f, nthreads);
+    ThreadPool::global_instance().parallel_for_each(
+      items, std::forward<UnaryFunction>(f));
 }
 
 } // end namespace quickpool

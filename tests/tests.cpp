@@ -110,7 +110,7 @@ testThreadPoolMap()
 {
     ThreadPool pool;
 
-    std::vector<size_t> x(1000000, 1);
+    std::vector<size_t> x(100000, 1);
     auto dummy = [&](size_t i) -> void {
         checkUserInterrupt();
         x[i] = 2 * x[i];
