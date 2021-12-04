@@ -7,7 +7,6 @@ library("ggthemes")
 
 Rcpp::sourceCpp(here::here("benchmarks/benchmarks.cpp"))
 
-ns <- 10^(2:6)
 
 wait_for <- 5
 
@@ -28,18 +27,21 @@ plot_df <- function(df, title = NULL) {
 }
 
 
+ns <- 10^(2:6)
 res <- benchEmpty(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "empty jobs")
 ggsave(here::here("benchmarks/benchEmptyThread.pdf"), width = 7.5, height = 3)
 
 
+ns <- 10^(2:6)
 res <- benchSqrt(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt")
 ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 7.5, height = 3)
 
 
+ns <- 10^(2:6)
 res <- benchSqrtWrite(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt modify inplace")
@@ -50,31 +52,32 @@ df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "n times sqrt (imbalanced)")
 ggsave(here::here("benchmarks/benchSqrtImbalanced.pdf"), width = 7.5, height = 3)
 
-
+ns <- 10^(2:6)
 res <- benchSqrtWriteImbalanced(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "n times sqrt modify inplace (imbalanced)")
 ggsave(here::here("benchmarks/benchSqrtWriteImbalanced.pdf"), width = 7.5, height = 3)
 
-
+ns <- 10^(2:5)
 res <- benchKDE(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "kernel density d = 10")
 ggsave(here::here("benchmarks/benchKDE-10.pdf"), width = 7.5, height = 3)
 
 
+ns <- 10^(2:5)
 res <- benchKDE(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "kernel density d = 100")
 ggsave(here::here("benchmarks/benchKDE-100.pdf"), width = 7.5, height = 3)
 
-
+ns <- 10^(2:4)
 res <- benchKendall(ns, 10, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "Kendall matrix (unbalanced) d = 10")
 ggsave(here::here("benchmarks/benchKendall-10.pdf"), width = 7.5, height = 3)
 
-
+ns <- 10^(2:4)
 res <- benchKendall(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "Kendall matrix (unbalanced) d = 100")
