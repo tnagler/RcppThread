@@ -61,7 +61,6 @@ class BenchMethods
     BenchMethods(size_t n, std::function<void(int)> func)
       : n_{ n }
       , func_(func)
-      , pool_()
     {}
 
     void singleThreaded(int n)
@@ -138,7 +137,7 @@ benchMark(std::function<void(int i)> task, size_t n, double min_sec = 10)
 Rcpp::NumericMatrix
 benchEmpty(Rcpp::IntegerVector ns, double min_sec = 10)
 {
-    Rcpp::NumericMatrix times(ns.size(), 5);
+    Rcpp::NumericMatrix times(ns.size(), 6);
     for (int i = 0; i < ns.size(); i++) {
         times(i, Rcpp::_) = benchMark([](int i) {}, ns[i], min_sec);
     }
@@ -146,7 +145,7 @@ benchEmpty(Rcpp::IntegerVector ns, double min_sec = 10)
     colnames(times) = Rcpp::CharacterVector{
         "single", "quickpool::push", "quickpool::parallel_for",
         "OpenMP static", "OpenMP dynamic",
-        "RcppParallel"
+        "Intel TBB"
     };
 
     return times;
@@ -162,14 +161,16 @@ benchSqrt(Rcpp::IntegerVector ns, double min_sec = 10)
             xx = std::sqrt(xx);
         }
     };
-    Rcpp::NumericMatrix times(ns.size(), 5);
+    Rcpp::NumericMatrix times(ns.size(), 6);
     for (int i = 0; i < ns.size(); i++) {
         std::vector<double> x(ns[i], 3.14);
         times(i, Rcpp::_) = benchMark([&](int i) { op(x[i]); }, ns[i], min_sec);
     }
 
     colnames(times) = Rcpp::CharacterVector{
-        "single", "ThreadPool", "parallelFor", "OpenMP", "RcppParallel"
+      "single", "quickpool::push", "quickpool::parallel_for",
+      "OpenMP static", "OpenMP dynamic",
+      "Intel TBB"
     };
 
     return times;
@@ -184,14 +185,16 @@ benchSqrtWrite(std::vector<int> ns, double min_sec = 10)
             x = std::sqrt(x);
         }
     };
-    Rcpp::NumericMatrix times(ns.size(), 5);
+    Rcpp::NumericMatrix times(ns.size(), 6);
     for (int i = 0; i < ns.size(); i++) {
         std::vector<double> x(ns[i], 3.14);
         times(i, Rcpp::_) = benchMark([&](int i) { op(x[i]); }, ns[i], min_sec);
     }
 
     colnames(times) = Rcpp::CharacterVector{
-        "single", "ThreadPool", "parallelFor", "OpenMP", "RcppParallel"
+      "single", "quickpool::push", "quickpool::parallel_for",
+      "OpenMP static", "OpenMP dynamic",
+      "Intel TBB"
     };
 
     return times;
@@ -217,7 +220,7 @@ benchKDE(std::vector<int> ns, size_t d, double min_sec = 10)
         return fhat;
     };
 
-    Rcpp::NumericMatrix times(ns.size(), 5);
+    Rcpp::NumericMatrix times(ns.size(), 6);
     for (int i = 0; i < ns.size(); i++) {
         MatrixXd x = MatrixXd(ns[i], d).setRandom();
         times(i, Rcpp::_) =
@@ -225,7 +228,9 @@ benchKDE(std::vector<int> ns, size_t d, double min_sec = 10)
     }
 
     colnames(times) = Rcpp::CharacterVector{
-        "single", "ThreadPool", "parallelFor", "OpenMP", "RcppParallel"
+      "single", "quickpool::push", "quickpool::parallel_for",
+      "OpenMP static", "OpenMP dynamic",
+      "Intel TBB"
     };
 
     return times;
@@ -236,7 +241,7 @@ Rcpp::NumericMatrix
 benchKendall(std::vector<int> ns, size_t d, double min_sec = 10)
 {
     using namespace Eigen;
-    Rcpp::NumericMatrix times(ns.size(), 5);
+    Rcpp::NumericMatrix times(ns.size(), 6);
     for (int i = 0; i < ns.size(); i++) {
         MatrixXd x = MatrixXd(ns[i], d).setRandom();
         MatrixXd res = MatrixXd::Identity(d, d);
@@ -255,18 +260,10 @@ benchKendall(std::vector<int> ns, size_t d, double min_sec = 10)
     }
 
     colnames(times) = Rcpp::CharacterVector{
-        "single", "ThreadPool", "parallelFor", "OpenMP", "RcppParallel"
+      "single", "quickpool::push", "quickpool::parallel_for",
+      "OpenMP static", "OpenMP dynamic",
+      "Intel TBB"
     };
 
     return times;
-}
-
-// [[Rcpp::export]]
-void
-pool_err()
-{
-    RcppThread::parallelFor(
-      0, 10, [](int i) { RcppThread::Rcout << i << "\n"; });
-    RcppThread::parallelFor(
-      0, 1, [](int i) { throw std::runtime_error("test error"); });
 }
