@@ -37,34 +37,34 @@ ggsave(here::here("benchmarks/benchEmptyThread.pdf"), width = 7.5, height = 3)
 res <- benchSqrt(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt")
-ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 7.5, height = 3)
 
 
 res <- benchSqrtWrite(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt modify inplace")
-ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 7.5, height = 3)
 
 
 res <- benchKDE(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "kernel density d = 10")
-ggsave(here::here("benchmarks/benchKDE-10.pdf"), width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKDE-10.pdf"), width = 7.5, height = 3)
 
 
 res <- benchKDE(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "kernel density d = 100")
-ggsave(here::here("benchmarks/benchKDE-100.pdf"), width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKDE-100.pdf"), width = 7.5, height = 3)
 
 
 res <- benchKendall(ns, 10, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "Kendall matrix (unbalanced) d = 10")
-ggsave(here::here("benchmarks/benchKendall-10.pdf"), width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKendall-10.pdf"), width = 7.5, height = 3)
 
 
 res <- benchKendall(ns, 100, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "Kendall matrix (unbalanced) d = 100")
-ggsave(here::here("benchmarks/benchKendall-100.pdf"), width = 5.5, height = 3)
+ggsave(here::here("benchmarks/benchKendall-100.pdf"), width = 7.5, height = 3)
