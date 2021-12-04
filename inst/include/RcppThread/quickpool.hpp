@@ -29,6 +29,10 @@
 #include <thread>
 #include <vector>
 
+#if (defined __linux__ || defined AFFINITY)
+#include <pthread.h>
+#endif
+
 // Layout of quickpool.hpp
 //
 // 1. Memory related utilities.
@@ -670,8 +674,9 @@ class ThreadPool
     explicit ThreadPool(size_t n_workers)
       : task_manager_{ n_workers }
     {
+        std::mutex iomutex;
         for (size_t id = 0; id < n_workers; ++id) {
-            workers_.emplace_back([this, id] {
+            workers_.emplace_back([&, id] {
                 std::function<void()> task;
                 while (!task_manager_.stopped()) {
                     task_manager_.wait_for_jobs(id);
@@ -682,6 +687,9 @@ class ThreadPool
                     } while (!task_manager_.done());
                 }
             });
+
+            // set thread affinity on linux
+            this->set_thread_affinity(id);
         }
     }
 
@@ -703,8 +711,8 @@ class ThreadPool
     static ThreadPool& global_instance()
     {
 #ifdef _WIN32
-        // Must leak resource, because windows + R deadlock otherwise. Memory
-        // is released on shutdown.
+        // Must leak resource, because windows + R deadlock otherwise.
+        // Memory is released on shutdown.
         static auto ptr = new ThreadPool;
         return *ptr;
 #else
@@ -728,8 +736,8 @@ class ThreadPool
     //! @brief executes a job asynchronously on the global thread pool.
     //! @param f a function.
     //! @param args (optional) arguments passed to `f`.
-    //! @return A `std::future` for the task. Call `future.get()` to retrieve
-    //! the results at a later point in time (blocking).
+    //! @return A `std::future` for the task. Call `future.get()` to
+    //! retrieve the results at a later point in time (blocking).
     template<class Function, class... Args>
     auto async(Function&& f, Args&&... args)
       -> std::future<decltype(f(args...))>
@@ -744,9 +752,9 @@ class ThreadPool
 
     //! @brief computes an index-based parallel for loop.
     //!
-    //! Waits until all tasks have finished, unless called from a thread that
-    //! didn't create the pool. If this is taken into account, parallel loops
-    //! can be nested.
+    //! Waits until all tasks have finished, unless called from a thread
+    //! that didn't create the pool. If this is taken into account, parallel
+    //! loops can be nested.
     //!
     //! @param begin first index of the loop.
     //! @param end the loop runs in the range `[begin, end)`.
@@ -754,8 +762,8 @@ class ThreadPool
     template<class UnaryFunction>
     void parallel_for(int begin, int end, UnaryFunction f)
     {
-        // each worker has its dedicated range, but can steal part of another
-        // worker's ranges when done with own
+        // each worker has its dedicated range, but can steal part of
+        // another worker's ranges when done with own
         auto nthreads =
           std::min(end - begin, static_cast<int>(workers_.size()));
         auto workers = loop::create_workers<UnaryFunction>(
@@ -768,9 +776,9 @@ class ThreadPool
 
     //! @brief computes a iterator-based parallel for loop.
     //!
-    //! Waits until all tasks have finished, unless called from a thread that
-    //! didn't create the pool. If this is taken into account, parallel loops
-    //! can be nested.
+    //! Waits until all tasks have finished, unless called from a thread
+    //! that didn't create the pool. If this is taken into account, parallel
+    //! loops can be nested.
     //!
     //! @param items an object allowing for `std::begin()` and `std::end()`.
     //! @param f function to be applied as `f(*it)` for the iterator in the
@@ -783,13 +791,31 @@ class ThreadPool
         this->parallel_for(0, size, [=](int i) { f(begin[i]); });
     }
 
-    //! @brief waits for all jobs currently running on the global thread pool.
-    //! Has no effect when called from threads other than the one that created
-    //! the pool.
+    //! @brief waits for all jobs currently running on the global thread
+    //! pool. Has no effect when called from threads other than the one that
+    //! created the pool.
     //! @param millis if > 0: stops waiting after millis ms.
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
   private:
+    //! sets thread affinity (if there are as many workers as cores). 
+    //! This works on linux by default. In OSX compile with -pthread -DAFFINITY.
+    void set_thread_affinity(size_t id)
+    {
+#if (defined __linux__ || defined AFFINITY)
+        if (workers_.size() == std::thread::hardware_concurrency())
+            return;
+        cpu_set_t cpuset;
+        CPU_ZERO(&cpuset);
+        CPU_SET(id, &cpuset);
+        int rc = pthread_setaffinity_np(
+          workers_[id].native_handle(), sizeof(cpu_set_t), &cpuset);
+        if (rc != 0) {
+            throw std::runtime_error("Error calling pthread_setaffinity_np");
+        }
+#endif
+    }
+
     void execute_safely(std::function<void()>& task)
     {
         try {
