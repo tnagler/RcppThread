@@ -72,13 +72,13 @@ class BenchMethods
     void ThreadPool(int n)
     {
         for (size_t i = 0; i < n; ++i)
-            RcppThread::push(func_, i);
-        RcppThread::wait();
+            quickpool::push(func_, i);
+        quickpool::wait();
     }
 
     void parallelFor(int n)
     {
-        RcppThread::parallelFor(0, n, func_);
+        quickpool::parallel_for(0, n, func_);
     }
 
     void OpenMP_static(int n)
