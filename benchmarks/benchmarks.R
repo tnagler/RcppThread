@@ -7,9 +7,9 @@ library("ggthemes")
 
 Rcpp::sourceCpp(here::here("benchmarks/benchmarks.cpp"))
 
-ns <- exp(seq.int(log(50), log(10^5), length = 7))
+ns <- exp(seq.int(log(50), log(10^5), length = 5))
 
-wait_for <- 3
+wait_for <- 5
 
 plot_df <- function(df) {
   p <- df %>%
