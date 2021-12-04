@@ -202,6 +202,55 @@ benchSqrtWrite(std::vector<int> ns, double min_sec = 10)
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix
+  benchSqrtImbalanced(Rcpp::IntegerVector ns, double min_sec = 10)
+  {
+    auto op = [](double x, size_t i) {
+      double xx = x;
+      for (int j = 0; j < i; j++) {
+        xx = std::sqrt(xx);
+      }
+    };
+    Rcpp::NumericMatrix times(ns.size(), 6);
+    for (int i = 0; i < ns.size(); i++) {
+      std::vector<double> x(ns[i], 3.14);
+      times(i, Rcpp::_) = benchMark([&](int i) { op(x[i], i); }, ns[i], min_sec);
+    }
+
+    colnames(times) = Rcpp::CharacterVector{
+      "single", "quickpool::push", "quickpool::parallel_for",
+      "OpenMP static", "OpenMP dynamic",
+      "Intel TBB"
+    };
+
+    return times;
+  }
+
+// [[Rcpp::export]]
+Rcpp::NumericMatrix
+  benchSqrtWriteImbalanced(std::vector<int> ns, double min_sec = 10)
+  {
+    auto op = [](double& x, size_t i) {
+      for (int j = 0; j < i; j++) {
+        x = std::sqrt(x);
+      }
+    };
+    Rcpp::NumericMatrix times(ns.size(), 6);
+    for (int i = 0; i < ns.size(); i++) {
+      std::vector<double> x(ns[i], 3.14);
+      times(i, Rcpp::_) = benchMark([&](int i) { op(x[i], i); }, ns[i], min_sec);
+    }
+
+    colnames(times) = Rcpp::CharacterVector{
+      "single", "quickpool::push", "quickpool::parallel_for",
+      "OpenMP static", "OpenMP dynamic",
+      "Intel TBB"
+    };
+
+    return times;
+  }
+
+// [[Rcpp::export]]
+Rcpp::NumericMatrix
 benchKDE(std::vector<int> ns, size_t d, double min_sec = 10)
 {
     using namespace Eigen;
