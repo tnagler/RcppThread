@@ -7,9 +7,9 @@ library("ggthemes")
 
 Rcpp::sourceCpp(here::here("benchmarks/benchmarks.cpp"))
 
-ns <- exp(seq.int(log(50), log(10^5), length = 7))
+ns <- 10^(2:6)
 
-wait_for <- 7
+wait_for <- 5
 
 plot_df <- function(df, title = NULL) {
   p <- df %>%
@@ -44,6 +44,17 @@ res <- benchSqrtWrite(ns, wait_for)
 df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt modify inplace")
 ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 7.5, height = 3)
+
+res <- benchSqrtImbalanced(ns, wait_for)
+df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
+plot_df(df, "n times sqrt (imbalanced)")
+ggsave(here::here("benchmarks/benchSqrtImbalanced.pdf"), width = 7.5, height = 3)
+
+
+res <- benchSqrtWriteImbalanced(ns, wait_for)
+df <- cbind(data.frame(n = ns), as.data.frame(res[, -1]))
+plot_df(df, "n times sqrt modify inplace (imbalanced)")
+ggsave(here::here("benchmarks/benchSqrtWriteImbalanced.pdf"), width = 7.5, height = 3)
 
 
 res <- benchKDE(ns, 100, wait_for)
