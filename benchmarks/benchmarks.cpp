@@ -6,11 +6,12 @@
 // [[Rcpp::depends(wdm)]]
 
 #include <Eigen/Dense>
+#include <wdm/eigen.hpp>
 #include <Rcpp.h>
-#include <RcppParallel.h>
+// #include <RcppParallel.h>
 #include <RcppThread.h>
 #include <omp.h>
-#include <wdm/eigen.hpp>
+#include <tbb/tbb.h>
 
 #include <algorithm>
 #include <cassert>
@@ -90,24 +91,37 @@ class BenchMethods
 
     void OpenMP_dynamic(int n)
     {
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for schedule(dynamic, 1)
       for (size_t i = 0; i < n; ++i)
         func_(i);
     }
 
-    void RcppParallelFor(int n)
+    // void RcppParallelFor(int n)
+    // {
+    //     struct Job : public RcppParallel::Worker
+    //     {
+    //         std::function<void(int)> f;
+    //         void operator()(std::size_t begin, std::size_t end)
+    //         {
+    //             for (size_t i = begin; i < end; i++)
+    //                 f(i);
+    //         }
+    //     } job;
+    //     job.f = func_;
+    //     RcppParallel::parallelFor(0, n, job);
+    // }
+
+    void IntelTBB(int n)
     {
-        struct Job : public RcppParallel::Worker
-        {
-            std::function<void(int)> f;
-            void operator()(std::size_t begin, std::size_t end)
-            {
-                for (size_t i = begin; i < end; i++)
-                    f(i);
-            }
-        } job;
-        job.f = func_;
-        RcppParallel::parallelFor(0, n, job);
+      tbb::parallel_for(
+        tbb::blocked_range<int>(0, n),
+        [&](tbb::blocked_range<int> r) {
+          for (int i = r.begin(); i < r.end(); ++i) {
+            func_(i);
+          }
+        }
+      );
+
     }
 };
 
@@ -117,18 +131,18 @@ benchMark(std::function<void(int i)> task, size_t n, double min_sec = 10)
     BenchMethods methods(n, task);
     auto times = bench::mark({
                                [&] { methods.singleThreaded(n); },
+                               [&] { methods.IntelTBB(n); },
+                               [&] { methods.parallelFor(n); },
                                [&] { methods.ThreadPool(n); },
                                [&] { methods.OpenMP_static(n); },
-                               [&] { methods.parallelFor(n); },
-                               [&] { methods.OpenMP_dynamic(n); },
-                               [&] { methods.RcppParallelFor(n); },
+                               [&] { methods.OpenMP_dynamic(n); }
                              },
                              min_sec);
 
-    // compute speed up over single threaded
-    const auto t0 = times[0];
-    for (auto& t : times)
-        t = t0 / t;
+    // // compute speed up over single threaded
+    // const auto t0 = times[0];
+    // for (auto& t : times)
+    //     t = t0 / t;
 
     return Rcpp::wrap(times);
 }
@@ -136,8 +150,10 @@ benchMark(std::function<void(int i)> task, size_t n, double min_sec = 10)
 void set_colnames(Rcpp::NumericMatrix& times)
 {
   colnames(times) = Rcpp::CharacterVector{
-    "single", "quickpool::push","OpenMP static",
-    "quickpool::parallel_for", "OpenMP dynamic", "Intel TBB"
+    "single",
+    "Intel TBB",
+    "quickpool::parallel_for", "quickpool::push",
+    "OpenMP static", "OpenMP dynamic",
   };
 }
 
