@@ -16,8 +16,7 @@ namespace RcppThread {
 //! @param size the loop runs in the range `[begin, begin + size)`.
 //! @param f a function (the 'loop body').
 //! @param nThreads deprecated; loop is run on global thread pool.
-//! @param nBatches the number of batches to create; the default (0)
-//!   triggers a heuristic to automatically determine the number of batches.
+//! @param nBatches deprecated.
 //! @details Consider the following code:
 //! ```
 //! std::vector<double> x(10);
@@ -40,11 +39,11 @@ template<class F>
 inline void
 parallelFor(int begin,
             size_t size,
-            F&& f,
+            F f,
             size_t nThreads = std::thread::hardware_concurrency(),
             size_t nBatches = 0)
 {
-    ThreadPool::globalInstance().parallelFor(begin, size, f, nBatches);
+    ThreadPool::globalInstance().parallelFor(begin, size, f);
     ThreadPool::globalInstance().wait();
 }
 
@@ -53,8 +52,7 @@ parallelFor(int begin,
 //!   are accessed by the `[]` operator.
 //! @param f a function (the 'loop body').
 //! @param nThreads deprecated; loop is run on global thread pool.
-//! @param nBatches the number of batches to create; the default (0)
-//!   triggers a heuristic to automatically determine the number of batches.
+//! @param nBatches deprecated.
 //! @details Consider the following code:
 //! ```
 //! std::vector<double> x(10, 1.0);
