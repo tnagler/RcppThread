@@ -235,8 +235,11 @@ testThreadPoolSingleThreaded()
         x[i] = 2 * x[i];
     };
 
-    for (size_t i = 0; i < x.size(); i++)
-        pool.push(dummy, i);
+    // for (size_t i = 0; i < x.size(); i++)
+    //     pool.push(dummy, i);
+    // pool.wait();
+
+    pool.parallelFor(0, x.size(), dummy);
     pool.wait();
 
     size_t count_wrong = 0;

@@ -200,9 +200,9 @@ ThreadPool::parallelFor(int begin, size_t size, F f, size_t nBatches)
 {
   // each worker has its dedicated range, but can steal part of another
   // worker's ranges when done with own
-  auto workers = quickpool::loop::create_workers<F>(
-      f, begin, begin + size, nWorkers_);
-  for (int k = 0; k < nWorkers_; k++) {
+  auto n = nWorkers_ > 1 ? nWorkers_ : 1;
+  auto workers = quickpool::loop::create_workers<F>(f, begin, begin + size, n);
+  for (int k = 0; k < n; k++) {
     this->push([=] { workers->at(k).run(workers); });
   }
 }
