@@ -33,7 +33,7 @@ Since then, the following features have been added:
   to a global thread pool that persists for the entire session. This 
   significantly speeds up programs that repeatedly call these functions.
 
-- Faster runtimes due to a work stealing task queue with lock-free pops (from [quickpool](https://github.com/tnagler/quickpool)).
+- Faster runtimes due to lock-free work stealing queue and loops (from [quickpool](https://github.com/tnagler/quickpool)).
 
 - An R function `RcppThread::detectCores()` to determine the number of (logical)
   cores on your machine.

@@ -1,4 +1,4 @@
-# RcppThread 1.1.0
+# RcppThread 2.0.0
 
 * Add R function `detectCores()` (#48).
 
@@ -10,6 +10,9 @@
 * Free-standing `parallelFor()` and `parallelForEach()` functions now dispatch 
   to a global thread pool that persists for the entire session. This 
   significantly speeds up programs that repeatedly call these functions. (#54)
+  
+* New free-standing `push()`, `pushReturn()`/`async()`, and `wait()`, mirroring
+  functionality from `ThreadPool`.
 
 
 # RcppThread 1.0.0
