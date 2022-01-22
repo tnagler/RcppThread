@@ -48,10 +48,10 @@ class ThreadPool
     void map(F&& f, I& items);
 
     template<class F>
-    inline void parallelFor(int begin, size_t end, F&& f, size_t nBatches = 0);
+    inline void parallelFor(int begin, size_t end, F f, size_t nBatches = 0);
 
     template<class F, class I>
-    inline void parallelForEach(I& items, F&& f, size_t nBatches = 0);
+    inline void parallelForEach(I& items, F f, size_t nBatches = 0);
 
     void wait();
     void join();
@@ -134,8 +134,7 @@ void
 ThreadPool::push(F&& f, Args&&... args)
 {
     if (nWorkers_ == 0) {
-        f(args...); // if there are no workers, do the job in the main
-                    // thread
+        f(args...); // if there are no workers, do the job in the main thread
     } else {
         taskManager_.push(
           std::bind(std::forward<F>(f), std::forward<Args>(args)...));
@@ -197,12 +196,12 @@ ThreadPool::map(F&& f, I& items)
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
 inline void
-ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
+ThreadPool::parallelFor(int begin, size_t size, F f, size_t nBatches)
 {
   // each worker has its dedicated range, but can steal part of another
   // worker's ranges when done with own
   auto workers = quickpool::loop::create_workers<F>(
-      std::forward<F>(f), begin, begin + size, nWorkers_);
+      f, begin, begin + size, nWorkers_);
   for (int k = 0; k < nWorkers_; k++) {
     this->push([=] { workers->at(k).run(workers); });
   }
@@ -232,7 +231,7 @@ ThreadPool::parallelFor(int begin, size_t size, F&& f, size_t nBatches)
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F, class I>
 inline void
-ThreadPool::parallelForEach(I& items, F&& f, size_t nBatches)
+ThreadPool::parallelForEach(I& items, F f, size_t nBatches)
 {
     this->parallelFor(0, items.size(), [&items, f](size_t i) { f(items[i]); });
 }

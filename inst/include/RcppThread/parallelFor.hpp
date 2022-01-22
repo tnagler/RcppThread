@@ -76,7 +76,7 @@ parallelFor(int begin,
 template<class I, class F>
 inline void
 parallelForEach(I& items,
-                F&& f,
+                F f,
                 size_t nThreads = std::thread::hardware_concurrency(),
                 size_t nBatches = 0)
 {
