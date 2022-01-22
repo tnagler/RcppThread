@@ -87,26 +87,30 @@ parallelForEach(I& items,
 }
 
 template<class F, class... Args>
-void push(F&& f, Args&&... args)
+inline void
+push(F&& f, Args&&... args)
 {
     ThreadPool::globalInstance().push(std::forward<F>(f),
                                       std::forward<Args>(args)...);
 }
 
 template<class F, class... Args>
-auto pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
+inline auto
+pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
 {
     return ThreadPool::globalInstance().pushReturn(
             std::forward<F>(f), std::forward<Args>(args)...);
 }
 
 template<class F, class... Args>
-auto async(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
+inline auto
+async(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
 {
     return pushReturn(std::forward<F>(f), std::forward<Args>(args)...);
 }
 
-void wait()
+inline void
+wait()
 {
     ThreadPool::globalInstance().wait();
 }
