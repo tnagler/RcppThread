@@ -86,6 +86,13 @@ parallelForEach(I& items,
     parallelFor(0, size, [f, begin](int i) { f(*(begin + i)); });
 }
 
+//! pushes jobs to the global thread pool.
+//! @param f a function taking an arbitrary number of arguments.
+//! @param args a comma-seperated list of the other arguments that shall
+//!   be passed to `f`.
+//!
+//! The function returns void; if a job returns a result, use
+//! `async()`.
 template<class F, class... Args>
 inline void
 push(F&& f, Args&&... args)
@@ -94,6 +101,12 @@ push(F&& f, Args&&... args)
                                       std::forward<Args>(args)...);
 }
 
+//! pushes jobs returning a value to the global thread pool.
+//! @param f a function taking an arbitrary number of arguments.
+//! @param args a comma-seperated list of the other arguments that shall
+//!   be passed to `f`.
+//! @return an `std::shared_future`, where the user can get the result and
+//!   rethrow exceptions.
 template<class F, class... Args>
 inline auto
 pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
@@ -102,6 +115,12 @@ pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
             std::forward<F>(f), std::forward<Args>(args)...);
 }
 
+//! pushes jobs returning a value to the global thread pool.
+//! @param f a function taking an arbitrary number of arguments.
+//! @param args a comma-seperated list of the other arguments that shall
+//!   be passed to `f`.
+//! @return an `std::shared_future`, where the user can get the result and
+//!   rethrow exceptions.
 template<class F, class... Args>
 inline auto
 async(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
@@ -109,6 +128,8 @@ async(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     return pushReturn(std::forward<F>(f), std::forward<Args>(args)...);
 }
 
+//! waits for all jobs to finish and checks for interruptions, but only from the
+//! main thread. Does nothing when called from other threads.
 inline void
 wait()
 {

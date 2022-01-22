@@ -70,8 +70,8 @@ C++</a>
         <section id="pub-static-methods">
           <h2><a href="#pub-static-methods">Public static functions</a></h2>
           <dl class="m-doc">
-            <dt id="a17e23c155801f91d2e3434a95e2cef84">
-              <span class="m-doc-wrap-bumper">static auto <a href="#a17e23c155801f91d2e3434a95e2cef84" class="m-doc-self">globalInstance</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classRcppThread_1_1ThreadPool.html" class="m-doc">ThreadPool</a>&amp;</span>
+            <dt id="acbe6f9722b613a9caed088d60ef32f0e">
+              <span class="m-doc-wrap-bumper">static auto <a href="#acbe6f9722b613a9caed088d60ef32f0e" class="m-doc-self">globalInstance</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classRcppThread_1_1ThreadPool.html" class="m-doc">ThreadPool</a>&amp;</span>
             </dt>
             <dd>Access to the global thread pool instance.</dd>
           </dl>
@@ -110,22 +110,22 @@ C++</a>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F, class I&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#ac0f94dddc58d21857245ae5010b9d491" class="m-doc">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
-              I&amp;&amp; items)</span>
+              <span class="m-doc-wrap-bumper">void <a href="#afb28b33cfbd817b1ef409196001bcb5e" class="m-doc">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              I&amp; items)</span>
             </dt>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#ac3f2a25288cfbfcc62e885b7fb72fe73" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t end,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#a2ecab198a62ed698e908fc85f3ec71f1" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              size_t size,
+              F f,
               size_t nBatches = 0)</span>
             </dt>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F, class I&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a44b177dbf1297cb38019eee3343b2319" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#a5209d746d78202faf17524ce6bf2e94a" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F f,
               size_t nBatches = 0)</span>
             </dt>
             <dd></dd>
@@ -209,19 +209,19 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
               <tfoot>
                 <tr>
                   <th>Returns</th>
-                  <td>an <code>std::shared_future</code>, where the user can get the result and rethrow the catched exceptions.</td>
+                  <td>an <code>std::shared_future</code>, where the user can get the result and rethrow exceptions.</td>
                 </tr>
               </tfoot>
             </table>
 <p>pushes jobs returning a value to the thread pool.</p>
           </div></section>
-          <section class="m-doc-details" id="ac0f94dddc58d21857245ae5010b9d491"><div>
+          <section class="m-doc-details" id="afb28b33cfbd817b1ef409196001bcb5e"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F, class I&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac0f94dddc58d21857245ae5010b9d491" class="m-doc-self">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
-              I&amp;&amp; items)</span></span>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#afb28b33cfbd817b1ef409196001bcb5e" class="m-doc-self">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              I&amp; items)</span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
               <thead>
@@ -240,14 +240,14 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
             </table>
 <p>maps a function on a list of items, possibly running tasks in parallel.</p>
           </div></section>
-          <section class="m-doc-details" id="ac3f2a25288cfbfcc62e885b7fb72fe73"><div>
+          <section class="m-doc-details" id="a2ecab198a62ed698e908fc85f3ec71f1"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac3f2a25288cfbfcc62e885b7fb72fe73" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t end,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2ecab198a62ed698e908fc85f3ec71f1" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              size_t size,
+              F f,
               size_t nBatches = 0)</span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
@@ -260,8 +260,8 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
                   <td>first index of the loop.</td>
                 </tr>
                 <tr>
-                  <td>end</td>
-                  <td></td>
+                  <td>size</td>
+                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>
@@ -282,13 +282,13 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
 <span class="p">});</span><span class="w"></span></pre><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
-          <section class="m-doc-details" id="a44b177dbf1297cb38019eee3343b2319"><div>
+          <section class="m-doc-details" id="a5209d746d78202faf17524ce6bf2e94a"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F, class I&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a44b177dbf1297cb38019eee3343b2319" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a5209d746d78202faf17524ce6bf2e94a" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F f,
               size_t nBatches = 0)</span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
