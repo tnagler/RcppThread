@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#pragma once
+
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
@@ -40,12 +42,12 @@
 //    - Class for padding bytes
 //    - Class for cache aligned atomics
 //    - Class for load/assign atomics with relaxed order
-// 2. Scheduling utilities.
+// 2. Loop related utilities.
+//    - Worker class for parallel for loops
+// 3. Scheduling utilities.
 //    - Ring buffer
 //    - Task queue
 //    - Task manager
-// 3. Loop related utilities.
-//    - Worker class for parallel for loops
 // 4. Thread pool class
 // 5. Free-standing functions (main API)
 
@@ -178,26 +180,153 @@ struct relaxed_atomic : public aligned_atomic<T>
 
 } // end namespace mem
 
-// 2. -------------------------------------------------------------------------
+// 2. --------------------------------------------------------------------------
+
+//! Loop related utilities.
+namespace loop {
+
+//! Worker state.
+struct State
+{
+    int pos; //!< position in the loop range
+    int end; //!< end of range assigned to worker
+};
+
+//! Worker class for parallel loops.
+//!
+//! When a worker completes its own range, it steals half of the remaining range
+//! of another worker. The number of steals (= only source of contention) is
+//! therefore only logarithmic in the number of tasks. The algorithm uses
+//! double-width compare-and-swap, which is lock-free on most modern processor
+//! architectures.
+//!
+//! @tparam type of function processing the loop (required to account for
+//! type-erasure).
+template<typename Function>
+struct Worker
+{
+    Worker() {}
+    Worker(int begin, int end, Function fun)
+      : state{ State{ begin, end } }
+      , f{ fun }
+    {}
+
+    Worker(Worker&& other)
+      : state{ other.state.load() }
+      , f{ std::forward<Function>(other.f) }
+    {}
+
+    size_t tasks_left() const
+    {
+        State s = state;
+        return s.end - s.pos;
+    }
+
+    bool done() const { return (tasks_left() == 0); }
+
+    //! @param others pointer to the vector of all workers.
+    void run(std::shared_ptr<std::vector<Worker>> others)
+    {
+        State s, s_old; // temporary state variables
+        do {
+            s = state;
+            if (s.pos < s.end) {
+                // Protect slot by trying to advance position before doing work.
+                s_old = s;
+                s.pos++;
+
+                // Another worker might have changed the end of the range in
+                // the meanwhile. Check atomically if the state is unaltered
+                // and, if so, replace by advanced state.
+                if (state.compare_exchange_weak(s_old, s)) {
+                    f(s_old.pos); // succeeded, do work
+                } else {
+                    continue; // failed, try again
+                }
+            }
+            if (s.pos == s.end) {
+                // Reached end of own range, steal range from others. Range
+                // remains empty if all work is done, so we can leave the loop.
+                this->steal_range(*others);
+            }
+        } while (!this->done());
+    }
+
+    //! @param workers vector of all workers.
+    void steal_range(std::vector<Worker>& workers)
+    {
+        do {
+            Worker& other = find_victim(workers);
+            State s = other.state;
+            if (s.pos >= s.end) {
+                continue; // other range is empty by now
+            }
+
+            // Remove second half of the range. Check atomically if the state is
+            // unaltered and, if so, replace with reduced range.
+            auto s_old = s;
+            s.end -= (s.end - s.pos + 1) / 2;
+            if (other.state.compare_exchange_weak(s_old, s)) {
+                // succeeded, update own range
+                state = State{ s.end, s_old.end };
+                break;
+            }
+        } while (!all_done(workers)); // failed steal, try again
+    }
+
+    //! @param workers vector of all workers.
+    bool all_done(const std::vector<Worker>& workers)
+    {
+        for (const auto& worker : workers) {
+            if (!worker.done())
+                return false;
+        }
+        return true;
+    }
+
+    //! targets the worker with the largest remaining range to minimize number
+    //! of steal events.
+    //! @param others vector of all workers.
+    Worker& find_victim(std::vector<Worker>& workers)
+    {
+        std::vector<size_t> tasks_left;
+        tasks_left.reserve(workers.size());
+        for (const auto& worker : workers) {
+            tasks_left.push_back(worker.tasks_left());
+        }
+        auto max_it = std::max_element(tasks_left.begin(), tasks_left.end());
+        auto idx = std::distance(tasks_left.begin(), max_it);
+        return workers[idx];
+    }
+
+    mem::relaxed_atomic<State> state; //!< worker state `{pos, end}`
+    Function f;                       //< function applied to the loop index
+};
+
+//! creates loop workers. They must be passed to each worker using a shared
+//! pointer, so that they persist if an inner `parallel_for()` in a nested
+//! loop exits.
+template<typename Function>
+std::shared_ptr<std::vector<Worker<Function>>>
+create_workers(const Function& f, int begin, int end, size_t num_workers)
+{
+    auto num_tasks = std::max(end - begin, static_cast<int>(0));
+    auto workers = new std::vector<Worker<Function>>;
+    workers->reserve(num_workers);
+    for (size_t i = 0; i < num_workers; i++) {
+        workers->emplace_back(begin + num_tasks * i / num_workers,
+                              begin + num_tasks * (i + 1) / num_workers,
+                              f);
+    }
+    return std::shared_ptr<std::vector<Worker<Function>>>(std::move(workers));
+}
+
+} // end namespace loop
+
+// 3. -------------------------------------------------------------------------
 
 //! Task management utilities.
 namespace sched {
-
-//! Exponential backoff to prevent contention on CAS loops.
-struct Backoff
-{
-    size_t n_try{ 0 };
-    size_t delay{ 1 }; // base delay in microseconds
-
-    Backoff& operator++()
-    {
-        if (++n_try > 3) {
-            std::this_thread::sleep_for(std::chrono::microseconds(delay));
-            delay *= 2;
-        }
-        return *this;
-    }
-};
 
 //! A simple ring buffer class.
 template<typename T>
@@ -374,7 +503,6 @@ class TaskManager
     bool try_pop(Task& task, size_t worker_id = 0)
     {
         // Always start pop cycle at own queue to avoid contention.
-        sched::Backoff backoff;
         for (size_t k = 0; k <= num_queues_; k++) {
             if (queues_[(worker_id + k) % num_queues_].try_pop(task)) {
                 if (is_running()) {
@@ -384,7 +512,6 @@ class TaskManager
                     return false;
                 }
             }
-            ++backoff; // failed;
         }
 
         return false;
@@ -532,151 +659,6 @@ class TaskManager
 
 } // end namespace sched
 
-// 3. --------------------------------------------------------------------------
-
-//! Loop related utilities.
-namespace loop {
-
-//! Worker state.
-struct State
-{
-    int pos; //!< position in the loop range
-    int end; //!< end of range assigned to worker
-};
-
-//! Worker class for parallel loops.
-//!
-//! When a worker completes its own range, it steals half of the remaining range
-//! of another worker. The number of steals (= only source of contention) is
-//! therefore only logarithmic in the number of tasks. The algorithm uses
-//! double-width compare-and-swap, which is lock-free on most modern processor
-//! architectures.
-//!
-//! @tparam type of function processing the loop (required to account for
-//! type-erasure).
-template<typename Function>
-struct Worker
-{
-    Worker() {}
-    Worker(int begin, int end, Function fun)
-      : state{ State{ begin, end } }
-      , f{ fun }
-    {}
-
-    Worker(Worker&& other)
-      : state{ other.state.load() }
-      , f{ std::forward<Function>(other.f) }
-    {}
-
-    size_t tasks_left() const
-    {
-        State s = state;
-        return s.end - s.pos;
-    }
-
-    bool done() const { return (tasks_left() == 0); }
-
-    //! @param others pointer to the vector of all workers.
-    void run(std::shared_ptr<std::vector<Worker>> others)
-    {
-        State s, s_old; // temporary state variables
-        do {
-            s = state;
-            if (s.pos < s.end) {
-                // Protect slot by trying to advance position before doing work.
-                s_old = s;
-                s.pos++;
-
-                // Another worker might have changed the end of the range in
-                // the meanwhile. Check atomically if the state is unaltered
-                // and, if so, replace by advanced state.
-                if (state.compare_exchange_weak(s_old, s)) {
-                    f(s_old.pos); // succeeded, do work
-                } else {
-                    continue; // failed, try again
-                }
-            }
-            if (s.pos == s.end) {
-                // Reached end of own range, steal range from others. Range
-                // remains empty if all work is done, so we can leave the loop.
-                this->steal_range(*others);
-            }
-        } while (!this->done());
-    }
-
-    //! @param workers vector of all workers.
-    void steal_range(std::vector<Worker>& workers)
-    {
-        sched::Backoff backoff;
-        do {
-            Worker& other = find_victim(workers);
-            State s = other.state;
-            if (s.pos >= s.end) {
-                continue; // other range is empty by now
-            }
-
-            // Remove second half of the range. Check atomically if the state is
-            // unaltered and, if so, replace with reduced range.
-            auto s_old = s;
-            s.end -= (s.end - s.pos + 1) / 2;
-            if (other.state.compare_exchange_weak(s_old, s)) {
-                // succeeded, update own range
-                state = State{ s.end, s_old.end };
-                break;
-            }
-            ++backoff; // failed steal, try again
-        } while (!all_done(workers));
-    }
-
-    //! @param workers vector of all workers.
-    bool all_done(const std::vector<Worker>& workers)
-    {
-        for (const auto& worker : workers) {
-            if (!worker.done())
-                return false;
-        }
-        return true;
-    }
-
-    //! targets the worker with the largest remaining range to minimize number
-    //! of steal events.
-    //! @param others vector of all workers.
-    Worker& find_victim(std::vector<Worker>& workers)
-    {
-        std::vector<size_t> tasks_left;
-        tasks_left.reserve(workers.size());
-        for (const auto& worker : workers) {
-            tasks_left.push_back(worker.tasks_left());
-        }
-        auto max_it = std::max_element(tasks_left.begin(), tasks_left.end());
-        auto idx = std::distance(tasks_left.begin(), max_it);
-        return workers[idx];
-    }
-
-    mem::relaxed_atomic<State> state; //!< worker state `{pos, end}`
-    Function f;                       //< function applied to the loop index
-};
-
-//! creates loop workers. They must be passed to each worker using a shared
-//! pointer, so that they persist if an inner `parallel_for()` in a nested
-//! loop exits.
-template<typename Function>
-std::shared_ptr<std::vector<Worker<Function>>>
-create_workers(const Function& f, int begin, int end, size_t num_workers)
-{
-    auto num_tasks = std::max(end - begin, static_cast<int>(0));
-    auto workers = new std::vector<Worker<Function>>;
-    workers->reserve(num_workers);
-    for (size_t i = 0; i < num_workers; i++) {
-        workers->emplace_back(begin + num_tasks * i / num_workers,
-                              begin + num_tasks * (i + 1) / num_workers,
-                              f);
-    }
-    return std::shared_ptr<std::vector<Worker<Function>>>(std::move(workers));
-}
-
-} // end namespace loop
-
 // 4. ------------------------------------------------------------------------
 
 //! A work stealing thread pool.
@@ -787,7 +769,7 @@ class ThreadPool
         auto nthreads =
           std::min(end - begin, static_cast<int>(workers_.size()));
         auto workers = loop::create_workers<UnaryFunction>(
-          std::forward<UnaryFunction>(f), begin, end, nthreads);
+            f, begin, end, nthreads);
         for (int k = 0; k < nthreads; k++) {
             this->push([=] { workers->at(k).run(workers); });
         }
@@ -804,7 +786,7 @@ class ThreadPool
     //! @param f function to be applied as `f(*it)` for the iterator in the
     //! range `[begin, end)` (the 'loop body').
     template<class Items, class UnaryFunction>
-    inline void parallel_for_each(Items& items, UnaryFunction&& f)
+    inline void parallel_for_each(Items& items, UnaryFunction f)
     {
         auto begin = std::begin(items);
         auto size = std::distance(begin, std::end(items));
@@ -818,7 +800,7 @@ class ThreadPool
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
   private:
-    //! sets thread affinity (if there are as many workers as cores).
+    //! sets thread affinity (if there are as many workers as cores). 
     //! This works on linux by default. In OSX compile with -pthread -DAFFINITY.
     void set_thread_affinity(size_t id)
     {
@@ -895,12 +877,12 @@ wait()
 //! @param begin first index of the loop.
 //! @param end the loop runs in the range `[begin, end)`.
 //! @param f a function taking `int` argument (the 'loop body').
-template<class Function>
+template<class UnaryFunction>
 inline void
-parallel_for(int begin, int end, Function&& f)
+parallel_for(int begin, int end, UnaryFunction&& f)
 {
     ThreadPool::global_instance().parallel_for(
-      begin, end, std::forward<Function>(f));
+      begin, end, std::forward<UnaryFunction>(f));
 }
 
 //! @brief computes a iterator-based parallel for loop.
