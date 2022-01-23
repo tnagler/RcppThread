@@ -45,13 +45,13 @@ class ThreadPool
     auto pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>;
 
     template<class F, class I>
-    void map(F&& f, I& items);
+    void map(F&& f, I&& items);
 
     template<class F>
-    inline void parallelFor(int begin, size_t size, F f, size_t nBatches = 0);
+    void parallelFor(int begin, int end, F f, size_t nBatches = 0);
 
     template<class F, class I>
-    inline void parallelForEach(I& items, F f, size_t nBatches = 0);
+    void parallelForEach(I& items, F f, size_t nBatches = 0);
 
     void wait();
     void join();
@@ -166,9 +166,10 @@ ThreadPool::pushReturn(F&& f, Args&&... args)
 //!  `std::end(I)` must be defined).
 template<class F, class I>
 void
-ThreadPool::map(F&& f, I& items)
+ThreadPool::map(F&& f, I&& items)
 {
-    this->parallelForEach(items, std::forward<F>(f));
+    for (auto &&item : items)
+        this->push(std::forward<F>(f), item);
 }
 
 //! computes an index-based for loop in parallel batches.
@@ -177,7 +178,7 @@ ThreadPool::map(F&& f, I& items)
 //! @param f an object callable as a function (the 'loop body'); typically
 //!   a lambda.
 //! @param nBatches the number of batches to create; the default (0)
-//!   triggers a heuristic to automatically determine the batch size.
+//!   uses work stealing to distribute tasks.
 //! @details Consider the following code:
 //! ```
 //! std::vector<double> x(10);
@@ -196,15 +197,30 @@ ThreadPool::map(F&& f, I& items)
 //! the tasks need to be synchronized manually (e.g., using mutexes).
 template<class F>
 inline void
-ThreadPool::parallelFor(int begin, size_t size, F f, size_t nBatches)
+ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
 {
-  // each worker has its dedicated range, but can steal part of another
-  // worker's ranges when done with own
-  auto n = nWorkers_ > 1 ? nWorkers_ : 1;
-  auto workers = quickpool::loop::create_workers<F>(f, begin, begin + size, n);
-  for (int k = 0; k < n; k++) {
-    this->push([=] { workers->at(k).run(workers); });
-  }
+    if (nBatches == 0) {
+        // each worker has its dedicated range, but can steal part of another
+        // worker's ranges when done with own
+        auto nw = nWorkers_ > 1 ? nWorkers_ : 1;
+        auto workers = quickpool::loop::create_workers<F>(f, begin, end, nw);
+        for (int k = 0; k < nw; k++) {
+          this->push([=] { workers->at(k).run(workers); });
+        }
+    } else {
+        // manual batching for backwards compatibility
+        size_t nTasks = std::max(end - begin, static_cast<int>(0));
+        nBatches = std::min(nTasks, nBatches);
+        for (size_t b = 0; b < nBatches; b++) {
+            this->push([=] {
+                for (int i = begin + nTasks * b / nBatches;
+                     i < begin + nTasks * (b + 1) / nBatches;
+                     i++) {
+                    f(i);
+                }
+            });
+        }
+    }
 }
 
 //! computes a for-each loop in parallel batches.
@@ -212,7 +228,7 @@ ThreadPool::parallelFor(int begin, size_t size, F f, size_t nBatches)
 //!   whose elements can be accessed by the `[]` operator.
 //! @param f a function (the 'loop body').
 //! @param nBatches the number of batches to create; the default (0)
-//!   triggers a heuristic to automatically determine the number of batches.
+//!   uses work stealing to distribute tasks.
 //! @details Consider the following code:
 //! ```
 //! std::vector<double> x(10, 1.0);

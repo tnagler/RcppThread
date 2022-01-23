@@ -142,12 +142,14 @@ testThreadPoolParallelFor()
         x[i] = 2 * x[i];
     };
 
-    pool.parallelFor(0, x.size(), dummy, 1);
+    pool.parallelFor(0, x.size(), dummy);
+    pool.wait();
+    pool.parallelFor(0, x.size(), dummy, 3); // backwards compatiblity
     pool.join();
 
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size(); i++)
-        count_wrong += (x[i] != 2);
+        count_wrong += (x[i] != 4);
     if (count_wrong > 0)
         Rcout << "parallelFor gives wrong result" << std::endl;
 }
