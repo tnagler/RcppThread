@@ -210,15 +210,22 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
     } else {
         // manual batching for backwards compatibility
         size_t nTasks = std::max(end - begin, static_cast<int>(0));
+        if (nTasks == 0)
+            return;
         nBatches = std::min(nTasks, nBatches);
-        for (size_t b = 0; b < nBatches; b++) {
+
+        size_t minSize = nTasks / nBatches;
+        int remSize = nTasks % nBatches;
+
+        for (size_t b = 0, k = 0; b < nBatches; b++) {
+            ptrdiff_t bBegin = begin + k;
+            ptrdiff_t bSize  = minSize + (remSize-- > 0);
             this->push([=] {
-                for (int i = begin + nTasks * b / nBatches;
-                     i < begin + nTasks * (b + 1) / nBatches;
-                     i++) {
+                for (int i = bBegin; i < bBegin + bSize; i++) {
                     f(i);
                 }
             });
+            k += bSize;
         }
     }
 }
