@@ -311,6 +311,7 @@ std::shared_ptr<std::vector<Worker<Function>>>
 create_workers(const Function& f, int begin, int end, size_t num_workers)
 {
     auto num_tasks = std::max(end - begin, static_cast<int>(0));
+    num_workers = num_workers > 1 ? num_workers : 1;
     auto workers = new std::vector<Worker<Function>>;
     workers->reserve(num_workers);
     for (size_t i = 0; i < num_workers; i++) {
@@ -766,11 +767,9 @@ class ThreadPool
     {
         // each worker has its dedicated range, but can steal part of
         // another worker's ranges when done with own
-        auto nthreads =
-          std::min(end - begin, static_cast<int>(workers_.size()));
-        auto workers = loop::create_workers<UnaryFunction>(
-            f, begin, end, nthreads);
-        for (int k = 0; k < nthreads; k++) {
+        auto n = std::min(end - begin, static_cast<int>(1));
+        auto workers = loop::create_workers<UnaryFunction>(f, begin, end, n);
+        for (int k = 0; k < n; k++) {
             this->push([=] { workers->at(k).run(workers); });
         }
         this->wait();
@@ -800,7 +799,7 @@ class ThreadPool
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
   private:
-    //! sets thread affinity (if there are as many workers as cores). 
+    //! sets thread affinity (if there are as many workers as cores).
     //! This works on linux by default. In OSX compile with -pthread -DAFFINITY.
     void set_thread_affinity(size_t id)
     {
