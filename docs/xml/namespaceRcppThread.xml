@@ -43,7 +43,7 @@
       </memberdef>
       </sectiondef>
       <sectiondef kind="func">
-      <memberdef kind="function" id="namespaceRcppThread_1a800a2ece44553db6da00c76d617b8223" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="namespaceRcppThread_1ae462e1889f6dbf0a3f9392613e9cdc76" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
           <param>
             <type>class F</type>
@@ -51,18 +51,18 @@
         </templateparamlist>
         <type>void</type>
         <definition>void RcppThread::parallelFor</definition>
-        <argsstring>(int begin, size_t size, F &amp;&amp;f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</argsstring>
+        <argsstring>(int begin, int end, F f, size_t nThreads=std::thread::hardware_concurrency(), size_t nBatches=0)</argsstring>
         <name>parallelFor</name>
         <param>
           <type>int</type>
           <declname>begin</declname>
         </param>
         <param>
-          <type>size_t</type>
-          <declname>size</declname>
+          <type>int</type>
+          <declname>end</declname>
         </param>
         <param>
-          <type>F &amp;&amp;</type>
+          <type>F</type>
           <declname>f</declname>
         </param>
         <param>
@@ -88,10 +88,10 @@
 </parameteritem>
 <parameteritem>
 <parameternamelist>
-<parametername>size</parametername>
+<parametername>end</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the loop runs in the range <computeroutput>[begin, begin + size)</computeroutput>. </para>
+<para>the loop runs in the range <computeroutput>[begin, end)</computeroutput>. </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -115,7 +115,7 @@
 <parametername>nBatches</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</para>
+<para>the number of batches to create; the default (0) uses work stealing to distribute tasks.</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -198,7 +198,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <parametername>nBatches</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</para>
+<para>the number of batches to create; the default (0) uses work stealing to distribute tasks.</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>

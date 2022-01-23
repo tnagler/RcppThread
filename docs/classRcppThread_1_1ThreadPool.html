@@ -110,14 +110,14 @@ C++</a>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F, class I&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#afb28b33cfbd817b1ef409196001bcb5e" class="m-doc">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
-              I&amp; items)</span>
+              <span class="m-doc-wrap-bumper">void <a href="#ac0f94dddc58d21857245ae5010b9d491" class="m-doc">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              I&amp;&amp; items)</span>
             </dt>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a2ecab198a62ed698e908fc85f3ec71f1" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t size,
+              <span class="m-doc-wrap-bumper">void <a href="#a86f352d702e3a8dc211838c9518a83d7" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
               F f,
               size_t nBatches = 0)</span>
             </dt>
@@ -215,13 +215,13 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
             </table>
 <p>pushes jobs returning a value to the thread pool.</p>
           </div></section>
-          <section class="m-doc-details" id="afb28b33cfbd817b1ef409196001bcb5e"><div>
+          <section class="m-doc-details" id="ac0f94dddc58d21857245ae5010b9d491"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F, class I&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#afb28b33cfbd817b1ef409196001bcb5e" class="m-doc-self">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
-              I&amp; items)</span></span>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac0f94dddc58d21857245ae5010b9d491" class="m-doc-self">map</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              I&amp;&amp; items)</span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
               <thead>
@@ -240,13 +240,13 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
             </table>
 <p>maps a function on a list of items, possibly running tasks in parallel.</p>
           </div></section>
-          <section class="m-doc-details" id="a2ecab198a62ed698e908fc85f3ec71f1"><div>
+          <section class="m-doc-details" id="a86f352d702e3a8dc211838c9518a83d7"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2ecab198a62ed698e908fc85f3ec71f1" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t size,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a86f352d702e3a8dc211838c9518a83d7" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
               F f,
               size_t nBatches = 0)</span></span>
             </h3>
@@ -260,8 +260,8 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
                   <td>first index of the loop.</td>
                 </tr>
                 <tr>
-                  <td>size</td>
-                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
+                  <td>end</td>
+                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>
@@ -269,7 +269,7 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the batch size.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>
@@ -306,7 +306,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>

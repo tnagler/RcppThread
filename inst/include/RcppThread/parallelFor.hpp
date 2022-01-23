@@ -13,7 +13,7 @@ namespace RcppThread {
 
 //! computes an index-based for loop in parallel batches.
 //! @param begin first index of the loop.
-//! @param size the loop runs in the range `[begin, begin + size)`.
+//! @param end the loop runs in the range `[begin, end)`.
 //! @param f a function (the 'loop body').
 //! @param nThreads deprecated; loop is run on global thread pool.
 //! @param nBatches the number of batches to create; the default (0)

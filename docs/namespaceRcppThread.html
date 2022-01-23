@@ -109,9 +109,9 @@ C++</a>
           <dl class="m-doc">
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a800a2ece44553db6da00c76d617b8223" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t size,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#ae462e1889f6dbf0a3f9392613e9cdc76" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
+              F f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span>
             </dt>
@@ -171,14 +171,14 @@ C++</a>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a800a2ece44553db6da00c76d617b8223"><div>
+          <section class="m-doc-details" id="ae462e1889f6dbf0a3f9392613e9cdc76"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a800a2ece44553db6da00c76d617b8223" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t size,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae462e1889f6dbf0a3f9392613e9cdc76" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
+              F f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span></span>
             </h3>
@@ -192,8 +192,8 @@ C++</a>
                   <td>first index of the loop.</td>
                 </tr>
                 <tr>
-                  <td>size</td>
-                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
+                  <td>end</td>
+                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>
@@ -205,7 +205,7 @@ C++</a>
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>
@@ -246,7 +246,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>

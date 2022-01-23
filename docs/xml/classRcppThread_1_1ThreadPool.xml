@@ -265,7 +265,7 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </inbodydescription>
         <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="45" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="152" bodyend="160"/>
       </memberdef>
-      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1afb28b33cfbd817b1ef409196001bcb5e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <templateparamlist>
           <param>
             <type>class F</type>
@@ -276,14 +276,14 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </templateparamlist>
         <type>void</type>
         <definition>void RcppThread::ThreadPool::map</definition>
-        <argsstring>(F &amp;&amp;f, I &amp;items)</argsstring>
+        <argsstring>(F &amp;&amp;f, I &amp;&amp;items)</argsstring>
         <name>map</name>
         <param>
           <type>F &amp;&amp;</type>
           <declname>f</declname>
         </param>
         <param>
-          <type>I &amp;</type>
+          <type>I &amp;&amp;</type>
           <declname>items</declname>
         </param>
         <briefdescription>
@@ -310,9 +310,9 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="48" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="169" bodyend="172"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="48" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="169" bodyend="173"/>
       </memberdef>
-      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a2ecab198a62ed698e908fc85f3ec71f1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a86f352d702e3a8dc211838c9518a83d7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
           <param>
             <type>class F</type>
@@ -320,15 +320,15 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
         </templateparamlist>
         <type>void</type>
         <definition>void RcppThread::ThreadPool::parallelFor</definition>
-        <argsstring>(int begin, size_t size, F f, size_t nBatches=0)</argsstring>
+        <argsstring>(int begin, int end, F f, size_t nBatches=0)</argsstring>
         <name>parallelFor</name>
         <param>
           <type>int</type>
           <declname>begin</declname>
         </param>
         <param>
-          <type>size_t</type>
-          <declname>size</declname>
+          <type>int</type>
+          <declname>end</declname>
         </param>
         <param>
           <type>F</type>
@@ -352,10 +352,10 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
 </parameteritem>
 <parameteritem>
 <parameternamelist>
-<parametername>size</parametername>
+<parametername>end</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the loop runs in the range <computeroutput>[begin, begin + size)</computeroutput>. </para>
+<para>the loop runs in the range <computeroutput>[begin, end)</computeroutput>. </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -371,7 +371,7 @@ The function returns void; if a job returns a result, use <computeroutput>pushRe
 <parametername>nBatches</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the number of batches to create; the default (0) triggers a heuristic to automatically determine the batch size.</para>
+<para>the number of batches to create; the default (0) uses work stealing to distribute tasks.</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -389,7 +389,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="51" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="199" bodyend="208"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="51" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="200" bodyend="224"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a5209d746d78202faf17524ce6bf2e94a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -441,7 +441,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <parametername>nBatches</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</para>
+<para>the number of batches to create; the default (0) uses work stealing to distribute tasks.</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -459,7 +459,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="54" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="234" bodyend="237"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="54" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="250" bodyend="253"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a6c93f9e84fadfdc1a3357770d47a738a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -473,7 +473,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="56" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="242" bodyend="258"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="56" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="258" bodyend="274"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -487,7 +487,7 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="57" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="262" bodyend="270"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" line="57" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp" bodystart="278" bodyend="286"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-static-func">
@@ -515,11 +515,11 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
     <listofallmembers>
       <member refid="classRcppThread_1_1ThreadPool_1acbe6f9722b613a9caed088d60ef32f0e" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>globalInstance</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>join</name></member>
-      <member refid="classRcppThread_1_1ThreadPool_1afb28b33cfbd817b1ef409196001bcb5e" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>map</name></member>
+      <member refid="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>map</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a4be4ca7cc2abaab9471590013702f421" prot="private" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>nWorkers_</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a4cda48aa1b12efd9e84302f2e3f463a7" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>operator=</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a6f3c66741b4c18ab9c096ec0f04da289" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>operator=</name></member>
-      <member refid="classRcppThread_1_1ThreadPool_1a2ecab198a62ed698e908fc85f3ec71f1" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelFor</name></member>
+      <member refid="classRcppThread_1_1ThreadPool_1a86f352d702e3a8dc211838c9518a83d7" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelFor</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a5209d746d78202faf17524ce6bf2e94a" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>parallelForEach</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1af1c8048954f42b41d19bd8fa9133490a" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>push</name></member>
       <member refid="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" prot="public" virt="non-virtual"><scope>RcppThread::ThreadPool</scope><name>pushReturn</name></member>

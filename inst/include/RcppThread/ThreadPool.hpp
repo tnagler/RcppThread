@@ -174,7 +174,7 @@ ThreadPool::map(F&& f, I&& items)
 
 //! computes an index-based for loop in parallel batches.
 //! @param begin first index of the loop.
-//! @param size the loop runs in the range `[begin, begin + size)`.
+//! @param end the loop runs in the range `[begin, end)`.
 //! @param f an object callable as a function (the 'loop body'); typically
 //!   a lambda.
 //! @param nBatches the number of batches to create; the default (0)
