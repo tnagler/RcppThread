@@ -15,7 +15,7 @@ namespace RcppThread {
 //! @param begin first index of the loop.
 //! @param end the loop runs in the range `[begin, end)`.
 //! @param f a function (the 'loop body').
-//! @param nThreads deprecated; loop is run on global thread pool.
+//! @param nThreads limits the number of threads used from the global pool.
 //! @param nBatches the number of batches to create; the default (0)
 //!   uses work stealing to distribute tasks.
 //! @details Consider the following code:
@@ -44,15 +44,20 @@ parallelFor(int begin,
             size_t nThreads = std::thread::hardware_concurrency(),
             size_t nBatches = 0)
 {
+    auto oldThreads = ThreadPool::globalInstance().getNumThreads();
+    ThreadPool::globalInstance().setNumThreads(nThreads); 
+
     ThreadPool::globalInstance().parallelFor(begin, end, f, nBatches);
     ThreadPool::globalInstance().wait();
+
+    ThreadPool::globalInstance().setNumThreads(oldThreads);
 }
 
 //! computes a range-based for loop in parallel batches.
 //! @param items an object allowing for `items.size()` and whose elements
 //!   are accessed by the `[]` operator.
 //! @param f a function (the 'loop body').
-//! @param nThreads deprecated; loop is run on global thread pool.
+//! @param nThreads limits the number of threads used from the global pool.
 //! @param nBatches the number of batches to create; the default (0)
 //!   uses work stealing to distribute tasks.
 //! @details Consider the following code:
@@ -83,7 +88,8 @@ parallelForEach(I& items,
     // loop ranges ranges indicate iterator offset
     auto begin = std::begin(items);
     auto size = std::distance(begin, std::end(items));
-    parallelFor(0, size, [f, begin](int i) { f(*(begin + i)); }, nBatches);
+    parallelFor(
+      0, size, [f, begin](int i) { f(*(begin + i)); }, nThreads, nBatches);
 }
 
 //! pushes jobs to the global thread pool.
@@ -111,8 +117,8 @@ template<class F, class... Args>
 inline auto
 pushReturn(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
 {
-    return ThreadPool::globalInstance().pushReturn(
-            std::forward<F>(f), std::forward<Args>(args)...);
+    return ThreadPool::globalInstance().pushReturn(std::forward<F>(f),
+                                                   std::forward<Args>(args)...);
 }
 
 //! pushes jobs returning a value to the global thread pool.

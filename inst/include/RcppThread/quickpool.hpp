@@ -492,7 +492,7 @@ class TaskManager
 
     void resize(size_t num_queues)
     {
-        num_queues_ = num_queues;
+        num_queues_ = std::max(num_queues, static_cast<size_t>(1));
         if (num_queues > queues_.size()) {
             queues_ = std::vector<TaskQueue>(num_queues);
             // thread pool must have stopped the manager, reset
@@ -747,6 +747,7 @@ class ThreadPool
     {
         if (active_threads_ == 0)
             return f(args...);
+        
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
     }

@@ -263,7 +263,7 @@ testThreadPoolDestructWOJoin()
 void
 testParallelFor()
 {
-    std::vector<size_t> x(1000000, 1);
+    std::vector<size_t> x(100000, 1);
     auto dummy = [&](size_t i) -> void {
         checkUserInterrupt();
         x[i] = 2 * x[i];
@@ -271,10 +271,12 @@ testParallelFor()
 
     parallelFor(0, x.size(), dummy, 2);
     parallelFor(0, x.size(), dummy, 0);
+    parallelFor(0, x.size(), dummy, 3, 5);
+    parallelFor(0, x.size(), dummy, std::thread::hardware_concurrency() + 1);
 
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size(); i++)
-        count_wrong += (x[i] != 4);
+        count_wrong += (x[i] != 16);
     if (count_wrong > 0)
         Rcout << "parallelFor gives wrong result" << std::endl;
 }
