@@ -38,6 +38,8 @@ class ThreadPool
     //! Access to the global thread pool instance.
     static ThreadPool& globalInstance();
 
+    void resize(size_t threads);
+
     template<class F, class... Args>
     void push(F&& f, Args&&... args);
 
@@ -56,11 +58,12 @@ class ThreadPool
     void wait();
     void join();
 
+    void setNumThreads(size_t threads);
+    size_t getNumThreads() const;
+
   private:
-    // variables for synchronization between workers (destructed last)
-    const size_t nWorkers_;
-    std::vector<std::thread> workers_;
-    quickpool::sched::TaskManager taskManager_;
+    quickpool::ThreadPool pool_;
+    std::thread::id owner_thread_;
 };
 
 //! constructs a thread pool with as many workers as there are cores.
@@ -72,40 +75,12 @@ inline ThreadPool::ThreadPool()
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
-  : nWorkers_{ nWorkers }
-  , taskManager_{ nWorkers }
-{
-    workers_.reserve(nWorkers);
-    for (size_t id = 0; id < nWorkers; id++) {
-        workers_.emplace_back([this, id] {
-            std::function<void()> task;
-            while (!taskManager_.stopped()) {
-                taskManager_.wait_for_jobs(id);
-                do {
-                    while (taskManager_.try_pop(task, id)) {
-                        try {
-                            task();
-                            taskManager_.report_success();
-                        } catch (...) {
-                            taskManager_.report_fail(std::current_exception());
-                        }
-                    }
-                } while (!taskManager_.done());
-            }
-        });
-    }
-}
+  : pool_{ nWorkers }
+  , owner_thread_{ std::this_thread::get_id() }
+{}
 
 //! destructor joins all threads if possible.
-inline ThreadPool::~ThreadPool() noexcept
-{
-    taskManager_.stop();
-    for (auto& worker : workers_) {
-        if (worker.joinable()) {
-            worker.join();
-        }
-    }
-}
+inline ThreadPool::~ThreadPool() noexcept {}
 
 //! Access to the global thread pool instance.
 inline ThreadPool&
@@ -133,12 +108,7 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-    if (nWorkers_ == 0) {
-        f(args...); // if there are no workers, do the job in the main thread
-    } else {
-        taskManager_.push(
-          std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-    }
+    pool_.push(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 }
 
 //! pushes jobs returning a value to the thread pool.
@@ -152,11 +122,8 @@ auto
 ThreadPool::pushReturn(F&& f, Args&&... args)
   -> std::future<decltype(f(args...))>
 {
-    auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-    using pack_t = std::packaged_task<decltype(f(args...))()>;
-    auto ptr = std::make_shared<pack_t>(std::move(task));
-    this->push([ptr] { (*ptr)(); });
-    return ptr->get_future();
+    return pool_.async(
+      std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
@@ -168,7 +135,7 @@ template<class F, class I>
 void
 ThreadPool::map(F&& f, I&& items)
 {
-    for (auto &&item : items)
+    for (auto&& item : items)
         this->push(std::forward<F>(f), item);
 }
 
@@ -202,24 +169,24 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
     if (nBatches == 0) {
         // each worker has its dedicated range, but can steal part of another
         // worker's ranges when done with own
-        auto nw = nWorkers_ > 1 ? nWorkers_ : 1;
-        auto workers = quickpool::loop::create_workers<F>(f, begin, end, nw);
-        for (int k = 0; k < nw; k++) {
-          this->push([=] { workers->at(k).run(workers); });
+        auto thr = std::max(pool_.get_active_threads(), static_cast<size_t>(1));
+        auto workers = quickpool::loop::create_workers<F>(f, begin, end, thr);
+        for (int k = 0; k < thr; k++) {
+            this->push([=] { workers->at(k).run(workers); });
         }
     } else {
         // manual batching for backwards compatibility
         size_t nTasks = std::max(end - begin, static_cast<int>(0));
         if (nTasks == 0)
             return;
-        nBatches = std::min(nTasks, nBatches);
+        nBatches = std::min(nBatches, nTasks);
 
         size_t minSize = nTasks / nBatches;
         int remSize = nTasks % nBatches;
 
         for (size_t b = 0, k = 0; b < nBatches; b++) {
             ptrdiff_t bBegin = begin + k;
-            ptrdiff_t bSize  = minSize + (remSize-- > 0);
+            ptrdiff_t bSize = minSize + (remSize-- > 0);
             this->push([=] {
                 for (int i = bBegin; i < bBegin + bSize; i++) {
                     f(i);
@@ -264,32 +231,39 @@ ThreadPool::parallelForEach(I& items, F f, size_t nBatches)
 inline void
 ThreadPool::wait()
 {
-    if (!taskManager_.called_from_owner_thread()) {
+    if (std::this_thread::get_id() != owner_thread_) {
         // Only the thread that constructed the pool can wait.
         return;
     }
 
-    while (!taskManager_.done()) {
-        taskManager_.wait_for_finish(100);
+    while (!pool_.done()) {
+        pool_.wait(100);
         Rcout << "";
         checkUserInterrupt();
     }
-
-    // release potentially pending msgs and exception
     Rcout << "";
-    taskManager_.rethrow_exception();
 }
 
-//! waits for all jobs to finish and joins all threads.
+//! waits for all jobs to finish.
 inline void
 ThreadPool::join()
 {
-    this->wait();
-    taskManager_.stop();
-    for (auto& worker : workers_) {
-        if (worker.joinable())
-            worker.join();
-    }
+    pool_.wait();
+}
+
+//! sets the number of active threads in the pool.
+//! @param threads the desired number of threads.
+inline void
+ThreadPool::setNumThreads(size_t threads)
+{
+    pool_.set_active_threads(threads);
+}
+
+//! gets the number of active threads in the pool.
+inline size_t
+ThreadPool::getNumThreads() const
+{
+    return pool_.get_active_threads();
 }
 
 } // end namespace RcppThread

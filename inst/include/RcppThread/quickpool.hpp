@@ -311,7 +311,7 @@ std::shared_ptr<std::vector<Worker<Function>>>
 create_workers(const Function& f, int begin, int end, size_t num_workers)
 {
     auto num_tasks = std::max(end - begin, static_cast<int>(0));
-    num_workers = num_workers > 1 ? num_workers : 1;
+    num_workers = std::max(num_workers, static_cast<size_t>(1));
     auto workers = new std::vector<Worker<Function>>;
     workers->reserve(num_workers);
     for (size_t i = 0; i < num_workers; i++) {
@@ -490,6 +490,18 @@ class TaskManager
       , owner_id_{ std::this_thread::get_id() }
     {}
 
+    void resize(size_t num_queues)
+    {
+        num_queues_ = num_queues;
+        if (num_queues > queues_.size()) {
+            queues_ = std::vector<TaskQueue>(num_queues);
+            // thread pool must have stopped the manager, reset
+            num_waiting_ = 0;
+            todo_ = 0;
+            status_ = Status::running;
+        }
+    }
+
     template<typename Task>
     void push(Task&& task)
     {
@@ -529,7 +541,7 @@ class TaskManager
         if (has_errored()) {
             // Main thread may be waiting to reset the pool.
             std::lock_guard<std::mutex> lk(mtx_);
-            if (++num_waiting_ == num_queues_)
+            if (++num_waiting_ == queues_.size())
                 cv_.notify_all();
         } else {
             ++num_waiting_;
@@ -604,7 +616,7 @@ class TaskManager
             {
                 // Wait for all threads to idle so we can clean up after them.
                 std::unique_lock<std::mutex> lk(mtx_);
-                cv_.wait(lk, [this] { return num_waiting_ == num_queues_; });
+                cv_.wait(lk, [this] { return num_waiting_ == queues_.size(); });
             }
             // Before throwing: restore defaults for potential future use of
             // the task manager.
@@ -666,43 +678,19 @@ class TaskManager
 class ThreadPool
 {
   public:
-    //! @brief constructs a thread pool with as many workers as there are cores.
-    ThreadPool()
-      : ThreadPool(std::thread::hardware_concurrency())
-    {}
-
     //! @brief constructs a thread pool.
-    //! @param n_workers number of worker threads to create; defaults to
+    //! @param threads number of worker threads to create; defaults to
     //! number of available (virtual) hardware cores.
-    explicit ThreadPool(size_t n_workers)
-      : task_manager_{ n_workers }
+    explicit ThreadPool(size_t threads = std::thread::hardware_concurrency())
+      : task_manager_{ threads }
     {
-        std::mutex iomutex;
-        for (size_t id = 0; id < n_workers; ++id) {
-            workers_.emplace_back([&, id] {
-                std::function<void()> task;
-                while (!task_manager_.stopped()) {
-                    task_manager_.wait_for_jobs(id);
-                    do {
-                        // inner while to save some time calling done()
-                        while (task_manager_.try_pop(task, id))
-                            this->execute_safely(task);
-                    } while (!task_manager_.done());
-                }
-            });
-
-            // set thread affinity on linux
-            this->set_thread_affinity(id);
-        }
+        set_active_threads(threads);
     }
 
     ~ThreadPool()
     {
         task_manager_.stop();
-        for (auto& worker : workers_) {
-            if (worker.joinable())
-                worker.join();
-        }
+        join_threads();
     }
 
     ThreadPool(ThreadPool&&) = delete;
@@ -724,13 +712,40 @@ class ThreadPool
 #endif
     }
 
+    //! @brief sets the number of active worker threads in the thread pool.
+    //! @param threads the number of worker threads.
+    //! Has no effect when not called from owner thread.
+    void set_active_threads(size_t threads)
+    {
+        if (!task_manager_.called_from_owner_thread())
+            return;
+
+        if (threads <= workers_.size()) {
+            task_manager_.resize(threads);
+        } else {
+            if (workers_.size() > 0) {
+                task_manager_.stop();
+                join_threads();
+            }
+            workers_ = std::vector<std::thread>{ threads };
+            task_manager_.resize(threads);
+            for (size_t id = 0; id < threads; ++id) {
+                add_worker(id);
+            }
+        }
+        active_threads_ = threads;
+    }
+
+    //! @brief retrieves the number of active worker threads in the thread pool.
+    size_t get_active_threads() const { return active_threads_; }
+
     //! @brief pushes a job to the thread pool.
     //! @param f a function.
     //! @param args (optional) arguments passed to `f`.
     template<class Function, class... Args>
     void push(Function&& f, Args&&... args)
     {
-        if (workers_.size() == 0)
+        if (active_threads_ == 0)
             return f(args...);
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
@@ -792,25 +807,58 @@ class ThreadPool
         this->parallel_for(0, size, [=](int i) { f(begin[i]); });
     }
 
-    //! @brief waits for all jobs currently running on the global thread
+    //! @brief waits for all jobs currently running on the thread
     //! pool. Has no effect when called from threads other than the one that
     //! created the pool.
     //! @param millis if > 0: stops waiting after millis ms.
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
+    //! @brief checks whether all jobs are done.
+    bool done() const { return task_manager_.done(); }
+
   private:
-    //! sets thread affinity (if there are as many workers as cores).
+    //! joins all worker threads.
+    void join_threads()
+    {
+        for (auto& worker : workers_) {
+            if (worker.joinable())
+                worker.join();
+        }
+    }
+
+    //! adds one worker thread to the thread pool.
+    //! @param id worker id (used for matching threads with queues and cores)
+    void add_worker(size_t id)
+    {
+        workers_[id] = std::thread([&, id] {
+            std::function<void()> task;
+            while (!task_manager_.stopped()) {
+                task_manager_.wait_for_jobs(id);
+                do {
+                    // inner while to save some time calling done()
+                    while (task_manager_.try_pop(task, id))
+                        this->execute_safely(task);
+                } while (!task_manager_.done());
+            }
+        });
+
+        // set thread affinity on linux
+        this->set_thread_affinity(id);
+    }
+
+    //! sets thread affinity (if there are as less workers than cores).
     //! This works on linux by default. In OSX compile with -pthread -DAFFINITY.
     void set_thread_affinity(size_t id)
     {
 #if (defined __linux__ || defined AFFINITY)
-        if (workers_.size() == std::thread::hardware_concurrency())
-            return;
+        auto hardware_cores = std::thread::hardware_concurrency();
+        if (id >= hardware_cores)
+            id = id % hardware_cores;
         cpu_set_t cpuset;
         CPU_ZERO(&cpuset);
         CPU_SET(id, &cpuset);
         int rc = pthread_setaffinity_np(
-          workers_[id].native_handle(), sizeof(cpu_set_t), &cpuset);
+          workers_.at(id).native_handle(), sizeof(cpu_set_t), &cpuset);
         if (rc != 0) {
             throw std::runtime_error("Error calling pthread_setaffinity_np");
         }
@@ -829,6 +877,7 @@ class ThreadPool
 
     sched::TaskManager task_manager_;
     std::vector<std::thread> workers_;
+    std::atomic_size_t active_threads_;
 };
 
 // 5. ---------------------------------------------------
@@ -865,6 +914,30 @@ inline void
 wait()
 {
     ThreadPool::global_instance().wait();
+}
+
+//! @brief checks whether all globel jobs are done.
+inline bool
+done()
+{
+    return ThreadPool::global_instance().done();
+}
+
+//! @brief sets the number of active worker threads in the global thread pool.
+//! @param threads the number of worker threads.
+//! Has no effect when not called from main thread.
+inline void
+set_active_threads(size_t threads)
+{
+    ThreadPool::global_instance().set_active_threads(threads);
+}
+
+//! @brief retrieves the number of active worker threads in the global thread
+//! pool.
+inline size_t
+get_active_threads()
+{
+    return ThreadPool::global_instance().get_active_threads();
 }
 
 //! @brief computes an index-based parallel for loop.
