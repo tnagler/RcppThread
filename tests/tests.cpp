@@ -424,7 +424,6 @@ testThreadPoolExceptionHandling()
 
     // poool should be functional again
     pool.push([] { throw std::runtime_error("test error"); });
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     try {
         pool.wait();
     } catch (...) {

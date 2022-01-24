@@ -234,12 +234,12 @@ ThreadPool::wait()
         // Only the thread that constructed the pool can wait.
         return;
     }
-
-    while (!pool_.done()) {
+    do {
         pool_.wait(100);
         Rcout << "";
         checkUserInterrupt();
-    }
+
+    } while (!pool_.done());
     Rcout << "";
 }
 
