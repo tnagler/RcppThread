@@ -171,7 +171,7 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
         // worker's ranges when done with own
         auto thr = std::max(pool_.get_active_threads(), static_cast<size_t>(1));
         auto workers = quickpool::loop::create_workers<F>(f, begin, end, thr);
-        for (int k = 0; k < thr; k++) {
+        for (size_t k = 0; k < thr; k++) {
             this->push([=] { workers->at(k).run(workers); });
         }
     } else {
