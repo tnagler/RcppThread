@@ -408,7 +408,7 @@ testThreadPoolExceptionHandling()
     std::exception_ptr eptr = nullptr;
     try {
         pool.push([] { throw std::runtime_error("test error"); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         for (size_t i = 0; i < 10; i++) {
             pool.push([&] {});
         }
@@ -424,6 +424,7 @@ testThreadPoolExceptionHandling()
 
     // poool should be functional again
     pool.push([] { throw std::runtime_error("test error"); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     try {
         pool.wait();
     } catch (...) {
