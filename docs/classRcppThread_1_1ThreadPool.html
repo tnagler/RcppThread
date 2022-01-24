@@ -136,7 +136,15 @@ C++</a>
             <dt id="a1ba95e4fe30c81e19c7980c865a8ce86">
               <span class="m-doc-wrap-bumper">void <a href="#a1ba95e4fe30c81e19c7980c865a8ce86" class="m-doc-self">join</a>(</span><span class="m-doc-wrap">)</span>
             </dt>
-            <dd>waits for all jobs to finish and joins all threads.</dd>
+            <dd>waits for all jobs to finish.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#a332b4f9a74d1c4e206e3957a299e0629" class="m-doc">setNumThreads</a>(</span><span class="m-doc-wrap">size_t threads)</span>
+            </dt>
+            <dd></dd>
+            <dt id="aa73eb6889492403da12d60a1a92de519">
+              <span class="m-doc-wrap-bumper">auto <a href="#aa73eb6889492403da12d60a1a92de519" class="m-doc-self">getNumThreads</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
+            </dt>
+            <dd>gets the number of active threads in the pool.</dd>
           </dl>
         </section>
         <section>
@@ -324,6 +332,23 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
               <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6c93f9e84fadfdc1a3357770d47a738a" class="m-doc-self">wait</a>(</span><span class="m-doc-wrap">)</span></span>
             </h3>
 <p>waits for all jobs to finish and checks for interruptions, but only from the thread that created the pool.Does nothing when called from other threads.</p>
+          </div></section>
+          <section class="m-doc-details" id="a332b4f9a74d1c4e206e3957a299e0629"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a332b4f9a74d1c4e206e3957a299e0629" class="m-doc-self">setNumThreads</a>(</span><span class="m-doc-wrap">size_t threads)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">threads</td>
+                  <td>the desired number of threads.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>sets the number of active threads in the pool.</p>
           </div></section>
         </section>
       </div>

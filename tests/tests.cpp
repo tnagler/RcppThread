@@ -408,7 +408,7 @@ testThreadPoolExceptionHandling()
     std::exception_ptr eptr = nullptr;
     try {
         pool.push([] { throw std::runtime_error("test error"); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         for (size_t i = 0; i < 10; i++) {
             pool.push([&] {});
         }
@@ -417,7 +417,7 @@ testThreadPoolExceptionHandling()
     }
 
     if (!eptr) {
-        throw std::runtime_error("exception not rethrown");
+        throw std::runtime_error("exception not rethrow on push");
     } else {
         eptr = nullptr;
     }
@@ -430,7 +430,7 @@ testThreadPoolExceptionHandling()
         eptr = std::current_exception();
     }
     if (!eptr) {
-        throw std::runtime_error("exception not rethrown");
+        throw std::runtime_error("exception not rethrown on wait");
     } else {
         eptr = nullptr;
     }
