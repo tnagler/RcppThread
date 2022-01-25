@@ -490,6 +490,17 @@ class TaskManager
       , owner_id_{ std::this_thread::get_id() }
     {}
 
+    TaskManager& operator=(TaskManager&& other)
+    {
+        std::swap(queues_, other.queues_);
+        num_queues_ = other.num_queues_;
+        status_ = other.status_.load();
+        num_waiting_ = other.num_waiting_.load();
+        push_idx_ = other.push_idx_.load();
+        todo_ = other.todo_.load();
+        return *this;
+    }
+
     void resize(size_t num_queues)
     {
         num_queues_ = std::max(num_queues, static_cast<size_t>(1));
@@ -728,7 +739,7 @@ class ThreadPool
                 join_threads();
             }
             workers_ = std::vector<std::thread>{ threads };
-            task_manager_.resize(threads);
+            task_manager_ = quickpool::sched::TaskManager{ threads };
             for (size_t id = 0; id < threads; ++id) {
                 add_worker(id);
             }
