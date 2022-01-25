@@ -26,6 +26,7 @@
 #include <exception>
 #include <functional>
 #include <future>
+#include <memory>
 #include <mutex>
 #include <numeric>
 #include <thread>
@@ -758,7 +759,7 @@ class ThreadPool
     {
         if (active_threads_ == 0)
             return f(args...);
-        
+
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
     }

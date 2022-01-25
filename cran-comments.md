@@ -1,24 +1,19 @@
-Fixed URL/DOI formatting required by Uwe Ligges via mail.
-
-The DOI in the CITATION, DESCRIPTION, and documentation is for a new JSS publication that will be registered after publication on CRAN.
-
-
 ## Test environments
-* ubuntu 16.04 (devel, release, old-rel)
+* ubuntu 20.04 (devel, release, old-rel)
 * macOS X (release)
 * Windows Server 2019 (release)
 * CRAN win builder (devel)
+* rhub::check_for_cran()
+* rhub::check_with_sanitizers()
+* rhub::check_with_valgrind()
 
-## R CMD check results
+Check status summary:
+                  WARN NOTE OK
+  Source packages    0    0  1
+  Reverse depends    1   17  1
 
-0 errors | 0 warnings | 1 note
+There was 1 WARNING in package CDSeq:
 
-* Note caused by invalid DOI.
+"Warning: replacing previous import ‘RcppThread::detectCores’ by ‘parallel::detectCores’ when loading ‘CDSeq’"
 
-## Reverse dependencies
-
-We checked 11 reverse dependencies (11 from CRAN), comparing R CMD check results across CRAN and dev versions of this package.
-
- * We saw 0 new problems
- * We failed to check 0 packages
-
+This is caused by CDSeq importing both 'parallel' and 'RcppThread' namespaces in full. I have opened a pull request to fix this in November: https://github.com/kkang7/CDSeq_R_Package/pull/13. I have also sent an email to the maintainer last week, with no response.
