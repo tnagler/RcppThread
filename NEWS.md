@@ -12,7 +12,9 @@
   significantly speeds up programs that repeatedly call these functions. (#54)
   
 * New free-standing `push()`, `pushReturn()`/`async()`, and `wait()`, mirroring
-  functionality from `ThreadPool`.
+  functionality from `ThreadPool`. (#56)
+
+* Option to resize a thread pool (#56).
 
 
 # RcppThread 1.0.0
