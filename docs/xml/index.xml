@@ -70,11 +70,8 @@
     <member refid="classRcppThread_1_1Thread_1a1ae92afcef21111e10a96cf5f4c8c8f0" kind="function"><name>hardware_concurrency</name></member>
   </compound>
   <compound refid="classRcppThread_1_1ThreadPool" kind="class"><name>RcppThread::ThreadPool</name>
-    <member refid="classRcppThread_1_1ThreadPool_1a4be4ca7cc2abaab9471590013702f421" kind="variable"><name>nWorkers_</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1a55d6e5030c0839bafdf5c5e9e8e3c337" kind="variable"><name>workers_</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1aae4f7bfd6bc3146587d3d43f8a215385" kind="variable"><name>taskManager_</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1afe2c7e90bfcd2d1e90c32827fa4ad29f" kind="variable"><name>todoList_</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1a58213270150f29c50adbb70c3d717c29" kind="variable"><name>ctor_id_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1ae01e3405af79ea4d86d1b63b2c822311" kind="variable"><name>pool_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a884ba54cc9f225392007a0736b80977d" kind="variable"><name>owner_thread_</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a83ffe33d4d776b62baf312a1c4965c08" kind="function"><name>ThreadPool</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a524ee4a9d217cba6cbdfd3405515376b" kind="function"><name>ThreadPool</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a66eb5407d41494582e7c456834e027b8" kind="function"><name>ThreadPool</name></member>
@@ -82,28 +79,30 @@
     <member refid="classRcppThread_1_1ThreadPool_1aca522b3487e549852bbf73a41c4ed7cd" kind="function"><name>~ThreadPool</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a4cda48aa1b12efd9e84302f2e3f463a7" kind="function"><name>operator=</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a6f3c66741b4c18ab9c096ec0f04da289" kind="function"><name>operator=</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a0967f38d786196019a06f0e65642cfb3" kind="function"><name>resize</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1af1c8048954f42b41d19bd8fa9133490a" kind="function"><name>push</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a14e16052783d48a17791b3f29d5149f0" kind="function"><name>pushReturn</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1ac0f94dddc58d21857245ae5010b9d491" kind="function"><name>map</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1ac3f2a25288cfbfcc62e885b7fb72fe73" kind="function"><name>parallelFor</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1a44b177dbf1297cb38019eee3343b2319" kind="function"><name>parallelForEach</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a86f352d702e3a8dc211838c9518a83d7" kind="function"><name>parallelFor</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a5209d746d78202faf17524ce6bf2e94a" kind="function"><name>parallelForEach</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a6c93f9e84fadfdc1a3357770d47a738a" kind="function"><name>wait</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a1ba95e4fe30c81e19c7980c865a8ce86" kind="function"><name>join</name></member>
-    <member refid="classRcppThread_1_1ThreadPool_1a17e23c155801f91d2e3434a95e2cef84" kind="function"><name>globalInstance</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1a332b4f9a74d1c4e206e3957a299e0629" kind="function"><name>setNumThreads</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1aa73eb6889492403da12d60a1a92de519" kind="function"><name>getNumThreads</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1acbe6f9722b613a9caed088d60ef32f0e" kind="function"><name>globalInstance</name></member>
   </compound>
   <compound refid="classRcppThread_1_1UserInterruptException" kind="class"><name>RcppThread::UserInterruptException</name>
     <member refid="classRcppThread_1_1UserInterruptException_1a5e4c038748d820773fa3e20e3620e8dc" kind="function"><name>what</name></member>
   </compound>
-  <compound refid="namespacebench" kind="namespace"><name>bench</name>
-    <member refid="Bench_8hpp_1ac3f0c01c0251666136d8e0813ee1369a" kind="function"><name>time_one</name></member>
-    <member refid="Bench_8hpp_1acade5867474f52235f4cec9d2c3740b1" kind="function"><name>time_once</name></member>
-    <member refid="Bench_8hpp_1a8a899c63f112cae6c500c80a5118528d" kind="function"><name>benchmark</name></member>
-  </compound>
   <compound refid="namespaceRcppThread" kind="namespace"><name>RcppThread</name>
     <member refid="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" kind="variable"><name>Rcout</name></member>
     <member refid="namespaceRcppThread_1ada4c397edb2f1f4150f8dc1ab899d324" kind="variable"><name>mainThreadID</name></member>
-    <member refid="namespaceRcppThread_1a800a2ece44553db6da00c76d617b8223" kind="function"><name>parallelFor</name></member>
-    <member refid="namespaceRcppThread_1a1c246ba8e53889c0cd5c1c24e8c6cc85" kind="function"><name>parallelForEach</name></member>
+    <member refid="namespaceRcppThread_1ae462e1889f6dbf0a3f9392613e9cdc76" kind="function"><name>parallelFor</name></member>
+    <member refid="namespaceRcppThread_1aacf602b65d52bf021dabf4628bca6176" kind="function"><name>parallelForEach</name></member>
+    <member refid="namespaceRcppThread_1a566c8269168c051f8418ce62a07eac58" kind="function"><name>push</name></member>
+    <member refid="namespaceRcppThread_1a3ce0a8f7082376726b749af3c3170927" kind="function"><name>pushReturn</name></member>
+    <member refid="namespaceRcppThread_1a3ed90ea612c5d982ab585c39d147c4d1" kind="function"><name>async</name></member>
+    <member refid="namespaceRcppThread_1ad2a2fc0e5880f137964f12a45a4ce140" kind="function"><name>wait</name></member>
     <member refid="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" kind="function"><name>checkUserInterrupt</name></member>
     <member refid="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" kind="function"><name>isInterrupted</name></member>
   </compound>
@@ -112,10 +111,6 @@
   <compound refid="mainpage_8h" kind="file"><name>mainpage.h</name>
   </compound>
   <compound refid="RcppThread_8h" kind="file"><name>RcppThread.h</name>
-  </compound>
-  <compound refid="Batch_8hpp" kind="file"><name>Batch.hpp</name>
-  </compound>
-  <compound refid="Bench_8hpp" kind="file"><name>Bench.hpp</name>
   </compound>
   <compound refid="parallelFor_8hpp" kind="file"><name>parallelFor.hpp</name>
   </compound>

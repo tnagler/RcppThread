@@ -70,8 +70,8 @@ C++</a>
         <section id="pub-static-methods">
           <h2><a href="#pub-static-methods">Public static functions</a></h2>
           <dl class="m-doc">
-            <dt id="a17e23c155801f91d2e3434a95e2cef84">
-              <span class="m-doc-wrap-bumper">static auto <a href="#a17e23c155801f91d2e3434a95e2cef84" class="m-doc-self">globalInstance</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classRcppThread_1_1ThreadPool.html" class="m-doc">ThreadPool</a>&amp;</span>
+            <dt id="acbe6f9722b613a9caed088d60ef32f0e">
+              <span class="m-doc-wrap-bumper">static auto <a href="#acbe6f9722b613a9caed088d60ef32f0e" class="m-doc-self">globalInstance</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classRcppThread_1_1ThreadPool.html" class="m-doc">ThreadPool</a>&amp;</span>
             </dt>
             <dd>Access to the global thread pool instance.</dd>
           </dl>
@@ -116,16 +116,16 @@ C++</a>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#ac3f2a25288cfbfcc62e885b7fb72fe73" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t end,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#a86f352d702e3a8dc211838c9518a83d7" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
+              F f,
               size_t nBatches = 0)</span>
             </dt>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class F, class I&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a44b177dbf1297cb38019eee3343b2319" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#a5209d746d78202faf17524ce6bf2e94a" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F f,
               size_t nBatches = 0)</span>
             </dt>
             <dd></dd>
@@ -136,7 +136,15 @@ C++</a>
             <dt id="a1ba95e4fe30c81e19c7980c865a8ce86">
               <span class="m-doc-wrap-bumper">void <a href="#a1ba95e4fe30c81e19c7980c865a8ce86" class="m-doc-self">join</a>(</span><span class="m-doc-wrap">)</span>
             </dt>
-            <dd>waits for all jobs to finish and joins all threads.</dd>
+            <dd>waits for all jobs to finish.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#a332b4f9a74d1c4e206e3957a299e0629" class="m-doc">setNumThreads</a>(</span><span class="m-doc-wrap">size_t threads)</span>
+            </dt>
+            <dd></dd>
+            <dt id="aa73eb6889492403da12d60a1a92de519">
+              <span class="m-doc-wrap-bumper">auto <a href="#aa73eb6889492403da12d60a1a92de519" class="m-doc-self">getNumThreads</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
+            </dt>
+            <dd>gets the number of active threads in the pool.</dd>
           </dl>
         </section>
         <section>
@@ -209,7 +217,7 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
               <tfoot>
                 <tr>
                   <th>Returns</th>
-                  <td>an <code>std::shared_future</code>, where the user can get the result and rethrow the catched exceptions.</td>
+                  <td>an <code>std::shared_future</code>, where the user can get the result and rethrow exceptions.</td>
                 </tr>
               </tfoot>
             </table>
@@ -240,14 +248,14 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
             </table>
 <p>maps a function on a list of items, possibly running tasks in parallel.</p>
           </div></section>
-          <section class="m-doc-details" id="ac3f2a25288cfbfcc62e885b7fb72fe73"><div>
+          <section class="m-doc-details" id="a86f352d702e3a8dc211838c9518a83d7"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac3f2a25288cfbfcc62e885b7fb72fe73" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t end,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a86f352d702e3a8dc211838c9518a83d7" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
+              F f,
               size_t nBatches = 0)</span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
@@ -261,7 +269,7 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
                 </tr>
                 <tr>
                   <td>end</td>
-                  <td></td>
+                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>
@@ -269,7 +277,7 @@ The function returns void; if a job returns a result, use <code>pushReturn()</co
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the batch size.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>
@@ -282,13 +290,13 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
 <span class="p">});</span><span class="w"></span></pre><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
-          <section class="m-doc-details" id="a44b177dbf1297cb38019eee3343b2319"><div>
+          <section class="m-doc-details" id="a5209d746d78202faf17524ce6bf2e94a"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F, class I&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a44b177dbf1297cb38019eee3343b2319" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a5209d746d78202faf17524ce6bf2e94a" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F f,
               size_t nBatches = 0)</span></span>
             </h3>
             <table class="m-table m-fullwidth m-flat">
@@ -306,7 +314,7 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>
@@ -324,6 +332,23 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
               <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6c93f9e84fadfdc1a3357770d47a738a" class="m-doc-self">wait</a>(</span><span class="m-doc-wrap">)</span></span>
             </h3>
 <p>waits for all jobs to finish and checks for interruptions, but only from the thread that created the pool.Does nothing when called from other threads.</p>
+          </div></section>
+          <section class="m-doc-details" id="a332b4f9a74d1c4e206e3957a299e0629"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />ThreadPool::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a332b4f9a74d1c4e206e3957a299e0629" class="m-doc-self">setNumThreads</a>(</span><span class="m-doc-wrap">size_t threads)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">threads</td>
+                  <td>the desired number of threads.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>sets the number of active threads in the pool.</p>
           </div></section>
         </section>
       </div>

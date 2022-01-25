@@ -109,19 +109,41 @@ C++</a>
           <dl class="m-doc">
             <dt>
               <div class="m-doc-template">template&lt;class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a800a2ece44553db6da00c76d617b8223" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t size,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#ae462e1889f6dbf0a3f9392613e9cdc76" class="m-doc">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
+              F f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span>
             </dt>
             <dd></dd>
             <dt>
               <div class="m-doc-template">template&lt;class I, class F&gt;</div>
-              <span class="m-doc-wrap-bumper">void <a href="#a1c246ba8e53889c0cd5c1c24e8c6cc85" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void <a href="#aacf602b65d52bf021dabf4628bca6176" class="m-doc">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class F, class... Args&gt;</div>
+              <span class="m-doc-wrap-bumper">void <a href="#a566c8269168c051f8418ce62a07eac58" class="m-doc">push</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              Args &amp;&amp; ... args)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class F, class... Args&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a3ce0a8f7082376726b749af3c3170927" class="m-doc">pushReturn</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              Args &amp;&amp; ... args) &gt; -&gt; auto</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class F, class... Args&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a3ed90ea612c5d982ab585c39d147c4d1" class="m-doc">async</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              Args &amp;&amp; ... args) &gt; -&gt; auto</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#ad2a2fc0e5880f137964f12a45a4ce140" class="m-doc">wait</a>(</span><span class="m-doc-wrap">)</span>
             </dt>
             <dd></dd>
             <dt>
@@ -149,14 +171,14 @@ C++</a>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a800a2ece44553db6da00c76d617b8223"><div>
+          <section class="m-doc-details" id="ae462e1889f6dbf0a3f9392613e9cdc76"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a800a2ece44553db6da00c76d617b8223" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
-              size_t size,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae462e1889f6dbf0a3f9392613e9cdc76" class="m-doc-self">parallelFor</a>(</span><span class="m-doc-wrap">int begin,
+              int end,
+              F f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span></span>
             </h3>
@@ -170,8 +192,8 @@ C++</a>
                   <td>first index of the loop.</td>
                 </tr>
                 <tr>
-                  <td>size</td>
-                  <td>the loop runs in the range <code>[begin, begin + size)</code>.</td>
+                  <td>end</td>
+                  <td>the loop runs in the range <code>[begin, end)</code>.</td>
                 </tr>
                 <tr>
                   <td>f</td>
@@ -179,11 +201,11 @@ C++</a>
                 </tr>
                 <tr>
                   <td>nThreads</td>
-                  <td>deprecated; loop is run on global thread pool.</td>
+                  <td>limits the number of threads used from the global pool.</td>
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>
@@ -195,13 +217,13 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="w">    </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
 <span class="p">});</span><span class="w"></span></pre><p>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
           </div></section>
-          <section class="m-doc-details" id="a1c246ba8e53889c0cd5c1c24e8c6cc85"><div>
+          <section class="m-doc-details" id="aacf602b65d52bf021dabf4628bca6176"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;class I, class F&gt;
               </div>
-              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a1c246ba8e53889c0cd5c1c24e8c6cc85" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
-              F&amp;&amp; f,
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aacf602b65d52bf021dabf4628bca6176" class="m-doc-self">parallelForEach</a>(</span><span class="m-doc-wrap">I&amp; items,
+              F f,
               size_t nThreads = std::thread::hardware_concurrency(),
               size_t nBatches = 0)</span></span>
             </h3>
@@ -220,11 +242,11 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
                 </tr>
                 <tr>
                   <td>nThreads</td>
-                  <td>deprecated; loop is run on global thread pool.</td>
+                  <td>limits the number of threads used from the global pool.</td>
                 </tr>
                 <tr>
                   <td>nBatches</td>
-                  <td>the number of batches to create; the default (0) triggers a heuristic to automatically determine the number of batches.</td>
+                  <td>the number of batches to create; the default (0) uses work stealing to distribute tasks.</td>
                 </tr>
               </tbody>
             </table>
@@ -235,6 +257,100 @@ Consider the following code:</p><pre class="m-code"><span class="n">std</span><s
 <span class="p">}</span><span class="w"></span></pre><p>The parallel equivalent is</p><pre class="m-code"><span class="n">parallelFor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="o">&amp;</span><span class="w"> </span><span class="n">xx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">xx</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
 <span class="p">});</span><span class="w"></span></pre><p>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</p><p><strong>Caution</strong>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes).</p>
+          </div></section>
+          <section class="m-doc-details" id="a566c8269168c051f8418ce62a07eac58"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class F, class... Args&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a566c8269168c051f8418ce62a07eac58" class="m-doc-self">push</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              Args &amp;&amp; ... args)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">f</td>
+                  <td>a function taking an arbitrary number of arguments.</td>
+                </tr>
+                <tr>
+                  <td>args</td>
+                  <td>a comma-seperated list of the other arguments that shall be passed to <code>f</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>pushes jobs to the global thread pool. 
+The function returns void; if a job returns a result, use <code>async()</code>.</p>
+          </div></section>
+          <section class="m-doc-details" id="a3ce0a8f7082376726b749af3c3170927"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class F, class... Args&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a3ce0a8f7082376726b749af3c3170927" class="m-doc-self">pushReturn</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              Args &amp;&amp; ... args) &gt;</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">f</td>
+                  <td>a function taking an arbitrary number of arguments.</td>
+                </tr>
+                <tr>
+                  <td>args</td>
+                  <td>a comma-seperated list of the other arguments that shall be passed to <code>f</code>.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>an <code>std::shared_future</code>, where the user can get the result and rethrow exceptions.</td>
+                </tr>
+              </tfoot>
+            </table>
+<p>pushes jobs returning a value to the global thread pool.</p>
+          </div></section>
+          <section class="m-doc-details" id="a3ed90ea612c5d982ab585c39d147c4d1"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class F, class... Args&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a3ed90ea612c5d982ab585c39d147c4d1" class="m-doc-self">async</a>(</span><span class="m-doc-wrap">F&amp;&amp; f,
+              Args &amp;&amp; ... args) &gt;</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">f</td>
+                  <td>a function taking an arbitrary number of arguments.</td>
+                </tr>
+                <tr>
+                  <td>args</td>
+                  <td>a comma-seperated list of the other arguments that shall be passed to <code>f</code>.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>an <code>std::shared_future</code>, where the user can get the result and rethrow exceptions.</td>
+                </tr>
+              </tfoot>
+            </table>
+<p>pushes jobs returning a value to the global thread pool.</p>
+          </div></section>
+          <section class="m-doc-details" id="ad2a2fc0e5880f137964f12a45a4ce140"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ad2a2fc0e5880f137964f12a45a4ce140" class="m-doc-self">wait</a>(</span><span class="m-doc-wrap">)</span></span>
+            </h3>
+<p>waits for all jobs to finish and checks for interruptions, but only from the main thread. Does nothing when called from other threads.</p>
           </div></section>
           <section class="m-doc-details" id="ae48d2e823f3ac43fb87a2795f242e3df"><div>
             <h3>

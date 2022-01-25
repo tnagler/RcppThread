@@ -80,7 +80,7 @@ jobs:
           _R_CHECK_CRAN_INCOMING_: false
         run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
-        # run: cd .. && R CMD build RcppThread && R CMD check RcppThread_1.1.0.tar.gz 
+        # run: cd .. && R CMD build RcppThread && R CMD check RcppThread_1.1.0.tar.gz
         # shell: bash
 
       - name: Show testthat output
@@ -94,9 +94,3 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
-
-      # - name: Test coverage
-      #   if: matrix.config.os == 'macOS-latest' && matrix.config.r == 'release'
-      #   run: |
-      #     Rscript -e 'remotes::install_github("r-lib/covr@gh-actions")'
-      #     Rscript -e 'covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")'

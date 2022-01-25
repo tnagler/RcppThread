@@ -110,7 +110,7 @@ testThreadPoolMap()
 {
     ThreadPool pool;
 
-    std::vector<size_t> x(1000000, 1);
+    std::vector<size_t> x(100000, 1);
     auto dummy = [&](size_t i) -> void {
         checkUserInterrupt();
         x[i] = 2 * x[i];
@@ -142,12 +142,14 @@ testThreadPoolParallelFor()
         x[i] = 2 * x[i];
     };
 
-    pool.parallelFor(0, x.size(), dummy, 1);
+    pool.parallelFor(0, x.size(), dummy);
+    pool.wait();
+    pool.parallelFor(0, x.size(), dummy, 3); // backwards compatiblity
     pool.join();
 
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size(); i++)
-        count_wrong += (x[i] != 2);
+        count_wrong += (x[i] != 4);
     if (count_wrong > 0)
         Rcout << "parallelFor gives wrong result" << std::endl;
 }
@@ -235,8 +237,11 @@ testThreadPoolSingleThreaded()
         x[i] = 2 * x[i];
     };
 
-    for (size_t i = 0; i < x.size(); i++)
-        pool.push(dummy, i);
+    // for (size_t i = 0; i < x.size(); i++)
+    //     pool.push(dummy, i);
+    // pool.wait();
+
+    pool.parallelFor(0, x.size(), dummy);
     pool.wait();
 
     size_t count_wrong = 0;
@@ -258,7 +263,7 @@ testThreadPoolDestructWOJoin()
 void
 testParallelFor()
 {
-    std::vector<size_t> x(1000000, 1);
+    std::vector<size_t> x(100000, 1);
     auto dummy = [&](size_t i) -> void {
         checkUserInterrupt();
         x[i] = 2 * x[i];
@@ -266,10 +271,12 @@ testParallelFor()
 
     parallelFor(0, x.size(), dummy, 2);
     parallelFor(0, x.size(), dummy, 0);
+    parallelFor(0, x.size(), dummy, 3, 5);
+    parallelFor(0, x.size(), dummy, std::thread::hardware_concurrency() + 1);
 
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size(); i++)
-        count_wrong += (x[i] != 4);
+        count_wrong += (x[i] != 16);
     if (count_wrong > 0)
         Rcout << "parallelFor gives wrong result" << std::endl;
 }
@@ -410,7 +417,7 @@ testThreadPoolExceptionHandling()
     }
 
     if (!eptr) {
-        throw std::runtime_error("exception not rethrown");
+        throw std::runtime_error("exception not rethrow on push");
     } else {
         eptr = nullptr;
     }
@@ -423,7 +430,7 @@ testThreadPoolExceptionHandling()
         eptr = std::current_exception();
     }
     if (!eptr) {
-        throw std::runtime_error("exception not rethrown");
+        throw std::runtime_error("exception not rethrown on wait");
     } else {
         eptr = nullptr;
     }

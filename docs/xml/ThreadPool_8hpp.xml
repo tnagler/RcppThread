@@ -2,7 +2,6 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
   <compounddef id="ThreadPool_8hpp" kind="file" language="C++">
     <compoundname>ThreadPool.hpp</compoundname>
-    <includes refid="Batch_8hpp" local="yes">RcppThread/Batch.hpp</includes>
     <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
     <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
     <includes refid="quickpool_8hpp" local="yes">RcppThread/quickpool.hpp</includes>
