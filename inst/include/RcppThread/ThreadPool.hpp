@@ -181,17 +181,12 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
             return;
         nBatches = std::min(nBatches, nTasks);
 
-        size_t minSize = nTasks / nBatches;
-        int remSize = nTasks % nBatches;
-
+        size_t sz = nTasks / nBatches;
+        int rem = nTasks % nBatches;
         for (size_t b = 0; b < nBatches; b++) {
-            int bSize = minSize + (remSize-- > 0);
-            this->push([=] {
-                for (int i = begin; i < begin + bSize; ++i) {
-                    f(i);
-                }
-            });
-            begin += bSize;
+            int bs = sz + (rem-- > 0);
+            this->push([=] { for (int i = begin; i < begin + bs; ++i) f(i); });
+            begin += bs;
         }
     }
 }
