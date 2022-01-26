@@ -41,6 +41,7 @@
 // 1. Memory related utilities.
 //    - Memory order aliases
 //    - Class for padding bytes
+//    - Memory aligned allocation utilities
 //    - Class for cache aligned atomics
 //    - Class for load/assign atomics with relaxed order
 // 2. Loop related utilities.
@@ -65,6 +66,8 @@ static constexpr std::memory_order relaxed = std::memory_order_relaxed;
 static constexpr std::memory_order acquire = std::memory_order_acquire;
 static constexpr std::memory_order release = std::memory_order_release;
 static constexpr std::memory_order seq_cst = std::memory_order_seq_cst;
+
+}
 
 //! Padding char[]s always must hold at least one char. If the size of the
 //! object ends at an alignment point, we don't want to pad one extra byte
@@ -104,18 +107,102 @@ struct padding
 
 } // end namespace padding_impl
 
+namespace aligned {
+
+// The alloc/dealloc mechanism is pretty much
+// https://www.boost.org/doc/libs/1_76_0/boost/align/detail/aligned_alloc.hpp
+
+inline void*
+alloc(size_t alignment, size_t size) noexcept
+{
+    // Make sure alignment is at least that of void*.
+    alignment = (alignment >= alignof(void*)) ? alignment : alignof(void*);
+
+    // Allocate enough space required for object and a void*.
+    size_t space = size + alignment + sizeof(void*);
+    void* p = std::malloc(space);
+    if (p == nullptr) {
+        return nullptr;
+    }
+
+    // Shift pointer to leave space for void*.
+    void* p_algn = static_cast<char*>(p) + sizeof(void*);
+    space -= sizeof(void*);
+
+    // Shift pointer further to ensure proper alignment.
+    (void)std::align(alignment, size, p_algn, space);
+
+    // Store unaligned pointer with offset sizeof(void*) before aligned
+    // location. Later we'll know where to look for the pointer telling
+    // us where to free what we malloc()'ed above.
+    *(static_cast<void**>(p_algn) - 1) = p;
+
+    return p_algn;
+}
+
+inline void
+free(void* ptr) noexcept
+{
+    if (ptr) {
+        std::free(*(static_cast<void**>(ptr) - 1));
+    }
+}
+
+// short version of https://www.boost.org/doc/libs/1_65_0/boost/align/aligned_allocator.hpp
+template<class T, std::size_t Alignment = 64>
+class allocator : public std::allocator<T>
+{
+  private:
+    static constexpr size_t min_align =
+      (Alignment >= alignof(void*)) ? Alignment : alignof(void*);
+
+  public:
+    template<class U>
+    struct rebind
+    {
+        typedef allocator<U, Alignment> other;
+    };
+
+    T* allocate(size_t size, const void* = 0)
+    {
+        if (size == 0) {
+            return 0;
+        }
+        void* p = aligned::alloc(min_align, sizeof(T) * size);
+        if (!p) {
+            throw std::bad_alloc();
+        }
+        return static_cast<T*>(p);
+    }
+
+    void deallocate(T* ptr, size_t) { aligned::free(ptr); }
+
+    template<class U, class... Args>
+    void construct(U* ptr, Args&&... args)
+    {
+        ::new ((void*)ptr) U(std::forward<Args>(args)...);
+    }
+
+    template<class U>
+    void destroy(U* ptr)
+    {
+        (void)ptr;
+        ptr->~U();
+    }
+};
+
 //! Memory-aligned atomic `std::atomic<T>`. Behaves like `std::atomic<T>`, but
 //! overloads operators `new` and `delete` to align its memory location. Padding
 //! bytes are added if necessary.
 template<class T, size_t Align = 64>
-struct alignas(Align) aligned_atomic
+struct alignas(Align) atomic
   : public std::atomic<T>
   , private padding_impl::padding<T, Align>
 {
   public:
-    aligned_atomic() noexcept = default;
+    atomic() noexcept = default;
 
-    aligned_atomic(T desired) noexcept
+    atomic(T desired) noexcept
       : std::atomic<T>(desired)
     {}
 
@@ -123,51 +210,20 @@ struct alignas(Align) aligned_atomic
     T operator=(T x) noexcept { return std::atomic<T>::operator=(x); }
     T operator=(T x) volatile noexcept { return std::atomic<T>::operator=(x); }
 
-    // The alloc/dealloc mechanism is pretty much
-    // https://www.boost.org/doc/libs/1_76_0/boost/align/detail/aligned_alloc.hpp
     static void* operator new(size_t count) noexcept
     {
-        // Make sure alignment is at least that of void*.
-        constexpr size_t alignment =
-          (Align >= alignof(void*)) ? Align : alignof(void*);
-
-        // Allocate enough space required for object and a void*.
-        size_t space = count + alignment + sizeof(void*);
-        void* p = std::malloc(space);
-        if (p == nullptr) {
-            return nullptr;
-        }
-
-        // Shift pointer to leave space for void*.
-        void* p_algn = static_cast<char*>(p) + sizeof(void*);
-        space -= sizeof(void*);
-
-        // Shift pointer further to ensure proper alignment.
-        (void)std::align(alignment, count, p_algn, space);
-
-        // Store unaligned pointer with offset sizeof(void*) before aligned
-        // location. Later we'll know where to look for the pointer telling
-        // us where to free what we malloc()'ed above.
-        *(static_cast<void**>(p_algn) - 1) = p;
-
-        return p_algn;
+        return aligned::alloc(Align, count);
     }
 
-    static void operator delete(void* ptr)
-    {
-        if (ptr) {
-            // Read pointer to start of malloc()'ed block and free there.
-            std::free(*(static_cast<void**>(ptr) - 1));
-        }
-    }
+    static void operator delete(void* ptr) { aligned::free(ptr); }
 };
 
 //! Fast and simple load/assign atomic with no memory ordering guarantees.
 template<typename T>
-struct relaxed_atomic : public aligned_atomic<T>
+struct relaxed_atomic : public aligned::atomic<T>
 {
     explicit relaxed_atomic(T value)
-      : mem::aligned_atomic<T>(value)
+      : aligned::atomic<T>(value)
     {}
 
     operator T() const noexcept { return this->load(mem::relaxed); }
@@ -179,7 +235,11 @@ struct relaxed_atomic : public aligned_atomic<T>
     }
 };
 
-} // end namespace mem
+template<class T, size_t Alignment = 64>
+using vector = std::vector<T, aligned::allocator<T, Alignment>>;
+
+} // end namespace aligned
+
 
 // 2. --------------------------------------------------------------------------
 
@@ -219,20 +279,21 @@ struct Worker
 
     size_t tasks_left() const
     {
-        State s = state;
+        State s = state.load();
         return s.end - s.pos;
     }
 
     bool done() const { return (tasks_left() == 0); }
 
     //! @param others pointer to the vector of all workers.
-    void run(std::shared_ptr<std::vector<Worker>> others)
+    void run(std::shared_ptr<aligned::vector<Worker>> others)
     {
         State s, s_old; // temporary state variables
         do {
-            s = state;
+            s = state.load();
             if (s.pos < s.end) {
-                // Protect slot by trying to advance position before doing work.
+                // Protect slot by trying to advance position before doing
+                // work.
                 s_old = s;
                 s.pos++;
 
@@ -247,24 +308,25 @@ struct Worker
             }
             if (s.pos == s.end) {
                 // Reached end of own range, steal range from others. Range
-                // remains empty if all work is done, so we can leave the loop.
+                // remains empty if all work is done, so we can leave the
+                // loop.
                 this->steal_range(*others);
             }
         } while (!this->done());
     }
 
     //! @param workers vector of all workers.
-    void steal_range(std::vector<Worker>& workers)
+    void steal_range(aligned::vector<Worker>& workers)
     {
         do {
             Worker& other = find_victim(workers);
-            State s = other.state;
+            State s = other.state.load();
             if (s.pos >= s.end) {
                 continue; // other range is empty by now
             }
 
-            // Remove second half of the range. Check atomically if the state is
-            // unaltered and, if so, replace with reduced range.
+            // Remove second half of the range. Check atomically if the
+            // state is unaltered and, if so, replace with reduced range.
             auto s_old = s;
             s.end -= (s.end - s.pos + 1) / 2;
             if (other.state.compare_exchange_weak(s_old, s)) {
@@ -276,7 +338,7 @@ struct Worker
     }
 
     //! @param workers vector of all workers.
-    bool all_done(const std::vector<Worker>& workers)
+    bool all_done(const aligned::vector<Worker>& workers)
     {
         for (const auto& worker : workers) {
             if (!worker.done())
@@ -285,10 +347,10 @@ struct Worker
         return true;
     }
 
-    //! targets the worker with the largest remaining range to minimize number
-    //! of steal events.
+    //! targets the worker with the largest remaining range to minimize
+    //! number of steal events.
     //! @param others vector of all workers.
-    Worker& find_victim(std::vector<Worker>& workers)
+    Worker& find_victim(aligned::vector<Worker>& workers)
     {
         std::vector<size_t> tasks_left;
         tasks_left.reserve(workers.size());
@@ -300,27 +362,28 @@ struct Worker
         return workers[idx];
     }
 
-    mem::relaxed_atomic<State> state; //!< worker state `{pos, end}`
-    Function f;                       //< function applied to the loop index
+    aligned::relaxed_atomic<State> state; //!< worker state `{pos, end}`
+    Function f;                           //< function applied to the loop index
 };
 
 //! creates loop workers. They must be passed to each worker using a shared
 //! pointer, so that they persist if an inner `parallel_for()` in a nested
 //! loop exits.
 template<typename Function>
-std::shared_ptr<std::vector<Worker<Function>>>
+std::shared_ptr<aligned::vector<Worker<Function>>>
 create_workers(const Function& f, int begin, int end, size_t num_workers)
 {
     auto num_tasks = std::max(end - begin, static_cast<int>(0));
     num_workers = std::max(num_workers, static_cast<size_t>(1));
-    auto workers = new std::vector<Worker<Function>>;
+    auto workers = new aligned::vector<Worker<Function>>;
     workers->reserve(num_workers);
     for (size_t i = 0; i < num_workers; i++) {
         workers->emplace_back(begin + num_tasks * i / num_workers,
                               begin + num_tasks * (i + 1) / num_workers,
                               f);
     }
-    return std::shared_ptr<std::vector<Worker<Function>>>(std::move(workers));
+    return std::shared_ptr<aligned::vector<Worker<Function>>>(
+      std::move(workers));
 }
 
 } // end namespace loop
@@ -466,8 +529,8 @@ class TaskQueue
 
   private:
     //! queue indices
-    mem::aligned_atomic<int> top_{ 0 };
-    mem::aligned_atomic<int> bottom_{ 0 };
+    aligned::atomic<int> top_{ 0 };
+    aligned::atomic<int> bottom_{ 0 };
 
     //! ring buffer holding task pointers
     std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
@@ -486,9 +549,9 @@ class TaskManager
 {
   public:
     explicit TaskManager(size_t num_queues)
-      : queues_{ std::vector<TaskQueue>(num_queues) }
-      , num_queues_{ num_queues }
-      , owner_id_{ std::this_thread::get_id() }
+      : queues_(num_queues)
+      , num_queues_(num_queues)
+      , owner_id_(std::this_thread::get_id())
     {}
 
     TaskManager& operator=(TaskManager&& other)
@@ -506,7 +569,7 @@ class TaskManager
     {
         num_queues_ = std::max(num_queues, static_cast<size_t>(1));
         if (num_queues > queues_.size()) {
-            queues_ = std::vector<TaskQueue>(num_queues);
+            queues_ = aligned::vector<TaskQueue>(num_queues);
             // thread pool must have stopped the manager, reset
             num_waiting_ = 0;
             todo_ = 0;
@@ -588,7 +651,8 @@ class TaskManager
 
         auto n = todo_.fetch_sub(1, mem::release) - 1;
         if (n == 0) {
-            // all jobs are done; lock before signal to prevent spurious failure
+            // all jobs are done; lock before signal to prevent spurious
+            // failure
             {
                 std::lock_guard<std::mutex> lk{ mtx_ };
             }
@@ -626,7 +690,8 @@ class TaskManager
         // Exceptions are only thrown from the owner thread, not in workers.
         if (called_from_owner_thread() && has_errored()) {
             {
-                // Wait for all threads to idle so we can clean up after them.
+                // Wait for all threads to idle so we can clean up after
+                // them.
                 std::unique_lock<std::mutex> lk(mtx_);
                 cv_.wait(lk, [this] { return num_waiting_ == queues_.size(); });
             }
@@ -660,13 +725,13 @@ class TaskManager
 
   private:
     //! worker queues
-    std::vector<TaskQueue> queues_;
+    aligned::vector<TaskQueue> queues_;
     size_t num_queues_;
 
     //! task management
-    mem::relaxed_atomic<size_t> num_waiting_{ 0 };
-    mem::relaxed_atomic<size_t> push_idx_{ 0 };
-    mem::aligned_atomic<int> todo_{ 0 };
+    aligned::relaxed_atomic<size_t> num_waiting_{ 0 };
+    aligned::relaxed_atomic<size_t> push_idx_{ 0 };
+    aligned::atomic<int> todo_{ 0 };
 
     //! synchronization variables
     const std::thread::id owner_id_;
@@ -676,7 +741,7 @@ class TaskManager
         errored,
         stopped
     };
-    mem::aligned_atomic<Status> status_{ Status::running };
+    aligned::atomic<Status> status_{ Status::running };
     std::mutex mtx_;
     std::condition_variable cv_;
     std::exception_ptr err_ptr_{ nullptr };
@@ -759,7 +824,6 @@ class ThreadPool
     {
         if (active_threads_ == 0)
             return f(args...);
-
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
     }
