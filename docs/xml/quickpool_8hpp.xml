@@ -8,6 +8,7 @@
     <includes local="no">exception</includes>
     <includes local="no">functional</includes>
     <includes local="no">future</includes>
+    <includes local="no">memory</includes>
     <includes local="no">mutex</includes>
     <includes local="no">numeric</includes>
     <includes local="no">thread</includes>
@@ -20,7 +21,7 @@
       <node id="6">
         <label>functional</label>
       </node>
-      <node id="9">
+      <node id="10">
         <label>numeric</label>
       </node>
       <node id="5">
@@ -52,21 +53,26 @@
         </childnode>
         <childnode refid="11" relation="include">
         </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
       </node>
       <node id="7">
         <label>future</label>
       </node>
-      <node id="11">
+      <node id="12">
         <label>vector</label>
       </node>
-      <node id="8">
+      <node id="9">
         <label>mutex</label>
       </node>
-      <node id="10">
+      <node id="11">
         <label>thread</label>
       </node>
       <node id="2">
         <label>algorithm</label>
+      </node>
+      <node id="8">
+        <label>memory</label>
       </node>
     </incdepgraph>
     <briefdescription>
