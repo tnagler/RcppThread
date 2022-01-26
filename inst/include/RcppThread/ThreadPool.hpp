@@ -86,15 +86,8 @@ inline ThreadPool::~ThreadPool() noexcept {}
 inline ThreadPool&
 ThreadPool::globalInstance()
 {
-#ifdef _WIN32
-    // Must leak resource, because windows + R deadlock otherwise. Memory
-    // is released on shutdown.
-    static auto ptr = new ThreadPool;
-    return *ptr;
-#else
     static ThreadPool instance_;
     return instance_;
-#endif
 }
 
 //! pushes jobs to the thread pool.
