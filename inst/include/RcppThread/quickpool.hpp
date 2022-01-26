@@ -148,7 +148,8 @@ free(void* ptr) noexcept
     }
 }
 
-// short version of https://www.boost.org/doc/libs/1_65_0/boost/align/aligned_allocator.hpp
+// short version of
+// https://www.boost.org/doc/libs/1_65_0/boost/align/aligned_allocator.hpp
 template<class T, std::size_t Alignment = 64>
 class allocator : public std::allocator<T>
 {
@@ -239,7 +240,6 @@ template<class T, size_t Alignment = 64>
 using vector = std::vector<T, aligned::allocator<T, Alignment>>;
 
 } // end namespace aligned
-
 
 // 2. --------------------------------------------------------------------------
 
@@ -892,6 +892,15 @@ class ThreadPool
 
     //! @brief checks whether all jobs are done.
     bool done() const { return task_manager_.done(); }
+
+    //! @brief allocator respecting memory alignment.
+    static void* operator new(size_t count) noexcept
+    {
+        return aligned::alloc(alignof(ThreadPool), count);
+    }
+
+    //! @brief deallocator respecting memory alignment.
+    static void operator delete(void* ptr) { aligned::free(ptr); }
 
   private:
     //! joins all worker threads.
