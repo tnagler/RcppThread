@@ -1,10 +1,10 @@
 inlineCxxPlugin <- function(...) {
-    plugin <- Rcpp::Rcpp.plugin.maker(
+    libs <- if (.Platform$OS.type == "unix") "-latomic" else ""
+    settings <- Rcpp::Rcpp.plugin.maker(
         include.before  = "#include <RcppThread.h>",
-        package        = "RcppThread",
-        Makevars = "CXX_FLAGS = -stdlib=libstdc++"
-    )
-    settings <- plugin()
+        package = "RcppThread",
+        libs = libs,
+    )()
     settings$env$USE_CXX11 <- "yes"
     settings
 }
