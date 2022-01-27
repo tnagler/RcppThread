@@ -15,4 +15,3 @@ revdep/
 .vscode/
 new-benchmarks.R
 bench*
-revdep/

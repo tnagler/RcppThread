@@ -1,24 +1,18 @@
-Fixed URL/DOI formatting required by Uwe Ligges via mail.
-
-The DOI in the CITATION, DESCRIPTION, and documentation is for a new JSS publication that will be registered after publication on CRAN.
-
+Fixes build warning on windows about misaligned address/allocation. Hopefully
+also the problems on Fedora, which I could not reproduce.
 
 ## Test environments
-* ubuntu 16.04 (devel, release, old-rel)
+* ubuntu 20.04 (devel, release, old-rel)
 * macOS X (release)
 * Windows Server 2019 (release)
 * CRAN win builder (devel)
+* rhub::check_for_cran()
+* rhub::check_with_sanitizers()
+* rhub::check_with_valgrind()
 
-## R CMD check results
+## Check status summary
+                WARN NOTE OK
+Source packages    0    0  1
+Reverse depends    1   17  1
 
-0 errors | 0 warnings | 1 note
-
-* Note caused by invalid DOI.
-
-## Reverse dependencies
-
-We checked 11 reverse dependencies (11 from CRAN), comparing R CMD check results across CRAN and dev versions of this package.
-
- * We saw 0 new problems
- * We failed to check 0 packages
-
+The warning in package CDSeq is known and expected.

@@ -70,7 +70,7 @@
     <member refid="classRcppThread_1_1Thread_1a1ae92afcef21111e10a96cf5f4c8c8f0" kind="function"><name>hardware_concurrency</name></member>
   </compound>
   <compound refid="classRcppThread_1_1ThreadPool" kind="class"><name>RcppThread::ThreadPool</name>
-    <member refid="classRcppThread_1_1ThreadPool_1ae01e3405af79ea4d86d1b63b2c822311" kind="variable"><name>pool_</name></member>
+    <member refid="classRcppThread_1_1ThreadPool_1ad5e5077aa6d1b23d5344cba2fef23761" kind="variable"><name>pool_</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a884ba54cc9f225392007a0736b80977d" kind="variable"><name>owner_thread_</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a83ffe33d4d776b62baf312a1c4965c08" kind="function"><name>ThreadPool</name></member>
     <member refid="classRcppThread_1_1ThreadPool_1a524ee4a9d217cba6cbdfd3405515376b" kind="function"><name>ThreadPool</name></member>

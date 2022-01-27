@@ -406,22 +406,6 @@ testThreadPoolExceptionHandling()
     RcppThread::ThreadPool pool;
     // pool passes exceptions either via wait() or push()
     std::exception_ptr eptr = nullptr;
-    try {
-        pool.push([] { throw std::runtime_error("test error"); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        for (size_t i = 0; i < 10; i++) {
-            pool.push([&] {});
-        }
-    } catch (...) {
-        eptr = std::current_exception();
-    }
-
-    if (!eptr) {
-        throw std::runtime_error("exception not rethrow on push");
-    } else {
-        eptr = nullptr;
-    }
-
     // poool should be functional again
     pool.push([] { throw std::runtime_error("test error"); });
     try {
@@ -433,6 +417,14 @@ testThreadPoolExceptionHandling()
         throw std::runtime_error("exception not rethrown on wait");
     } else {
         eptr = nullptr;
+    }
+
+    // poool should be functional again
+    int i = 0;
+    pool.push([&] { i = 1; });
+    pool.wait();
+    if (i != 1) {
+        throw std::runtime_error("not functional after throw");
     }
 }
 
