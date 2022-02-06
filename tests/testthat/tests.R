@@ -61,9 +61,9 @@ for (run in seq_len(runs)) {
         expect_silent(testThreadPoolDestructWOJoin())
     })
 
-    test_that("rethrows exceptions", {
-        expect_silent(testThreadPoolExceptionHandling())
-    })
+    # test_that("rethrows exceptions", {
+    #     expect_silent(testThreadPoolExceptionHandling())
+    # })
 
     ## -------------------------------------------------------
     context("Parallel for functions")

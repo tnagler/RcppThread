@@ -1,8 +1,8 @@
-# # RcppThread 2.0.1
-# 
-# BUG FIX
-# 
-# * safeguard construction of memory aligned objects.
+# RcppThread 2.0.1
+
+BUG FIX
+
+* safeguard construction of memory aligned objects.
 
 
 # RcppThread 2.0.0
