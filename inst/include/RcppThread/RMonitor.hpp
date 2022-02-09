@@ -36,6 +36,7 @@ class RMonitor {
     // user-facing functionality must be friends, so they can access
     // protected members of RMonitor.
     friend class RPrinter;
+    friend class RErrPrinter;
     friend void checkUserInterrupt(bool condition);
     friend bool isInterrupted(bool condition);
 
@@ -100,6 +101,23 @@ protected:
         }
     }
 
+    //! prints `object` to R error stream íf called from main thread; otherwise
+    //! adds a printable version of `object` to a buffer for deferred printing.
+    //! @param object a string or coercible object to print.
+    template<class T>
+    void safelyPrintErr(const T& object)
+    {
+        std::lock_guard<std::mutex> lk(m_);
+        msgsErr_ << object;
+        if ( calledFromMainThread() && (msgsErr_.str() != std::string("")) ) {
+            // release messages in buffer
+            REprintf("%s", msgsErr_.str().c_str());
+            //R_FlushConsole();
+            // clear message buffer
+            msgsErr_.str("");
+        }
+    }
+
 private:
     //! Ctors declared private, to instantiate class use `::instance()`.
     RMonitor(void) : isInterrupted_(false) {}
@@ -119,6 +137,7 @@ private:
 
     std::mutex m_;                           // mutex for synchronized r/w
     std::stringstream msgs_;                 // string buffer
+    std::stringstream msgsErr_;              // string buffer for stderr
     std::atomic_bool isInterrupted_;
 };
 
