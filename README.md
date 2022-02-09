@@ -9,7 +9,7 @@
 Provides R-friendly threading functionality: 
 
   * thread safe versions of [Rcpp's](http://www.rcpp.org/)
-    `checkUserInterrupt()` and `Rcout`,
+    `checkUserInterrupt()`, `Rcout`, and `Rcerr`,
   * an interruptible thread class that otherwise behaves like 
    [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread),
   * classes for the [thread pool
@@ -28,6 +28,8 @@ For a detailed description of its functionality and examples, see the associated
 or the [API documentation](https://tnagler.github.io/RcppThread/).
 
 Since then, the following **new features** have been added:
+
+- Printing to the error stream with `Rcerr`.
 
 - Free-standing functions like `parallelFor()` now dispatch 
   to a global thread pool that persists for the entire session. This 
@@ -99,13 +101,14 @@ before including any headers in your source code.
 1. Add the line `CXX_STD = CXX11` to the `src/Makevars(.win)` files of your package.
 2. Add `RcppThread` to the `LinkingTo` field of your `DESCRIPTION` file.
 
-## Automatic override of `std::cout` and `std::thread`
+## Automatic override of `std::cout`, `std::cerr``, and `std::thread`
 
-There are preprocessor options to replace all occurrences of `std::cout` and 
-`std::thread` with calls to `RcppThread::Rcout` and `RcppThread::Thread` 
+There are preprocessor options to replace all occurrences of `std::cout`, `std::cerr`, and `std::thread` with calls to `RcppThread::Rcout`, `RcppThread::Rcerr`, and `RcppThread::Thread`
 (provided that the RcppThread headers are included first). To enable this, use 
+
 ```
 #define RCPPTHREAD_OVERRIDE_COUT 1    // std::cout override
+#define RCPPTHREAD_OVERRIDE_CERR 1    // std::cerr override
 #define RCPPTHREAD_OVERRIDE_THREAD 1  // std::thread override
 ```
 before including the RcppThread headers.

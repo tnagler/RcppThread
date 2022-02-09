@@ -8,6 +8,7 @@
 
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
+#include "RcppThread/Rcerr.hpp"
 #include "RcppThread/quickpool.hpp"
 
 #include <atomic>
@@ -232,10 +233,12 @@ ThreadPool::wait()
     do {
         pool_->wait(100);
         Rcout << "";
+        Rcerr << "";
         checkUserInterrupt();
 
     } while (!pool_->done());
     Rcout << "";
+    Rcerr << "";
 }
 
 //! waits for all jobs to finish.

@@ -8,6 +8,7 @@
 
 #include "RcppThread/RMonitor.hpp"
 #include "RcppThread/Rcout.hpp"
+#include "RcppThread/Rcerr.hpp"
 #include "RcppThread/Thread.hpp"
 #include "RcppThread/ThreadPool.hpp"
 #include "RcppThread/parallelFor.hpp"
