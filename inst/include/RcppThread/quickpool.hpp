@@ -930,7 +930,7 @@ class ThreadPool
         });
 
         // set thread affinity on linux
-        this->set_thread_affinity(id);
+        // this->set_thread_affinity(id);
     }
 
     //! sets thread affinity (if there are as less workers than cores).
