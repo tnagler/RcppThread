@@ -101,7 +101,7 @@ before including any headers in your source code.
 1. Add the line `CXX_STD = CXX11` to the `src/Makevars(.win)` files of your package.
 2. Add `RcppThread` to the `LinkingTo` field of your `DESCRIPTION` file.
 
-## Automatic override of `std::cout`, `std::cerr``, and `std::thread`
+## Automatic override of `std::cout`, `std::cerr`, and `std::thread`
 
 There are preprocessor options to replace all occurrences of `std::cout`, `std::cerr`, and `std::thread` with calls to `RcppThread::Rcout`, `RcppThread::Rcerr`, and `RcppThread::Thread`
 (provided that the RcppThread headers are included first). To enable this, use 
