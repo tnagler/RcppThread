@@ -755,6 +755,7 @@ get_avail_cores()
     auto ncores = std::thread::hardware_concurrency();
     std::vector<size_t> avail_cores;
     avail_cores.reserve(ncores);
+#if (defined __linux__)
     cpu_set_t cpuset;
     int rc = pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
     if (rc != 0) {
@@ -765,6 +766,7 @@ get_avail_cores()
             avail_cores.push_back(id);
         }
     }
+#endif
     return avail_cores;
 }
 
