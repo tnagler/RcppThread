@@ -11,6 +11,7 @@
     <includes local="no">sstream</includes>
     <includedby refid="ThreadPool_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</includedby>
     <includedby refid="Rcout_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp</includedby>
+    <includedby refid="Rcerr_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp</includedby>
     <includedby refid="Thread_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp</includedby>
     <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
     <incdepgraph>

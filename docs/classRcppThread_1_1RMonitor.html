@@ -124,6 +124,11 @@ C++</a>
               <span class="m-doc-wrap-bumper">void <a href="#a98b81ed3996a37a51b5cdb8dbed89712" class="m-doc">safelyPrint</a>(</span><span class="m-doc-wrap">const T&amp; object)</span>
             </dt>
             <dd></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;class T&gt;</div>
+              <span class="m-doc-wrap-bumper">void <a href="#aca4da9d515e3366af9e8185a7d2b866a" class="m-doc">safelyPrintErr</a>(</span><span class="m-doc-wrap">const T&amp; object)</span>
+            </dt>
+            <dd></dd>
           </dl>
         </section>
         <section id="friends">
@@ -172,6 +177,26 @@ C++</a>
               </tbody>
             </table>
 <p>prints <code>object</code> to R console íf called from main thread; otherwise adds a printable version of <code>object</code> to a buffer for deferred printing.</p>
+          </div></section>
+          <section class="m-doc-details" id="aca4da9d515e3366af9e8185a7d2b866a"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;class T&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">void RcppThread::<wbr />RMonitor::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aca4da9d515e3366af9e8185a7d2b866a" class="m-doc-self">safelyPrintErr</a>(</span><span class="m-doc-wrap">const T&amp; object) <span class="m-label m-warning">protected</span></span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">object</td>
+                  <td>a string or coercible object to print.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>prints <code>object</code> to R error stream íf called from main thread; otherwise adds a printable version of <code>object</code> to a buffer for deferred printing.</p>
           </div></section>
           <section class="m-doc-details" id="ad81d4d6402e7bfe7f254b2d5388fb97b"><div>
             <h3>

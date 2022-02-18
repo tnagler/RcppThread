@@ -1,4 +1,4 @@
-// Copyright 2021 Thomas Nagler (MIT License)
+// Copyright 2022 Thomas Nagler (MIT License)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -364,7 +364,7 @@ struct Worker
     }
 
     mem::aligned::relaxed_atomic<State> state; //!< worker state `{pos, end}`
-    Function f;                           //< function applied to the loop index
+    Function f; //< function applied to the loop index
 };
 
 //! creates loop workers. They must be passed to each worker using a shared
@@ -748,6 +748,37 @@ class TaskManager
     std::exception_ptr err_ptr_{ nullptr };
 };
 
+// find out which cores are allowed for use by pthread
+std::vector<size_t>
+get_avail_cores()
+{
+    auto ncores = std::thread::hardware_concurrency();
+    std::vector<size_t> avail_cores;
+    avail_cores.reserve(ncores);
+#if (defined __linux__)
+    cpu_set_t cpuset;
+    int rc = pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+    if (rc != 0) {
+        throw std::runtime_error("Error calling pthread_getaffinity_np");
+    }
+    for (size_t id = 0; id < ncores; id++) {
+        if (CPU_ISSET(id, &cpuset)) {
+            avail_cores.push_back(id);
+        }
+    }
+#endif
+    return avail_cores;
+}
+
+size_t
+num_cores_avail()
+{
+#if (defined __linux__)
+    return get_avail_cores().size();
+#endif
+    return std::thread::hardware_concurrency();
+}
+
 } // end namespace sched
 
 // 4. ------------------------------------------------------------------------
@@ -759,7 +790,7 @@ class ThreadPool
     //! @brief constructs a thread pool.
     //! @param threads number of worker threads to create; defaults to
     //! number of available (virtual) hardware cores.
-    explicit ThreadPool(size_t threads = std::thread::hardware_concurrency())
+    explicit ThreadPool(size_t threads = sched::num_cores_avail())
       : task_manager_{ threads }
     {
         set_active_threads(threads);
@@ -810,6 +841,9 @@ class ThreadPool
             for (size_t id = 0; id < threads; ++id) {
                 add_worker(id);
             }
+#if (defined __linux__)
+            set_thread_affinity();
+#endif
         }
         active_threads_ = threads;
     }
@@ -928,29 +962,26 @@ class ThreadPool
                 } while (!task_manager_.done());
             }
         });
-
-        // set thread affinity on linux
-        this->set_thread_affinity(id);
     }
 
-    //! sets thread affinity (if there are as less workers than cores).
-    //! This works on linux by default. In OSX compile with -pthread -DAFFINITY.
-    void set_thread_affinity(size_t id)
+#if (defined __linux__)
+    //! sets thread affinity on linux.
+    void set_thread_affinity()
     {
-#if (defined __linux__ || defined AFFINITY)
-        auto hardware_cores = std::thread::hardware_concurrency();
-        if (id >= hardware_cores)
-            id = id % hardware_cores;
         cpu_set_t cpuset;
-        CPU_ZERO(&cpuset);
-        CPU_SET(id, &cpuset);
-        int rc = pthread_setaffinity_np(
-          workers_.at(id).native_handle(), sizeof(cpu_set_t), &cpuset);
-        if (rc != 0) {
-            throw std::runtime_error("Error calling pthread_setaffinity_np");
+        auto avail_cores = sched::get_avail_cores();
+        for (size_t id = 0; id < workers_.size(); id++) {
+            CPU_ZERO(&cpuset);
+            CPU_SET(avail_cores[id % avail_cores.size()], &cpuset);
+            int rc = pthread_setaffinity_np(
+              workers_.at(id).native_handle(), sizeof(cpu_set_t), &cpuset);
+            if (rc != 0) {
+                throw std::runtime_error(
+                  "Error calling pthread_setaffinity_np");
+            }
         }
-#endif
     }
+#endif
 
     void execute_safely(std::function<void()>& task)
     {

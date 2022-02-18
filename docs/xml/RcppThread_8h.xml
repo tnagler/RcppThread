@@ -4,6 +4,7 @@
     <compoundname>RcppThread.h</compoundname>
     <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
     <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
+    <includes refid="Rcerr_8hpp" local="yes">RcppThread/Rcerr.hpp</includes>
     <includes refid="Thread_8hpp" local="yes">RcppThread/Thread.hpp</includes>
     <includes refid="ThreadPool_8hpp" local="yes">RcppThread/ThreadPool.hpp</includes>
     <includes refid="parallelFor_8hpp" local="yes">RcppThread/parallelFor.hpp</includes>

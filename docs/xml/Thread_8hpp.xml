@@ -4,6 +4,7 @@
     <compoundname>Thread.hpp</compoundname>
     <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
     <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
+    <includes refid="Rcerr_8hpp" local="yes">RcppThread/Rcerr.hpp</includes>
     <includes local="no">thread</includes>
     <includes local="no">future</includes>
     <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
@@ -35,7 +36,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="123" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="123" bodyend="-1"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="126" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="126" bodyend="-1"/>
       </memberdef>
       </sectiondef>
     <briefdescription>

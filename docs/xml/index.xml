@@ -25,12 +25,19 @@
     <member refid="classRcppThread_1_1ProgressPrinter_1ac4f5d2a6d465f9e6b67256ef73d34dad" kind="function"><name>progressString</name></member>
     <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" kind="function"><name>formatTime</name></member>
   </compound>
+  <compound refid="classRcppThread_1_1RErrPrinter" kind="class"><name>RcppThread::RErrPrinter</name>
+    <member refid="classRcppThread_1_1RErrPrinter_1adeee1773d69206c2e0c806dbc72ce8e1" kind="function"><name>operator&lt;&lt;</name></member>
+    <member refid="classRcppThread_1_1RErrPrinter_1a04842e0c5c9bcb6b13f49623896067e7" kind="function"><name>operator&lt;&lt;</name></member>
+    <member refid="classRcppThread_1_1RErrPrinter_1a679a95fb8a26668c8e224cb4467598d8" kind="function"><name>operator&lt;&lt;</name></member>
+  </compound>
   <compound refid="classRcppThread_1_1RMonitor" kind="class"><name>RcppThread::RMonitor</name>
     <member refid="classRcppThread_1_1RMonitor_1a9ccf6a0d51bcb0b83334683b2dbd70c7" kind="friend"><name>RPrinter</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a1bacd12c19aa48e2377f8c07f7f79b6c" kind="friend"><name>RErrPrinter</name></member>
     <member refid="classRcppThread_1_1RMonitor_1ad81d4d6402e7bfe7f254b2d5388fb97b" kind="friend"><name>checkUserInterrupt</name></member>
     <member refid="classRcppThread_1_1RMonitor_1a3cf8caa9587760e532e08c2718089597" kind="friend"><name>isInterrupted</name></member>
     <member refid="classRcppThread_1_1RMonitor_1a02796f0b72a9228164f23a3e0d311001" kind="variable"><name>m_</name></member>
     <member refid="classRcppThread_1_1RMonitor_1a17e4abb37b2c72343ca9c20f50ba1420" kind="variable"><name>msgs_</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1a579b216fee710cdf464331797be37b77" kind="variable"><name>msgsErr_</name></member>
     <member refid="classRcppThread_1_1RMonitor_1aa93358324924efde10cb3a13c6f6b7ab" kind="variable"><name>isInterrupted_</name></member>
     <member refid="classRcppThread_1_1RMonitor_1a1abaa58edc53dba7d12773c5dee58651" kind="function"><name>RMonitor</name></member>
     <member refid="classRcppThread_1_1RMonitor_1ab9baec1f5dbfe8a3349695bd6d9863e8" kind="function"><name>RMonitor</name></member>
@@ -41,6 +48,7 @@
     <member refid="classRcppThread_1_1RMonitor_1a97096ce3bac37573f36a20954891c1f2" kind="function"><name>safelycheckUserInterrupt</name></member>
     <member refid="classRcppThread_1_1RMonitor_1ac38e054f6e63dfa2be582dfb606b129f" kind="function"><name>safelyIsInterrupted</name></member>
     <member refid="classRcppThread_1_1RMonitor_1a98b81ed3996a37a51b5cdb8dbed89712" kind="function"><name>safelyPrint</name></member>
+    <member refid="classRcppThread_1_1RMonitor_1aca4da9d515e3366af9e8185a7d2b866a" kind="function"><name>safelyPrintErr</name></member>
     <member refid="classRcppThread_1_1RMonitor_1ac098c6d99a0946cae3c326033ddb8000" kind="function"><name>RMonitor</name></member>
     <member refid="classRcppThread_1_1RMonitor_1af36b6c5eaede6e3b4af7e7cf3b8666c9" kind="function"><name>isInterrupted</name></member>
     <member refid="classRcppThread_1_1RMonitor_1ab1e76b3676907a75912fb28ca1a44972" kind="function"><name>callRCheck</name></member>
@@ -95,6 +103,7 @@
     <member refid="classRcppThread_1_1UserInterruptException_1a5e4c038748d820773fa3e20e3620e8dc" kind="function"><name>what</name></member>
   </compound>
   <compound refid="namespaceRcppThread" kind="namespace"><name>RcppThread</name>
+    <member refid="namespaceRcppThread_1a8393ba347760237abf9d823000af775e" kind="variable"><name>Rcerr</name></member>
     <member refid="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" kind="variable"><name>Rcout</name></member>
     <member refid="namespaceRcppThread_1ada4c397edb2f1f4150f8dc1ab899d324" kind="variable"><name>mainThreadID</name></member>
     <member refid="namespaceRcppThread_1ae462e1889f6dbf0a3f9392613e9cdc76" kind="function"><name>parallelFor</name></member>
@@ -117,6 +126,9 @@
   <compound refid="Progress_8hpp" kind="file"><name>Progress.hpp</name>
   </compound>
   <compound refid="quickpool_8hpp" kind="file"><name>quickpool.hpp</name>
+  </compound>
+  <compound refid="Rcerr_8hpp" kind="file"><name>Rcerr.hpp</name>
+    <member refid="Rcerr_8hpp_1aee9772c59261c90406ba939940c2b471" kind="define"><name>RCPPTHREAD_OVERRIDE_CERR</name></member>
   </compound>
   <compound refid="Rcout_8hpp" kind="file"><name>Rcout.hpp</name>
     <member refid="Rcout_8hpp_1a85b8de01431b2a45e5f280faa971e51b" kind="define"><name>RCPPTHREAD_OVERRIDE_COUT</name></member>

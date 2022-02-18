@@ -5,6 +5,7 @@
     <innerfile refid="parallelFor_8hpp">parallelFor.hpp</innerfile>
     <innerfile refid="Progress_8hpp">Progress.hpp</innerfile>
     <innerfile refid="quickpool_8hpp">quickpool.hpp</innerfile>
+    <innerfile refid="Rcerr_8hpp">Rcerr.hpp</innerfile>
     <innerfile refid="Rcout_8hpp">Rcout.hpp</innerfile>
     <innerfile refid="RMonitor_8hpp">RMonitor.hpp</innerfile>
     <innerfile refid="Thread_8hpp">Thread.hpp</innerfile>

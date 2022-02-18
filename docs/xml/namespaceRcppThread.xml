@@ -5,12 +5,28 @@
     <innerclass refid="classRcppThread_1_1ProgressBar" prot="public">RcppThread::ProgressBar</innerclass>
     <innerclass refid="classRcppThread_1_1ProgressCounter" prot="public">RcppThread::ProgressCounter</innerclass>
     <innerclass refid="classRcppThread_1_1ProgressPrinter" prot="public">RcppThread::ProgressPrinter</innerclass>
+    <innerclass refid="classRcppThread_1_1RErrPrinter" prot="public">RcppThread::RErrPrinter</innerclass>
     <innerclass refid="classRcppThread_1_1RMonitor" prot="public">RcppThread::RMonitor</innerclass>
     <innerclass refid="classRcppThread_1_1RPrinter" prot="public">RcppThread::RPrinter</innerclass>
     <innerclass refid="classRcppThread_1_1Thread" prot="public">RcppThread::Thread</innerclass>
     <innerclass refid="classRcppThread_1_1ThreadPool" prot="public">RcppThread::ThreadPool</innerclass>
     <innerclass refid="classRcppThread_1_1UserInterruptException" prot="public">RcppThread::UserInterruptException</innerclass>
       <sectiondef kind="var">
+      <memberdef kind="variable" id="namespaceRcppThread_1a8393ba347760237abf9d823000af775e" prot="public" static="yes" mutable="no">
+        <type><ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref></type>
+        <definition>RErrPrinter RcppThread::Rcerr</definition>
+        <argsstring></argsstring>
+        <name>Rcerr</name>
+        <initializer>= <ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref>()</initializer>
+        <briefdescription>
+<para>global <computeroutput>RPrinter</computeroutput> instance called &apos;Rcerr&apos; (as in Rcpp). </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="52" column="20" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="52" bodyend="-1"/>
+      </memberdef>
       <memberdef kind="variable" id="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" prot="public" static="yes" mutable="no">
         <type><ref refid="classRcppThread_1_1RPrinter" kindref="compound">RPrinter</ref></type>
         <definition>RPrinter RcppThread::Rcout</definition>
@@ -409,7 +425,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="129" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="129" bodyend="133"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="148" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="148" bodyend="152"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>bool</type>
@@ -437,7 +453,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="139" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="139" bodyend="144"/>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="158" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="158" bodyend="163"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
