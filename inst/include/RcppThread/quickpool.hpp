@@ -841,7 +841,9 @@ class ThreadPool
             for (size_t id = 0; id < threads; ++id) {
                 add_worker(id);
             }
+#if (defined __linux__)
             set_thread_affinity();
+#endif
         }
         active_threads_ = threads;
     }
@@ -962,11 +964,10 @@ class ThreadPool
         });
     }
 
-    //! sets thread affinity (if there are as less workers than cores).
-    //! This works on linux by default.
+#if (defined __linux__)
+    //! sets thread affinity on linux.
     void set_thread_affinity()
     {
-#if (defined __linux__)
         cpu_set_t cpuset;
         auto avail_cores = sched::get_avail_cores();
         for (size_t id = 0; id < workers_.size(); id++) {
@@ -979,8 +980,8 @@ class ThreadPool
                   "Error calling pthread_setaffinity_np");
             }
         }
-#endif
     }
+#endif
 
     void execute_safely(std::function<void()>& task)
     {

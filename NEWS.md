@@ -1,3 +1,10 @@
+# RcppThread 2.0.3
+
+BUG FIX
+
+* adapt thread affinity to possibly restricted CPU set.
+
+
 # RcppThread 2.0.1
 
 BUG FIX

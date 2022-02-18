@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classRcppThread_1_1RErrPrinter" kind="class" language="C++" prot="public">
+    <compoundname>RcppThread::RErrPrinter</compoundname>
+    <includes local="no">Rcerr.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classRcppThread_1_1RErrPrinter_1adeee1773d69206c2e0c806dbc72ce8e1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type><ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref> &amp;</type>
+        <definition>RErrPrinter&amp; RcppThread::RErrPrinter::operator&lt;&lt;</definition>
+        <argsstring>(T &amp;object)</argsstring>
+        <name>operator&lt;&lt;</name>
+        <param>
+          <type>T &amp;</type>
+          <declname>object</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>prints <computeroutput>object</computeroutput> to R error stream íf called from main thread; otherwise adds a printable version of <computeroutput>object</computeroutput> to a buffer for deferred printing. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>object</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a string (or coercible object) to print.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="23" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="23" bodyend="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RErrPrinter_1a04842e0c5c9bcb6b13f49623896067e7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type><ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref> &amp;</type>
+        <definition>RErrPrinter&amp; RcppThread::RErrPrinter::operator&lt;&lt;</definition>
+        <argsstring>(const T &amp;object)</argsstring>
+        <name>operator&lt;&lt;</name>
+        <param>
+          <type>const T &amp;</type>
+          <declname>object</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>prints <computeroutput>object</computeroutput> to R error stream íf called from main thread; otherwise adds a printable version of <computeroutput>object</computeroutput> to a buffer for deferred printing. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>object</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a string (or coercible object) to print.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="34" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="34" bodyend="38"/>
+      </memberdef>
+      <memberdef kind="function" id="classRcppThread_1_1RErrPrinter_1a679a95fb8a26668c8e224cb4467598d8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref> &amp;</type>
+        <definition>RErrPrinter&amp; RcppThread::RErrPrinter::operator&lt;&lt;</definition>
+        <argsstring>(std::ostream &amp;(*object)(std::ostream &amp;))</argsstring>
+        <name>operator&lt;&lt;</name>
+        <param>
+          <type>std::ostream &amp;(*)(std::ostream &amp;)</type>
+          <declname>object</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>prints <computeroutput>object</computeroutput> to R error stream íf called from main thread; otherwise adds a printable version of <computeroutput>object</computeroutput> to a buffer for deferred printing. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>object</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a string (or coercible object) to print.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="44" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="44" bodyend="48"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Safely printing to the R console from threaded code. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="15" column="18" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="15" bodyend="49"/>
+    <listofallmembers>
+      <member refid="classRcppThread_1_1RErrPrinter_1adeee1773d69206c2e0c806dbc72ce8e1" prot="public" virt="non-virtual"><scope>RcppThread::RErrPrinter</scope><name>operator&lt;&lt;</name></member>
+      <member refid="classRcppThread_1_1RErrPrinter_1a04842e0c5c9bcb6b13f49623896067e7" prot="public" virt="non-virtual"><scope>RcppThread::RErrPrinter</scope><name>operator&lt;&lt;</name></member>
+      <member refid="classRcppThread_1_1RErrPrinter_1a679a95fb8a26668c8e224cb4467598d8" prot="public" virt="non-virtual"><scope>RcppThread::RErrPrinter</scope><name>operator&lt;&lt;</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
