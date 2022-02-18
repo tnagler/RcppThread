@@ -1,4 +1,4 @@
-// Copyright 2021 Thomas Nagler (MIT License)
+// Copyright 2022 Thomas Nagler (MIT License)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

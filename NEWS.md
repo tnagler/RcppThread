@@ -1,8 +1,13 @@
-# RcppThread 2.0.3
+# RcppThread 2.1.0
+
+NEW FEATURE
+
+* safe printing to the R error stream with `RcppThread::Rcerr` (#60, thanks to
+  @appelmar).
 
 BUG FIX
 
-* adapt thread affinity to possibly restricted CPU set.
+* adapt thread affinity to possibly restricted CPU set (#61).
 
 
 # RcppThread 2.0.1
