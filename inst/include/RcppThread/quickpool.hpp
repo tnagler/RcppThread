@@ -748,6 +748,7 @@ class TaskManager
     std::exception_ptr err_ptr_{ nullptr };
 };
 
+#if (defined __linux__)
 // find out which cores are allowed for use by pthread
 inline std::vector<size_t>
 get_avail_cores()
@@ -755,7 +756,6 @@ get_avail_cores()
     auto ncores = std::thread::hardware_concurrency();
     std::vector<size_t> avail_cores;
     avail_cores.reserve(ncores);
-#if (defined __linux__)
     cpu_set_t cpuset;
     int rc = pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
     if (rc != 0) {
@@ -766,9 +766,9 @@ get_avail_cores()
             avail_cores.push_back(id);
         }
     }
-#endif
     return avail_cores;
 }
+#endif
 
 inline size_t
 num_cores_avail()
@@ -829,6 +829,8 @@ class ThreadPool
         if (!task_manager_.called_from_owner_thread())
             return;
 
+        active_threads_ = threads;
+
         if (threads <= workers_.size()) {
             task_manager_.resize(threads);
         } else {
@@ -845,7 +847,6 @@ class ThreadPool
             set_thread_affinity();
 #endif
         }
-        active_threads_ = threads;
     }
 
     //! @brief retrieves the number of active worker threads in the thread pool.
@@ -970,7 +971,7 @@ class ThreadPool
     {
         cpu_set_t cpuset;
         auto avail_cores = sched::get_avail_cores();
-        for (size_t id = 0; id < workers_.size(); id++) {
+        for (size_t id = 0; id < active_threads_; id++) {
             CPU_ZERO(&cpuset);
             CPU_SET(avail_cores[id % avail_cores.size()], &cpuset);
             int rc = pthread_setaffinity_np(

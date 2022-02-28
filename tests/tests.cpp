@@ -237,18 +237,18 @@ testThreadPoolSingleThreaded()
         x[i] = 2 * x[i];
     };
 
-    // for (size_t i = 0; i < x.size(); i++)
-    //     pool.push(dummy, i);
-    // pool.wait();
+    for (size_t i = 0; i < x.size(); i++)
+        pool.push(dummy, i);
+    pool.wait();
 
     pool.parallelFor(0, x.size(), dummy);
     pool.wait();
 
     size_t count_wrong = 0;
     for (size_t i = 0; i < x.size(); i++)
-        count_wrong += (x[i] != 2);
+        count_wrong += (x[i] != 4);
     if (count_wrong > 0)
-        Rcout << "push gives wrong result" << std::endl;
+        Rcout << "single threaded gives wrong result" << std::endl;
     pool.join();
 }
 

@@ -112,7 +112,7 @@ protected:
         if ( calledFromMainThread() && (msgsErr_.str() != std::string("")) ) {
             // release messages in buffer
             REprintf("%s", msgsErr_.str().c_str());
-            //R_FlushConsole();
+            // R_FlushConsole();
             // clear message buffer
             msgsErr_.str("");
         }
