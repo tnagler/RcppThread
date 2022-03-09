@@ -1,3 +1,10 @@
+# RcppThread 2.1.1
+
+NEW FEATURE
+
+* R function `LdFlags()` to portably generate linker flags for `libatomic`/`pthread`. See README for details.
+
+  
 # RcppThread 2.1.0
 
 NEW FEATURE
