@@ -1,4 +1,5 @@
-## -------------------------------------------------------
+if (hasAtomicSupport()) {
+
 context("Compile test functions")
 Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
@@ -93,4 +94,6 @@ for (run in seq_len(runs)) {
     test_that("ProgressBar works", {
         expect_output(testProgressBar(), "100% \\(done\\)")
     })
+}
+
 }
