@@ -3,16 +3,13 @@ getCompiler <- function() {
 }
 
 runCmd <- function(...) {
-    args <- list(command = paste(...))
-    args$ignore.stdout = TRUE
-    args$ignore.stderr = TRUE
-    do.call(system, args)
+    system(paste(...), ignore.stdout = TRUE, ignore.stderr = TRUE)
 }
 
 createTestFiles <- function() {
     src <- tempfile("test", fileext = ".cpp")
-    lib <- tempfile("test", fileext = ".out")
-    c(src = src, lib = lib)
+    out <- tempfile("test", fileext = ".out")
+    c(src = src, out = out)
 }
 
 writeLibAtomicTest <- function(file) {
@@ -33,7 +30,7 @@ checkForLibAtomic <- function() {
 
     tmp <- createTestFiles()
     writeLibAtomicTest(tmp["src"])
-    failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["lib"], "-latomic")
+    failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["out"], "-latomic")
     unlink(tmp)
 
     !failed
@@ -45,7 +42,7 @@ hasAtomicSupport <- function() {
 
     tmp <- createTestFiles()
     writeLibAtomicTest(tmp["src"])
-    failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["lib"])
+    failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["out"])
     unlink(tmp)
 
     !failed
@@ -57,7 +54,7 @@ checkForLibPthread <- function() {
 
     tmp <- createTestFiles()
     cat("#include <pthread.h> \n int main() { return 0; }", file = tmp["src"])
-    failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["lib"], "-lpthread")
+    failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["out"], "-lpthread")
     unlink(tmp)
 
     !failed
