@@ -31,14 +31,9 @@ checkForLibAtomic <- function() {
     if (.Platform$OS.type == "windows")
         return(TRUE)
 
-    # create temporary source and out files
     tmp <- createTestFiles()
     writeLibAtomicTest(tmp["src"])
-
-    # check whether test program can be compiled
     failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["lib"], "-latomic")
-
-    # clean up temporary files
     unlink(tmp)
 
     !failed
@@ -48,14 +43,9 @@ hasAtomicSupport <- function() {
     if (checkForLibAtomic())
         return(TRUE)
 
-    # create temporary source and out files
     tmp <- createTestFiles()
     writeLibAtomicTest(tmp["src"])
-
-    # check whether test program can be compiled
     failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["lib"])
-
-    # clean up temporary files
     unlink(tmp)
 
     !failed
@@ -65,14 +55,9 @@ checkForLibPthread <- function() {
     if (.Platform$OS.type == "windows")
         return(FALSE)
 
-    # create temporary source and out files
     tmp <- createTestFiles()
     cat("#include <pthread.h> \n int main() { return 0; }", file = tmp["src"])
-
-    # check whether test program can be compiled
     failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["lib"], "-lpthread")
-
-    # clean up temporary files
     unlink(tmp)
 
     !failed

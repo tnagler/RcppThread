@@ -115,7 +115,7 @@
     <member refid="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" kind="function"><name>checkUserInterrupt</name></member>
     <member refid="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" kind="function"><name>isInterrupted</name></member>
   </compound>
-  <compound refid="additional-features_8dox" kind="file"><name>additional-features.dox</name>
+  <compound refid="overrides_8dox" kind="file"><name>overrides.dox</name>
   </compound>
   <compound refid="mainpage_8h" kind="file"><name>mainpage.h</name>
   </compound>

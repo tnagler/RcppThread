@@ -1,5 +1,3 @@
-Fixes build warning on windows about misaligned address/allocation. Hopefully
-also the problems on Fedora, which I could not reproduce.
 
 ## Test environments
 * ubuntu 20.04 (devel, release, old-rel)

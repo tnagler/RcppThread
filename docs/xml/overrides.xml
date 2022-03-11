@@ -8,7 +8,9 @@
     <detaileddescription>
 <sect1 id="overrides_1override-sec">
 <title>Automatic override of std::cout and std::thread</title>
-<para>There are preprocessor options to replace all occurences of <computeroutput>std::cout</computeroutput> and <computeroutput>std::thread</computeroutput> with calls to <computeroutput>RcppThread::Rcout</computeroutput> and <computeroutput>RcppThread::Thread</computeroutput> (provided that the RcppThread headers are included first). To enable this, use <programlisting><codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_COUT<sp/>1<sp/><sp/><sp/><sp/>//<sp/>std::cout<sp/>override</highlight></codeline>
+<para>There are preprocessor options to replace all occurrences of <computeroutput>std::cout</computeroutput>, <computeroutput>std::cerr</computeroutput>, and <computeroutput>std::thread</computeroutput> with calls to <computeroutput>RcppThread::Rcout</computeroutput>, <computeroutput>RcppThread::Rcerr</computeroutput>, and <computeroutput>RcppThread::Thread</computeroutput> (provided that the RcppThread headers are included first). To enable this, use</para>
+<para><programlisting><codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_COUT<sp/>1<sp/><sp/><sp/><sp/>//<sp/>std::cout<sp/>override</highlight></codeline>
+<codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_CERR<sp/>1<sp/><sp/><sp/><sp/>//<sp/>std::cerr<sp/>override</highlight></codeline>
 <codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_THREAD<sp/>1<sp/><sp/>//<sp/>std::thread<sp/>override</highlight></codeline>
 </programlisting></para>
 <para>before including the RcppThread headers. </para>
