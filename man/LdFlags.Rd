@@ -7,7 +7,7 @@
 LdFlags()
 }
 \description{
-To be used in \code{Makevars} on Linux and OSX. Returns a character vector with
+To be used in \code{Makevars} on Linux and OSX. Returns a string with
 linker flags for \code{pthread} and \code{libatomic}, if available.
 }
 \details{
