@@ -79,7 +79,7 @@ protected:
     //! (otherwise last known state is returned).
     bool safelyIsInterrupted()
     {
-        if (!isInterrupted_ & calledFromMainThread())
+        if (!isInterrupted_ && calledFromMainThread())
             isInterrupted_ = isInterrupted();
         return isInterrupted_;
     }

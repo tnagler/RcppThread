@@ -1,3 +1,10 @@
+# RcppThread 2.1.3
+
+BUG FIX
+
+* Fixes clang-14 warning about bitwise & with Boolean operands.
+
+
 # RcppThread 2.1.2
 
 NEW FEATURE

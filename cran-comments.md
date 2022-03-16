@@ -1,3 +1,4 @@
+Fixes clang-14 warning about bitwise & with boolen operands.
 
 ## Test environments
 * ubuntu 20.04 (devel, release, old-rel)
