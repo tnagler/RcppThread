@@ -81,7 +81,10 @@ inline ThreadPool::ThreadPool(size_t nWorkers)
 {}
 
 //! destructor joins all threads if possible.
-inline ThreadPool::~ThreadPool() noexcept {}
+inline ThreadPool::~ThreadPool() noexcept
+{
+    this->wait();
+}
 
 //! Access to the global thread pool instance.
 inline ThreadPool&
