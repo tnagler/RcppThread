@@ -73,13 +73,13 @@ class BenchMethods
     void ThreadPool(int n)
     {
         for (size_t i = 0; i < n; ++i)
-            quickpool::push(func_, i);
-        quickpool::wait();
+            RcppThread::async(func_, i);
+        RcppThread::wait();
     }
 
     void parallelFor(int n)
     {
-        quickpool::parallel_for(0, n, func_);
+        RcppThread::parallelFor(0, n, func_);
     }
 
     void OpenMP_static(int n)
@@ -139,10 +139,10 @@ benchMark(std::function<void(int i)> task, size_t n, double min_sec = 10)
                              },
                              min_sec);
 
-    // // compute speed up over single threaded
-    // const auto t0 = times[0];
-    // for (auto& t : times)
-    //     t = t0 / t;
+    // compute speed up over single threaded
+    const auto t0 = times[0];
+    for (auto& t : times)
+        t = t0 / t;
 
     return Rcpp::wrap(times);
 }
@@ -152,7 +152,7 @@ void set_colnames(Rcpp::NumericMatrix& times)
   colnames(times) = Rcpp::CharacterVector{
     "single",
     "Intel TBB",
-    "quickpool::parallel_for", "quickpool::push",
+    "RcppThread::parallelFor", "RcppThread::async",
     "OpenMP static", "OpenMP dynamic",
   };
 }
@@ -212,46 +212,6 @@ benchSqrtWrite(std::vector<int> ns, double min_sec = 10)
     return times;
 }
 
-// [[Rcpp::export]]
-Rcpp::NumericMatrix
-  benchSqrtImbalanced(Rcpp::IntegerVector ns, double min_sec = 10)
-  {
-    auto op = [](double x, size_t i) {
-      double xx = x;
-      for (int j = 0; j < i; j++) {
-        xx = std::sqrt(xx);
-      }
-    };
-    Rcpp::NumericMatrix times(ns.size(), 6);
-    for (int i = 0; i < ns.size(); i++) {
-      std::vector<double> x(ns[i], 3.14);
-      times(i, Rcpp::_) = benchMark([&](int i) { op(x[i], i); }, ns[i], min_sec);
-    }
-
-    set_colnames(times);
-
-    return times;
-  }
-
-// [[Rcpp::export]]
-Rcpp::NumericMatrix
-  benchSqrtWriteImbalanced(std::vector<int> ns, double min_sec = 10)
-  {
-    auto op = [](double& x, size_t i) {
-      for (int j = 0; j < i; j++) {
-        x = std::sqrt(x);
-      }
-    };
-    Rcpp::NumericMatrix times(ns.size(), 6);
-    for (int i = 0; i < ns.size(); i++) {
-      std::vector<double> x(ns[i], 3.14);
-      times(i, Rcpp::_) = benchMark([&](int i) { op(x[i], i); }, ns[i], min_sec);
-    }
-
-    set_colnames(times);
-
-    return times;
-  }
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix

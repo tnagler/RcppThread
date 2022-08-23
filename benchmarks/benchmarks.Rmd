@@ -1,13 +1,30 @@
+---
+title: "RcppThread Benchmarks"
+author: "Thomas Nagler"
+date: "2022-08-23"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Graphs show speedup over single-threaded execution (higher is better)
+
+
+#### Libraries
+```{r}
 library("tidyverse")
 library("Rcpp")
 library("RcppParallel")
 library("RcppThread")
 library("ggthemes")
+```
 
+#### Utilities
 
+```{r}
 Rcpp::sourceCpp(here::here("benchmarks/benchmarks.cpp"))
-
-
 wait_for <- 5
 
 plot_df <- function(df, title = NULL) {
@@ -25,61 +42,81 @@ plot_df <- function(df, title = NULL) {
     labs(title = title)
   print(p)
 }
+```
+
+## Benchmarks
+
+### empty threads
 
 
+```{r}
 ns <- 10^(2:6)
 res <- benchEmpty(rev(ns), wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "empty jobs")
 ggsave(here::here("benchmarks/benchEmptyThread.pdf"), width = 7.5, height = 3)
+```
 
 
+### compute 1000 square roots per thread
+
+```{r}
 ns <- 10^(2:6)
 res <- benchSqrt(rev(ns), wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt")
 ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 7.5, height = 3)
+```
 
+### compute and write 1000 square roots per thread
 
+```{r}
 ns <- 10^(2:6)
 res <- benchSqrtWrite(rev(ns), wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt modify inplace")
 ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 7.5, height = 3)
+```
 
-ns <- 10^(2:4)
-res <- benchSqrtImbalanced(rev(ns), wait_for)
-df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
-plot_df(df, "n times sqrt (imbalanced)")
-ggsave(here::here("benchmarks/benchSqrtImbalanced.pdf"), width = 7.5, height = 3)
 
-ns <- 10^(2:4)
-res <- benchSqrtWriteImbalanced(rev(ns), wait_for)
-df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
-plot_df(df, "n times sqrt modify inplace (imbalanced)")
-ggsave(here::here("benchmarks/benchSqrtWriteImbalanced.pdf"), width = 7.5, height = 3)
+### kernel density estimation (d = 10)
 
+```{r}
 ns <- 10^(2:5)
 res <- benchKDE(rev(ns), 100, wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "kernel density d = 10")
 ggsave(here::here("benchmarks/benchKDE-10.pdf"), width = 7.5, height = 3)
+```
 
 
+
+### kernel density estimation (d = 100)
+
+```{r}
 ns <- 10^(2:5)
 res <- benchKDE(rev(ns), 100, wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "kernel density d = 100")
 ggsave(here::here("benchmarks/benchKDE-100.pdf"), width = 7.5, height = 3)
+```
 
+### Kendall matrix (d = 10, imbalanced)
+
+```{r}
 ns <- 10^(2:4)
 res <- benchKendall(rev(ns), 10, wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "Kendall matrix (unbalanced) d = 10")
 ggsave(here::here("benchmarks/benchKendall-10.pdf"), width = 7.5, height = 3)
+```
 
+### Kendall matrix (d = 100, imbalanced)
+
+```{r}
 ns <- 10^(2:4)
 res <- benchKendall(rev(ns), 100, wait_for)
 df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "Kendall matrix (unbalanced) d = 100")
 ggsave(here::here("benchmarks/benchKendall-100.pdf"), width = 7.5, height = 3)
+```
