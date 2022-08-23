@@ -15,7 +15,8 @@ Provides R-friendly threading functionality:
   * classes for the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) and parallel for loops
     for easy and flexible parallelism,
-  * thread safe progress tracking.
+  * thread safe progress tracking,
+  * state-of-the art speed, see  [benchmarks](https://github.com/tnagler/RcppThread/blob/benchmarks/benchmarks/benchmarks.md).
 
 The library is header-only, platform-independent, and only 
 requires a 
