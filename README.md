@@ -2,25 +2,25 @@
 
 <!-- badges: start -->
 [![R build status](https://github.com/tnagler/RcppThread/workflows/R-CMD-check/badge.svg)](https://github.com/tnagler/RcppThread/actions)
-[![CRAN version](http://www.r-pkg.org/badges/version/RcppThread)](https://cran.r-project.org/package=RcppThread) 
-[![CRAN downloads](http://cranlogs.r-pkg.org/badges/RcppThread)](https://cran.r-project.org/package=RcppThread)
+[![CRAN version](https://www.r-pkg.org/badges/version/RcppThread)](https://cran.r-project.org/package=RcppThread) 
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/RcppThread)](https://cran.r-project.org/package=RcppThread)
 <!-- badges: end -->
 
 Provides R-friendly threading functionality: 
 
-  * thread safe versions of [Rcpp's](http://www.rcpp.org/)
+  * thread safe versions of [Rcpp's](https://www.rcpp.org/)
     `checkUserInterrupt()`, `Rcout`, and `Rcerr`,
   * an interruptible thread class that otherwise behaves like 
-   [`std::thread`](http://en.cppreference.com/w/cpp/thread/thread),
+   [`std::thread`](https://en.cppreference.com/w/cpp/thread/thread),
   * classes for the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) and parallel for loops
     for easy and flexible parallelism,
   * thread safe progress tracking,
-  * state-of-the art speed, see  [benchmarks](https://github.com/tnagler/RcppThread/blob/benchmarks/benchmarks/benchmarks.md).
+  * state-of-the art speed, see  [benchmarks](https://github.com/tnagler/RcppThread/blob/main/benchmarks/benchmarks.md).
 
 The library is header-only, platform-independent, and only 
 requires a 
-[C++11-compatible compiler](http://en.cppreference.com/w/cpp/compiler_support#cpp11).
+[C++11-compatible compiler](https://en.cppreference.com/w/cpp/compiler_support#cpp11).
 
 ## Functionality
 
