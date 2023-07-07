@@ -1,0 +1,2 @@
+PKG_CPPFLAGS = -I../inst/include
+PKG_CPPFLAGS += `"$(R_HOME)/bin/Rscript" -e "source('../R/LdFlags.R'); LdFlags()"`
