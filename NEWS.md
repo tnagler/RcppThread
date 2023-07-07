@@ -1,3 +1,20 @@
+# RcppThread 2.1.5
+
+BUG FIX
+
+* Fixes static lifetime issue on MacM1.
+
+# RcppThread 2.1.4
+
+BUG FIX
+
+* Fixes order of headers in `detectCores.cpp`.
+
+REQUIREMENTS
+
+* Remove `Systemrequirements: C++11`
+
+
 # RcppThread 2.1.3
 
 BUG FIX

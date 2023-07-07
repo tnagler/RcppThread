@@ -80,8 +80,7 @@ LdFlags <- function() {
     invisible(flags)
 }
 
-
-#' Internal test for global thread pool
+# internal function for testing destructor of global thread pool
 testGlobal <- function() {
     .Call("testGlobalCpp")
 }

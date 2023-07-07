@@ -1,4 +1,4 @@
-testGlobal()
+RcppThread:::testGlobal()
 
 if (RcppThread:::hasAtomicSupport()) {
 
