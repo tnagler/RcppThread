@@ -1,3 +1,5 @@
+RcppThread:::testGlobal()
+
 if (RcppThread:::hasAtomicSupport()) {
 
     context("Compile test functions")

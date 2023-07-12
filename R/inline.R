@@ -4,7 +4,6 @@ inlineCxxPlugin <- function(...) {
         package = "RcppThread",
         libs = RcppThread::LdFlags()
     )()
-    settings$env$USE_CXX11 <- "yes"
     settings
 }
 

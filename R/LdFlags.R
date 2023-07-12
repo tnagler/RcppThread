@@ -79,3 +79,9 @@ LdFlags <- function() {
     cat(flags)
     invisible(flags)
 }
+
+# internal function for testing destructor of global thread pool
+testGlobal <- function() {
+    .Call("testGlobalCpp")
+}
+

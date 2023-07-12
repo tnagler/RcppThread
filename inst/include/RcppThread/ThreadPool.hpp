@@ -7,8 +7,8 @@
 #pragma once
 
 #include "RcppThread/RMonitor.hpp"
-#include "RcppThread/Rcout.hpp"
 #include "RcppThread/Rcerr.hpp"
+#include "RcppThread/Rcout.hpp"
 #include "RcppThread/quickpool.hpp"
 
 #include <atomic>
@@ -70,7 +70,8 @@ class ThreadPool
 //! constructs a thread pool with as many workers as there are cores.
 inline ThreadPool::ThreadPool()
   : ThreadPool(std::thread::hardware_concurrency())
-{}
+{
+}
 
 //! constructs a thread pool with `nWorkers` threads.
 //! @param nWorkers number of worker threads to create; if `nWorkers = 0`, all
@@ -78,13 +79,11 @@ inline ThreadPool::ThreadPool()
 inline ThreadPool::ThreadPool(size_t nWorkers)
   : pool_{ new quickpool::ThreadPool(nWorkers) }
   , owner_thread_{ std::this_thread::get_id() }
-{}
+{
+}
 
 //! destructor joins all threads if possible.
-inline ThreadPool::~ThreadPool() noexcept
-{
-    this->wait();
-}
+inline ThreadPool::~ThreadPool() noexcept {}
 
 //! Access to the global thread pool instance.
 inline ThreadPool&
@@ -173,7 +172,8 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
     if (nBatches == 0) {
         // each worker has its dedicated range, but can steal part of another
         // worker's ranges when done with own
-        auto thr = std::max(pool_->get_active_threads(), static_cast<size_t>(1));
+        auto thr =
+          std::max(pool_->get_active_threads(), static_cast<size_t>(1));
         auto workers = quickpool::loop::create_workers<F>(f, begin, end, thr);
         for (size_t k = 0; k < thr; k++) {
             this->push([=] { workers->at(k).run(workers); });
@@ -189,7 +189,10 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
         int rem = nTasks % nBatches;
         for (size_t b = 0; b < nBatches; b++) {
             int bs = sz + (rem-- > 0);
-            this->push([=] { for (int i = begin; i < begin + bs; ++i) f(i); });
+            this->push([=] {
+                for (int i = begin; i < begin + bs; ++i)
+                    f(i);
+            });
             begin += bs;
         }
     }
