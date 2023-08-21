@@ -3,6 +3,7 @@
 \docType{package}
 \name{RcppThread}
 \alias{RcppThread}
+\alias{RcppThread-package}
 \title{R-friendly C++11 threads}
 \description{
 Provides a C++11-style thread class and thread pool that can safely be
@@ -12,4 +13,16 @@ interrupted from R.
 Nagler, T. (2021). "R-Friendly Multi-Threading in C++."
 \emph{Journal of Statistical Software, Code Snippets}, \emph{97}(1), 1-18.
 \doi{10.18637/jss.v097.c01}.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/tnagler/RcppThread}
+  \item Report bugs at \url{https://github.com/tnagler/RcppThread/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Thomas Nagler \email{mail@tnagler.com} (\href{https://orcid.org/0000-0003-1855-0046}{ORCID})
+
 }
