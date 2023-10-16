@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="quickpool_8hpp" kind="file" language="C++">
     <compoundname>quickpool.hpp</compoundname>
     <includes local="no">algorithm</includes>
@@ -13,25 +13,13 @@
     <includes local="no">numeric</includes>
     <includes local="no">thread</includes>
     <includes local="no">vector</includes>
-    <includedby refid="ThreadPool_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</includedby>
+    <includedby refid="ThreadPool_8hpp" local="yes">/home/n5/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</includedby>
     <incdepgraph>
       <node id="3">
         <label>atomic</label>
       </node>
-      <node id="6">
-        <label>functional</label>
-      </node>
-      <node id="10">
-        <label>numeric</label>
-      </node>
-      <node id="5">
-        <label>exception</label>
-      </node>
-      <node id="4">
-        <label>condition_variable</label>
-      </node>
       <node id="1">
-        <label>/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp</label>
+        <label>/home/n5/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp</label>
         <link refid="quickpool_8hpp"/>
         <childnode refid="2" relation="include">
         </childnode>
@@ -56,6 +44,18 @@
         <childnode refid="12" relation="include">
         </childnode>
       </node>
+      <node id="6">
+        <label>functional</label>
+      </node>
+      <node id="10">
+        <label>numeric</label>
+      </node>
+      <node id="5">
+        <label>exception</label>
+      </node>
+      <node id="4">
+        <label>condition_variable</label>
+      </node>
       <node id="7">
         <label>future</label>
       </node>
@@ -79,6 +79,6 @@
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/quickpool.hpp"/>
   </compounddef>
 </doxygen>

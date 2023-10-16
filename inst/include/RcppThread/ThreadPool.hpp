@@ -101,7 +101,7 @@ ThreadPool::globalInstance()
 }
 
 //! changes the number of threads in the pool.
-//! @param the new number of threads.
+//! @param num_threads the new number of threads.
 void
 ThreadPool::resize(size_t num_threads)
 {

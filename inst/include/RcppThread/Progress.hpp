@@ -129,6 +129,8 @@ public:
     //! constructs a progress counter.
     //! @param numIt total number of iterations.
     //! @param printEvery how regularly to print updates (in seconds).
+    //! @param custom_msg (optional) a custom message to be printed before the
+    //!   progress count; default is `"Computing: "`.
     ProgressCounter(size_t numIt, size_t printEvery, std::string custom_msg = "Computing: ") :
         ProgressPrinter(numIt, printEvery), cmsg(custom_msg)
     {}

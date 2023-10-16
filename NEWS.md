@@ -1,3 +1,10 @@
+# RcppThread 2.1.6
+
+NEW FEATURES
+
+* allow custom message in `ProgessCounter` (thanks @tylermorganwall)
+
+
 # RcppThread 2.1.5
 
 BUG FIX

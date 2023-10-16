@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="overrides" kind="page">
     <compoundname>overrides</compoundname>
     <title>Automatic overrides</title>
@@ -12,9 +12,9 @@
 <para><programlisting><codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_COUT<sp/>1<sp/><sp/><sp/><sp/>//<sp/>std::cout<sp/>override</highlight></codeline>
 <codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_CERR<sp/>1<sp/><sp/><sp/><sp/>//<sp/>std::cerr<sp/>override</highlight></codeline>
 <codeline><highlight class="normal">#define<sp/>RCPPTHREAD_OVERRIDE_THREAD<sp/>1<sp/><sp/>//<sp/>std::thread<sp/>override</highlight></codeline>
-</programlisting></para>
-<para>before including the RcppThread headers. </para>
+</programlisting> before including the RcppThread headers. </para>
 </sect1>
     </detaileddescription>
+    <location file="overrides.dox"/>
   </compounddef>
 </doxygen>

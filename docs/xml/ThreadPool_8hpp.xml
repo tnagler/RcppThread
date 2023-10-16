@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="ThreadPool_8hpp" kind="file" language="C++">
     <compoundname>ThreadPool.hpp</compoundname>
     <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
+    <includes refid="Rcerr_8hpp" local="yes">RcppThread/Rcerr.hpp</includes>
     <includes refid="Rcout_8hpp" local="yes">RcppThread/Rcout.hpp</includes>
     <includes refid="quickpool_8hpp" local="yes">RcppThread/quickpool.hpp</includes>
     <includes local="no">atomic</includes>
@@ -13,8 +14,8 @@
     <includes local="no">mutex</includes>
     <includes local="no">thread</includes>
     <includes local="no">vector</includes>
-    <includedby refid="parallelFor_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp</includedby>
-    <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
+    <includedby refid="parallelFor_8hpp" local="yes">/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp</includedby>
+    <includedby refid="RcppThread_8h" local="yes">/home/n5/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
     <incdepgraph>
       <node id="2">
         <label>atomic</label>
@@ -22,23 +23,8 @@
       <node id="4">
         <label>functional</label>
       </node>
-      <node id="3">
-        <label>condition_variable</label>
-      </node>
-      <node id="5">
-        <label>future</label>
-      </node>
-      <node id="9">
-        <label>vector</label>
-      </node>
-      <node id="7">
-        <label>mutex</label>
-      </node>
-      <node id="8">
-        <label>thread</label>
-      </node>
       <node id="1">
-        <label>/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</label>
+        <label>/home/n5/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</label>
         <link refid="ThreadPool_8hpp"/>
         <childnode refid="2" relation="include">
         </childnode>
@@ -57,6 +43,21 @@
         <childnode refid="9" relation="include">
         </childnode>
       </node>
+      <node id="3">
+        <label>condition_variable</label>
+      </node>
+      <node id="5">
+        <label>future</label>
+      </node>
+      <node id="9">
+        <label>vector</label>
+      </node>
+      <node id="7">
+        <label>mutex</label>
+      </node>
+      <node id="8">
+        <label>thread</label>
+      </node>
       <node id="6">
         <label>memory</label>
       </node>
@@ -67,6 +68,6 @@
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp"/>
   </compounddef>
 </doxygen>

@@ -1,12 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.9.1" xml:lang="en-US">
   <compound refid="classRcppThread_1_1ProgressBar" kind="class"><name>RcppThread::ProgressBar</name>
     <member refid="classRcppThread_1_1ProgressBar_1a09bdaf2e551442af08b10b7ef19ab7ba" kind="function"><name>ProgressBar</name></member>
     <member refid="classRcppThread_1_1ProgressBar_1a39f9b31c61cd22cc7548abea097336ce" kind="function"><name>printProgress</name></member>
     <member refid="classRcppThread_1_1ProgressBar_1ab2369495912d2c12ab5dbd810048e3de" kind="function"><name>makeBar</name></member>
   </compound>
   <compound refid="classRcppThread_1_1ProgressCounter" kind="class"><name>RcppThread::ProgressCounter</name>
-    <member refid="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" kind="function"><name>ProgressCounter</name></member>
+    <member refid="classRcppThread_1_1ProgressCounter_1a8ff24a618938804eef0422ffd3aa3987" kind="variable"><name>cmsg</name></member>
+    <member refid="classRcppThread_1_1ProgressCounter_1a6689c4e4b64b76b4a69fd087337cb04f" kind="function"><name>ProgressCounter</name></member>
     <member refid="classRcppThread_1_1ProgressCounter_1af0ab5e21bb89fd8fd499f7ac6443a10d" kind="function"><name>printProgress</name></member>
   </compound>
   <compound refid="classRcppThread_1_1ProgressPrinter" kind="class"><name>RcppThread::ProgressPrinter</name>
@@ -143,11 +144,11 @@
   </compound>
   <compound refid="overrides" kind="page"><name>overrides</name>
   </compound>
-  <compound refid="dir_2b5d1a398a9eec011391d543f21db223" kind="dir"><name>/data/dev/r/RcppThread/inst/include</name>
+  <compound refid="dir_2b5d1a398a9eec011391d543f21db223" kind="dir"><name>/home/n5/dev/r/RcppThread/inst/include</name>
   </compound>
-  <compound refid="dir_920884c6b3b2f0be94e27d51660adee5" kind="dir"><name>/data/dev/r/RcppThread/inst</name>
+  <compound refid="dir_920884c6b3b2f0be94e27d51660adee5" kind="dir"><name>/home/n5/dev/r/RcppThread/inst</name>
   </compound>
-  <compound refid="dir_b2386a6e32c05a6a1e7925d7c95f2160" kind="dir"><name>/data/dev/r/RcppThread/inst/include/RcppThread</name>
+  <compound refid="dir_b2386a6e32c05a6a1e7925d7c95f2160" kind="dir"><name>/home/n5/dev/r/RcppThread/inst/include/RcppThread</name>
   </compound>
   <compound refid="indexpage" kind="page"><name>index</name>
   </compound>

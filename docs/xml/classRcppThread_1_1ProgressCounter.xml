@@ -1,14 +1,29 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="classRcppThread_1_1ProgressCounter" kind="class" language="C++" prot="public">
     <compoundname>RcppThread::ProgressCounter</compoundname>
     <basecompoundref refid="classRcppThread_1_1ProgressPrinter" prot="public" virt="non-virtual">RcppThread::ProgressPrinter</basecompoundref>
     <includes local="no">Progress.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classRcppThread_1_1ProgressCounter_1a8ff24a618938804eef0422ffd3aa3987" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string RcppThread::ProgressCounter::cmsg</definition>
+        <argsstring></argsstring>
+        <name>cmsg</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="139" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="139" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
       <sectiondef kind="public-func">
-      <memberdef kind="function" id="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+      <memberdef kind="function" id="classRcppThread_1_1ProgressCounter_1a6689c4e4b64b76b4a69fd087337cb04f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type></type>
         <definition>RcppThread::ProgressCounter::ProgressCounter</definition>
-        <argsstring>(size_t numIt, size_t printEvery)</argsstring>
+        <argsstring>(size_t numIt, size_t printEvery, std::string custom_msg=&quot;Computing: &quot;)</argsstring>
         <name>ProgressCounter</name>
         <param>
           <type>size_t</type>
@@ -17,6 +32,11 @@
         <param>
           <type>size_t</type>
           <declname>printEvery</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>custom_msg</declname>
+          <defval>&quot;Computing: &quot;</defval>
         </param>
         <briefdescription>
         </briefdescription>
@@ -37,12 +57,20 @@
 <para>how regularly to print updates (in seconds). </para>
 </parameterdescription>
 </parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>custom_msg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>(optional) a custom message to be printed before the progress count; default is <computeroutput>&quot;Computing: &quot;</computeroutput>. </para>
+</parameterdescription>
+</parameteritem>
 </parameterlist>
 </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="132" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="132" bodyend="134"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="134" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="134" bodyend="136"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-func">
@@ -59,7 +87,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="139" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="139" bodyend="147"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="142" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="142" bodyend="150"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -92,8 +120,9 @@
         </childnode>
       </node>
     </collaborationgraph>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="126" column="45" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="126" bodyend="148"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="126" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="126" bodyend="151"/>
     <listofallmembers>
+      <member refid="classRcppThread_1_1ProgressCounter_1a8ff24a618938804eef0422ffd3aa3987" prot="private" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>cmsg</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>formatTime</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>isDone_</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a28e410b643798f36a59bcef22b9d1dbd" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>it_</name></member>
@@ -104,7 +133,7 @@
       <member refid="classRcppThread_1_1ProgressPrinter_1a2d7146dd49c3df81a45d0537489826c3" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>operator++</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a9a0af32f5d66762e6b3993e085b90cf7" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>printEvery_</name></member>
       <member refid="classRcppThread_1_1ProgressCounter_1af0ab5e21bb89fd8fd499f7ac6443a10d" prot="private" virt="virtual"><scope>RcppThread::ProgressCounter</scope><name>printProgress</name></member>
-      <member refid="classRcppThread_1_1ProgressCounter_1a185ef604ccad91a26d4db1a1d04b0b9c" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressCounter</name></member>
+      <member refid="classRcppThread_1_1ProgressCounter_1a6689c4e4b64b76b4a69fd087337cb04f" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressCounter</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a71e9e5034d220b4fc75648545554b401" prot="public" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>ProgressPrinter</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1ac4f5d2a6d465f9e6b67256ef73d34dad" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>progressString</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1a0fac2a44d886424a2693e4b9d7fb4d58" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressCounter</scope><name>remainingSecs</name></member>
