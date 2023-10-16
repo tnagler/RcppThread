@@ -129,11 +129,12 @@ public:
     //! constructs a progress counter.
     //! @param numIt total number of iterations.
     //! @param printEvery how regularly to print updates (in seconds).
-    ProgressCounter(size_t numIt, size_t printEvery) :
-        ProgressPrinter(numIt, printEvery)
+    ProgressCounter(size_t numIt, size_t printEvery, std::string custom_msg = "Computing: ") :
+        ProgressPrinter(numIt, printEvery), cmsg(custom_msg)
     {}
 
 private:
+    std::string cmsg;
     //! prints progress in percent to the R console (+ an estimate of remaining
     //! time).
     void printProgress() {
@@ -142,7 +143,7 @@ private:
         if (it_ == numIt_)
             isDone_ = true;
         std::ostringstream msg;
-        msg << "\rComputing: " << progressString();
+        msg << "\r" << cmsg << progressString();
         Rcout << msg.str();
     }
 };

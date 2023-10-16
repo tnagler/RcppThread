@@ -90,7 +90,11 @@ if (RcppThread:::hasAtomicSupport()) {
         # ------------------------------------------------------
         context("Progress tracking")
         test_that("ProgressCounter works", {
-            expect_output(testProgressCounter(), "100% \\(done\\)")
+            expect_output(testProgressCounter(), "Computing: 100% \\(done\\)")
+        })
+
+        test_that("ProgressCounter works", {
+            expect_output(testProgressCounter2(), "Test message: 100% \\(done\\)")
         })
 
         test_that("ProgressBar works", {
