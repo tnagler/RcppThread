@@ -100,6 +100,14 @@ ThreadPool::globalInstance()
 #endif
 }
 
+//! changes the number of threads in the pool.
+//! @param the new number of threads.
+void
+ThreadPool::resize(size_t num_threads)
+{
+    pool_->set_active_threads(num_threads);
+}
+
 //! pushes jobs to the thread pool.
 //! @param f a function taking an arbitrary number of arguments.
 //! @param args a comma-seperated list of the other arguments that shall
