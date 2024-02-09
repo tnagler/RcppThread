@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="classRcppThread_1_1ProgressPrinter" kind="class" language="C++" prot="public" abstract="yes">
     <compoundname>RcppThread::ProgressPrinter</compoundname>
     <derivedcompoundref refid="classRcppThread_1_1ProgressBar" prot="public" virt="non-virtual">RcppThread::ProgressBar</derivedcompoundref>
@@ -19,7 +19,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="112" column="24" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="112" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="112" column="24" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="112" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1ProgressPrinter_1a1aa7189b1a757bc6089966886443b49d" prot="protected" static="no" mutable="no">
         <type>std::atomic_size_t</type>
@@ -34,7 +34,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="113" column="24" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="113" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="113" column="24" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="113" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" static="no" mutable="no">
         <type>std::atomic_bool</type>
@@ -49,7 +49,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="114" column="22" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="114" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="114" column="22" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="114" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1ProgressPrinter_1a9529bc02365f45586db36b903b4f1e9f" prot="protected" static="no" mutable="no">
         <type>size_t</type>
@@ -63,7 +63,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="115" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="115" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="115" column="12" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="115" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1ProgressPrinter_1a9a0af32f5d66762e6b3993e085b90cf7" prot="protected" static="no" mutable="no">
         <type>size_t</type>
@@ -77,7 +77,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="116" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="116" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="116" column="12" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="116" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1ProgressPrinter_1abb8c055119f7a19bf2672e6614b04f14" prot="protected" static="no" mutable="no">
         <type>std::chrono::time_point&lt; std::chrono::steady_clock &gt;</type>
@@ -91,7 +91,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="118" column="29" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="118" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="118" column="29" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="118" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -133,7 +133,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="27" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="27" bodyend="31"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="27" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="27" bodyend="31"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressPrinter_1a9fbe8e4d867cf9e03dd7e67ab3240419" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
         <type>void</type>
@@ -149,7 +149,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="34" column="18"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="34" column="18"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressPrinter_1a9b92bd795df45b246a578e66d10e2d50" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>size_t</type>
@@ -163,7 +163,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="37" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="37" bodyend="42"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="37" column="12" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="37" bodyend="42"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressPrinter_1a2d7146dd49c3df81a45d0537489826c3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>size_t</type>
@@ -180,7 +180,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="45" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="45" bodyend="50"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="45" column="12" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="45" bodyend="50"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="protected-func">
@@ -196,7 +196,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="54" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="54" bodyend="62"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="54" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="54" bodyend="62"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressPrinter_1a0fac2a44d886424a2693e4b9d7fb4d58" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>size_t</type>
@@ -210,7 +210,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="65" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="65" bodyend="70"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="65" column="12" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="65" bodyend="70"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressPrinter_1ac4f5d2a6d465f9e6b67256ef73d34dad" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>std::string</type>
@@ -224,7 +224,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="73" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="73" bodyend="82"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="73" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="73" bodyend="82"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>std::string</type>
@@ -251,7 +251,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="86" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="86" bodyend="110"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="86" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="86" bodyend="110"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -278,7 +278,7 @@
         </childnode>
       </node>
     </inheritancegraph>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="22" column="22" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="22" bodyend="119"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="22" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="22" bodyend="119"/>
     <listofallmembers>
       <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressPrinter</scope><name>formatTime</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressPrinter</scope><name>isDone_</name></member>

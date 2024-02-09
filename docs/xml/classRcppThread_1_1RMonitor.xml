@@ -1,37 +1,43 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="classRcppThread_1_1RMonitor" kind="class" language="C++" prot="public">
     <compoundname>RcppThread::RMonitor</compoundname>
     <includes local="no">RMonitor.hpp</includes>
       <sectiondef kind="friend">
       <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1a9ccf6a0d51bcb0b83334683b2dbd70c7" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
-        <type>friend class</type>
+        <type>class</type>
         <definition>friend class RPrinter</definition>
         <argsstring></argsstring>
         <name>RPrinter</name>
+        <param>
+          <type><ref refid="classRcppThread_1_1RPrinter" kindref="compound">RPrinter</ref></type>
+        </param>
         <briefdescription>
         </briefdescription>
         <detaileddescription>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="38" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="38" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="38" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="38" bodyend="-1"/>
       </memberdef>
       <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1a1bacd12c19aa48e2377f8c07f7f79b6c" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
-        <type>friend class</type>
+        <type>class</type>
         <definition>friend class RErrPrinter</definition>
         <argsstring></argsstring>
         <name>RErrPrinter</name>
+        <param>
+          <type><ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref></type>
+        </param>
         <briefdescription>
         </briefdescription>
         <detaileddescription>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="39" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="39" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="39" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="39" bodyend="-1"/>
       </memberdef>
       <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1ad81d4d6402e7bfe7f254b2d5388fb97b" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
-        <type>friend void</type>
+        <type>void</type>
         <definition>void checkUserInterrupt</definition>
         <argsstring>(bool condition)</argsstring>
         <name>checkUserInterrupt</name>
@@ -55,10 +61,10 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="40" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="148" bodyend="152"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="40" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="148" bodyend="152"/>
       </memberdef>
       <memberdef kind="friend" id="classRcppThread_1_1RMonitor_1a3cf8caa9587760e532e08c2718089597" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
-        <type>friend bool</type>
+        <type>bool</type>
         <definition>bool isInterrupted</definition>
         <argsstring>(bool condition)</argsstring>
         <name>isInterrupted</name>
@@ -82,7 +88,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="41" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="158" bodyend="163"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="41" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="158" bodyend="163"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-attrib">
@@ -97,7 +103,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="138" column="16" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="138" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="138" column="16" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="138" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1RMonitor_1a17e4abb37b2c72343ca9c20f50ba1420" prot="private" static="no" mutable="no">
         <type>std::stringstream</type>
@@ -110,7 +116,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="139" column="23" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="139" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="139" column="23" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="139" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1RMonitor_1a579b216fee710cdf464331797be37b77" prot="private" static="no" mutable="no">
         <type>std::stringstream</type>
@@ -123,7 +129,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="140" column="23" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="140" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="140" column="23" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="140" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1RMonitor_1aa93358324924efde10cb3a13c6f6b7ab" prot="private" static="no" mutable="no">
         <type>std::atomic_bool</type>
@@ -136,7 +142,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="141" column="22" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="141" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="141" column="22" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="141" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -155,7 +161,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="45" column="5"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="45" column="5"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1ab9baec1f5dbfe8a3349695bd6d9863e8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type></type>
@@ -172,7 +178,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="47" column="5"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="47" column="5"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a2073f46ded6bb67799d967faff17cd42" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;</type>
@@ -189,7 +195,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="49" column="14"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="49" column="14"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a4677bdda0a35abaf288e66cf9dcd6032" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type><ref refid="classRcppThread_1_1RMonitor" kindref="compound">RMonitor</ref> &amp;</type>
@@ -206,7 +212,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="51" column="14"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="51" column="14"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-static-func">
@@ -222,7 +228,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="55" column="21" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="55" bodyend="59"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="55" column="21" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="55" bodyend="59"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="protected-func">
@@ -238,7 +244,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="63" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="63" bodyend="66"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="63" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="63" bodyend="66"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a97096ce3bac37573f36a20954891c1f2" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -252,7 +258,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="69" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="69" bodyend="76"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="69" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="69" bodyend="76"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1ac38e054f6e63dfa2be582dfb606b129f" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>bool</type>
@@ -266,7 +272,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="80" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="80" bodyend="85"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="80" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="80" bodyend="85"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1a98b81ed3996a37a51b5cdb8dbed89712" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -298,7 +304,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="91" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="91" bodyend="102"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="91" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="91" bodyend="102"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1aca4da9d515e3366af9e8185a7d2b866a" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -330,7 +336,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="108" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="108" bodyend="119"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="108" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="108" bodyend="119"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-func">
@@ -349,7 +355,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="123" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="123" bodyend="123"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="123" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="123" bodyend="123"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1RMonitor_1af36b6c5eaede6e3b4af7e7cf3b8666c9" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>bool</type>
@@ -363,7 +369,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="134" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="134" bodyend="136"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="134" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="134" bodyend="136"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-static-func">
@@ -384,7 +390,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="129" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="129" bodyend="131"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="129" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="129" bodyend="131"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -392,7 +398,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="35" column="15" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="35" bodyend="142"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="35" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="35" bodyend="142"/>
     <listofallmembers>
       <member refid="classRcppThread_1_1RMonitor_1a5e763c7ad671fbed5fcfb3dc45a87978" prot="protected" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>calledFromMainThread</name></member>
       <member refid="classRcppThread_1_1RMonitor_1ab1e76b3676907a75912fb28ca1a44972" prot="private" virt="non-virtual"><scope>RcppThread::RMonitor</scope><name>callRCheck</name></member>

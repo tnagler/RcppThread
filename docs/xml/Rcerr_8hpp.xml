@@ -1,17 +1,18 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="Rcerr_8hpp" kind="file" language="C++">
     <compoundname>Rcerr.hpp</compoundname>
     <includes local="no">ostream</includes>
     <includes refid="RMonitor_8hpp" local="yes">RcppThread/RMonitor.hpp</includes>
-    <includedby refid="Thread_8hpp" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp</includedby>
-    <includedby refid="RcppThread_8h" local="yes">/data/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
+    <includedby refid="Thread_8hpp" local="yes">/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp</includedby>
+    <includedby refid="ThreadPool_8hpp" local="yes">/home/n5/dev/r/RcppThread/inst/include/RcppThread/ThreadPool.hpp</includedby>
+    <includedby refid="RcppThread_8h" local="yes">/home/n5/dev/r/RcppThread/inst/include/RcppThread.h</includedby>
     <incdepgraph>
       <node id="2">
         <label>ostream</label>
       </node>
       <node id="1">
-        <label>/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp</label>
+        <label>/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp</label>
         <link refid="Rcerr_8hpp"/>
         <childnode refid="2" relation="include">
         </childnode>
@@ -29,13 +30,13 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="58" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="58" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="58" column="13" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="58" bodyend="-1"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp"/>
   </compounddef>
 </doxygen>

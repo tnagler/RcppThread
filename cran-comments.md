@@ -1,6 +1,7 @@
-Fixes clang-17 error caused by wrong order of system/R headers (macro `RF_length`).
+Also includes a fix for the @doctype isseu (now documenting "_PACKAGE" instead of NULL).
 
 ## Test environments
+
 * ubuntu 22.04 (devel, release, old-rel)
 * macOS X (release)
 * Windows Server 2019 (release)
@@ -10,4 +11,4 @@ Fixes clang-17 error caused by wrong order of system/R headers (macro `RF_length
 
                   NOTE OK
   Source packages    0  1
-  Reverse depends   21  2
+  Reverse depends   19  3

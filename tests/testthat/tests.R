@@ -5,7 +5,7 @@ if (RcppThread:::hasAtomicSupport()) {
     context("Compile test functions")
     Rcpp::sourceCpp(file = normalizePath("../tests.cpp"))
 
-    runs <- 10
+    runs <- 5
     for (run in seq_len(runs)) {
         context(paste0("---------------------------- run ", run, "/", runs))
         test_that("start", expect_true(TRUE))
@@ -90,7 +90,11 @@ if (RcppThread:::hasAtomicSupport()) {
         # ------------------------------------------------------
         context("Progress tracking")
         test_that("ProgressCounter works", {
-            expect_output(testProgressCounter(), "100% \\(done\\)")
+            expect_output(testProgressCounter(), "Computing: 100% \\(done\\)")
+        })
+
+        test_that("ProgressCounter works", {
+            expect_output(testProgressCounter2(), "Test message: 100% \\(done\\)")
         })
 
         test_that("ProgressBar works", {

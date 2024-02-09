@@ -64,7 +64,7 @@ checkForLibPthread <- function() {
 #' linker flags for `pthread` and `libatomic`, if available.
 #'
 #' Use as
-#' `PKG_LIBS = ${R_HOME}/bin/Rscript -e 'RcppThread::LdFlags()'.
+#' `PKG_LIBS = $(R_HOME)/bin/Rscript -e 'RcppThread::LdFlags()'.
 #'
 #' @export
 LdFlags <- function() {

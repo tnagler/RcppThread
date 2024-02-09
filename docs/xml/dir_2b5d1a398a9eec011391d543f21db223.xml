@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="dir_2b5d1a398a9eec011391d543f21db223" kind="dir">
-    <compoundname>/data/dev/r/RcppThread/inst/include</compoundname>
-    <innerdir refid="dir_b2386a6e32c05a6a1e7925d7c95f2160">/data/dev/r/RcppThread/inst/include/RcppThread</innerdir>
+    <compoundname>/home/n5/dev/r/RcppThread/inst/include</compoundname>
+    <innerdir refid="dir_b2386a6e32c05a6a1e7925d7c95f2160">/home/n5/dev/r/RcppThread/inst/include/RcppThread</innerdir>
     <innerfile refid="mainpage_8h">mainpage.h</innerfile>
     <innerfile refid="RcppThread_8h">RcppThread.h</innerfile>
     <briefdescription>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/"/>
   </compounddef>
 </doxygen>

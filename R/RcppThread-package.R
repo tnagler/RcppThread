@@ -10,4 +10,4 @@
 #' @name RcppThread
 #' @docType package
 #' @useDynLib RcppThread, .registration=TRUE
-NULL
+"_PACKAGE"

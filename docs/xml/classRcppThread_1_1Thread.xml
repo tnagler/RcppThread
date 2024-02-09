@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="classRcppThread_1_1Thread" kind="class" language="C++" prot="public">
     <compoundname>RcppThread::Thread</compoundname>
     <includes local="no">Thread.hpp</includes>
@@ -15,7 +15,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="118" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="118" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="118" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="118" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classRcppThread_1_1Thread_1a40bf2b02e180210b2e2ba3eaf1ce76b8" prot="private" static="no" mutable="no">
         <type>std::future&lt; void &gt;</type>
@@ -29,7 +29,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="119" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="119" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="119" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="119" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -44,7 +44,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="30" column="5"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="30" column="5"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1aefb2e287e1d97ad640b8b9fc639b20b9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type></type>
@@ -60,7 +60,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="31" column="5"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="31" column="5"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1ae78324ca523ddc81b025bbfa73197691" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type></type>
@@ -76,7 +76,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="32" column="5"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="32" column="5"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a9e3c55afbbea5be13e98156f61ef86c7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type></type>
@@ -93,7 +93,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="33" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="33" bodyend="36"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="33" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="33" bodyend="36"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1acaffb3618c381a88b4770ae25779150c" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -124,7 +124,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="39" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="39" bodyend="48"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="39" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="39" bodyend="48"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1af1e261c271914383cd566b61ac6b27cc" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
         <type></type>
@@ -137,7 +137,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="50" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="50" bodyend="56"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="50" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="50" bodyend="56"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a8d7c04538a8595d8072e61e6829144ad" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type><ref refid="classRcppThread_1_1Thread" kindref="compound">Thread</ref> &amp;</type>
@@ -153,7 +153,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="58" column="12"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="58" column="12"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a528edd9f049af759ed19c8ba22eb6f5e" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type><ref refid="classRcppThread_1_1Thread" kindref="compound">Thread</ref> &amp;</type>
@@ -170,7 +170,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="59" column="12" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="59" bodyend="65"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="59" column="12" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="59" bodyend="65"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1af8ecfc8b7fd960c14e2b7bb841bea919" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
         <type>void</type>
@@ -187,7 +187,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="67" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="67" bodyend="71"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="67" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="67" bodyend="71"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a633c55ca748eb91b617e9fc588ab5a44" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
         <type>bool</type>
@@ -200,7 +200,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="73" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="73" bodyend="76"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="73" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="73" bodyend="76"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a3f6e519ee72e8a1a550fd2a56392a089" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -214,7 +214,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="80" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="80" bodyend="95"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="80" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="80" bodyend="95"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1af4cf8104541e00ff8c6d8a37234e67e6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -227,7 +227,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="97" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="97" bodyend="100"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="97" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="97" bodyend="100"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a163ddb0a744f6aaea8db79021caf167f" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
         <type>std::thread::id</type>
@@ -240,7 +240,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="102" column="21" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="102" bodyend="105"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="102" column="21" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="102" bodyend="105"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1Thread_1a6bf0eba662eabb65caf34839dd28a2f5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>auto</type>
@@ -253,7 +253,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="107" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="107" bodyend="110"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="107" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="107" bodyend="110"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-static-func">
@@ -268,7 +268,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="112" column="25" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="112" bodyend="115"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="112" column="25" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="112" bodyend="115"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -277,7 +277,7 @@
     <detaileddescription>
 <para>Instances of class <computeroutput>Thread</computeroutput> behave just like instances of <computeroutput>std::thread</computeroutput>, see <ulink url="http://en.cppreference.com/w/cpp/thread/thread">http://en.cppreference.com/w/cpp/thread/thread</ulink> for methods and examples. There is one difference exception: Whenever other threads are doing some work, the main thread periodically synchronizes with R. When the user interrupts a threaded computation, any thread will stop as soon as it encounters a <computeroutput>checkUserInterrupt()</computeroutput>. </para>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="28" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="28" bodyend="120"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" line="28" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Thread.hpp" bodystart="28" bodyend="120"/>
     <listofallmembers>
       <member refid="classRcppThread_1_1Thread_1af4cf8104541e00ff8c6d8a37234e67e6" prot="public" virt="non-virtual"><scope>RcppThread::Thread</scope><name>detach</name></member>
       <member refid="classRcppThread_1_1Thread_1a40bf2b02e180210b2e2ba3eaf1ce76b8" prot="private" virt="non-virtual"><scope>RcppThread::Thread</scope><name>future_</name></member>

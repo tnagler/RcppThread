@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="classRcppThread_1_1ProgressBar" kind="class" language="C++" prot="public">
     <compoundname>RcppThread::ProgressBar</compoundname>
     <basecompoundref refid="classRcppThread_1_1ProgressPrinter" prot="public" virt="non-virtual">RcppThread::ProgressPrinter</basecompoundref>
@@ -42,7 +42,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="160" column="5" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="160" bodyend="162"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="163" column="5" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="163" bodyend="165"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="private-func">
@@ -59,7 +59,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="167" column="10" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="167" bodyend="176"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="170" column="10" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="170" bodyend="179"/>
       </memberdef>
       <memberdef kind="function" id="classRcppThread_1_1ProgressBar_1ab2369495912d2c12ab5dbd810048e3de" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>std::string</type>
@@ -99,7 +99,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="181" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="181" bodyend="191"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="184" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="184" bodyend="194"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -132,7 +132,7 @@
         <link refid="classRcppThread_1_1ProgressPrinter"/>
       </node>
     </collaborationgraph>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="154" column="41" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="154" bodyend="192"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" line="157" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Progress.hpp" bodystart="157" bodyend="195"/>
     <listofallmembers>
       <member refid="classRcppThread_1_1ProgressPrinter_1a7a8c8d7b7ea582dd260768a47893c19f" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>formatTime</name></member>
       <member refid="classRcppThread_1_1ProgressPrinter_1aacbd938eed528c3cd165b1b9277e7892" prot="protected" virt="non-virtual"><scope>RcppThread::ProgressBar</scope><name>isDone_</name></member>

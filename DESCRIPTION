@@ -1,6 +1,6 @@
 Package: RcppThread
 Title: R-Friendly Threading in C++
-Version: 2.1.5
+Version: 2.1.6
 Authors@R: c(
     person("Thomas", "Nagler",, "mail@tnagler.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1855-0046"))

@@ -1,16 +1,16 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
   <compounddef id="namespaceRcppThread" kind="namespace" language="C++">
     <compoundname>RcppThread</compoundname>
-    <innerclass refid="classRcppThread_1_1ProgressBar" prot="public">RcppThread::ProgressBar</innerclass>
-    <innerclass refid="classRcppThread_1_1ProgressCounter" prot="public">RcppThread::ProgressCounter</innerclass>
     <innerclass refid="classRcppThread_1_1ProgressPrinter" prot="public">RcppThread::ProgressPrinter</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressCounter" prot="public">RcppThread::ProgressCounter</innerclass>
+    <innerclass refid="classRcppThread_1_1ProgressBar" prot="public">RcppThread::ProgressBar</innerclass>
     <innerclass refid="classRcppThread_1_1RErrPrinter" prot="public">RcppThread::RErrPrinter</innerclass>
-    <innerclass refid="classRcppThread_1_1RMonitor" prot="public">RcppThread::RMonitor</innerclass>
     <innerclass refid="classRcppThread_1_1RPrinter" prot="public">RcppThread::RPrinter</innerclass>
+    <innerclass refid="classRcppThread_1_1UserInterruptException" prot="public">RcppThread::UserInterruptException</innerclass>
+    <innerclass refid="classRcppThread_1_1RMonitor" prot="public">RcppThread::RMonitor</innerclass>
     <innerclass refid="classRcppThread_1_1Thread" prot="public">RcppThread::Thread</innerclass>
     <innerclass refid="classRcppThread_1_1ThreadPool" prot="public">RcppThread::ThreadPool</innerclass>
-    <innerclass refid="classRcppThread_1_1UserInterruptException" prot="public">RcppThread::UserInterruptException</innerclass>
       <sectiondef kind="var">
       <memberdef kind="variable" id="namespaceRcppThread_1a8393ba347760237abf9d823000af775e" prot="public" static="yes" mutable="no">
         <type><ref refid="classRcppThread_1_1RErrPrinter" kindref="compound">RErrPrinter</ref></type>
@@ -25,7 +25,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="52" column="20" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="52" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" line="52" column="20" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcerr.hpp" bodystart="52" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceRcppThread_1a314d0d8e34b9799f4dda1b4d5da36ed0" prot="public" static="yes" mutable="no">
         <type><ref refid="classRcppThread_1_1RPrinter" kindref="compound">RPrinter</ref></type>
@@ -40,7 +40,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp" line="52" column="17" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp" bodystart="52" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp" line="52" column="17" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/Rcout.hpp" bodystart="52" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceRcppThread_1ada4c397edb2f1f4150f8dc1ab899d324" prot="public" static="yes" mutable="no">
         <type>std::thread::id</type>
@@ -55,7 +55,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="24" column="24" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="24" bodyend="-1"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="24" column="24" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="24" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="func">
@@ -139,17 +139,15 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <codeline><highlight class="normal">for<sp/>(size_t<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>x.size();<sp/>i++)<sp/>{</highlight></codeline>
 <codeline><highlight class="normal"><sp/><sp/><sp/><sp/>x[i]<sp/>=<sp/>i;</highlight></codeline>
 <codeline><highlight class="normal">}</highlight></codeline>
-</programlisting></para>
-<para>The parallel equivalent is <programlisting><codeline><highlight class="normal">parallelFor(0,<sp/>10,<sp/>[&amp;]<sp/>(size_t<sp/>i)<sp/>{</highlight></codeline>
+</programlisting> The parallel equivalent is <programlisting><codeline><highlight class="normal">parallelFor(0,<sp/>10,<sp/>[&amp;]<sp/>(size_t<sp/>i)<sp/>{</highlight></codeline>
 <codeline><highlight class="normal"><sp/><sp/><sp/><sp/>x[i]<sp/>=<sp/>i;</highlight></codeline>
 <codeline><highlight class="normal">});</highlight></codeline>
-</programlisting></para>
-<para>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</para>
+</programlisting> The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</para>
 <para><bold>Caution</bold>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="41" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="41" bodyend="54"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="41" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="41" bodyend="54"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1aacf602b65d52bf021dabf4628bca6176" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -222,17 +220,15 @@ Consider the following code: <programlisting><codeline><highlight class="normal"
 <codeline><highlight class="normal">for<sp/>(auto&amp;<sp/>xx<sp/>:<sp/>x)<sp/>{</highlight></codeline>
 <codeline><highlight class="normal"><sp/><sp/><sp/><sp/>xx<sp/>*=<sp/>2;</highlight></codeline>
 <codeline><highlight class="normal">}</highlight></codeline>
-</programlisting></para>
-<para>The parallel equivalent is <programlisting><codeline><highlight class="normal">parallelFor(x,<sp/>[&amp;]<sp/>(double&amp;<sp/>xx)<sp/>{</highlight></codeline>
+</programlisting> The parallel equivalent is <programlisting><codeline><highlight class="normal">parallelFor(x,<sp/>[&amp;]<sp/>(double&amp;<sp/>xx)<sp/>{</highlight></codeline>
 <codeline><highlight class="normal"><sp/><sp/><sp/><sp/>xx<sp/>*=<sp/>2;</highlight></codeline>
 <codeline><highlight class="normal">});</highlight></codeline>
-</programlisting></para>
-<para>The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</para>
+</programlisting> The function dispatches to a global thread pool, so it can safely be nested or called multiple times with almost no overhead.</para>
 <para><bold>Caution</bold>: if the iterations are not independent from another, the tasks need to be synchronized manually (e.g., using mutexes). </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="83" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="83" bodyend="93"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="83" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="83" bodyend="93"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1a566c8269168c051f8418ce62a07eac58" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -281,7 +277,7 @@ The function returns void; if a job returns a result, use <computeroutput>async(
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="104" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="104" bodyend="108"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="104" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="104" bodyend="108"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1a3ce0a8f7082376726b749af3c3170927" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -332,7 +328,7 @@ The function returns void; if a job returns a result, use <computeroutput>async(
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="118" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="118" bodyend="122"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="118" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="118" bodyend="122"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1a3ed90ea612c5d982ab585c39d147c4d1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <templateparamlist>
@@ -383,7 +379,7 @@ The function returns void; if a job returns a result, use <computeroutput>async(
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="132" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="132" bodyend="135"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="132" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="132" bodyend="135"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1ad2a2fc0e5880f137964f12a45a4ce140" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -397,7 +393,7 @@ The function returns void; if a job returns a result, use <computeroutput>async(
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="140" column="1" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="140" bodyend="143"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="140" column="1" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" bodystart="140" bodyend="143"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1ae48d2e823f3ac43fb87a2795f242e3df" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -425,7 +421,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="148" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="148" bodyend="152"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="148" column="13" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="148" bodyend="152"/>
       </memberdef>
       <memberdef kind="function" id="namespaceRcppThread_1a2953566b926010e05a2d10586c72267c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>bool</type>
@@ -453,7 +449,7 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="158" column="13" bodyfile="/data/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="158" bodyend="163"/>
+        <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" line="158" column="13" bodyfile="/home/n5/dev/r/RcppThread/inst/include/RcppThread/RMonitor.hpp" bodystart="158" bodyend="163"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -461,6 +457,6 @@ Declared as a friend in <computeroutput>RMonitor</computeroutput>. </para>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="/data/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="12" column="20"/>
+    <location file="/home/n5/dev/r/RcppThread/inst/include/RcppThread/parallelFor.hpp" line="12" column="1"/>
   </compounddef>
 </doxygen>

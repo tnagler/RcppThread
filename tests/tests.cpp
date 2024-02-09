@@ -458,12 +458,24 @@ testProgressCounter()
 
 // [[Rcpp::export]]
 void
+testProgressCounter2()
+{
+    // 20 iterations in loop, update progress every 1 sec
+    RcppThread::ProgressCounter cntr(20, 1, "Test message: ");
+    RcppThread::parallelFor(0, 20, [&](int i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        cntr++;
+    });
+}
+
+// [[Rcpp::export]]
+void
 testProgressBar()
 {
     // 20 iterations in loop, update progress every 1 sec
     RcppThread::ProgressBar bar(20, 1);
     RcppThread::parallelFor(0, 20, [&](int i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
         ++bar;
     });
 }

@@ -12,5 +12,5 @@ linker flags for \code{pthread} and \code{libatomic}, if available.
 }
 \details{
 Use as
-`PKG_LIBS = ${R_HOME}/bin/Rscript -e 'RcppThread::LdFlags()'.
+`PKG_LIBS = $(R_HOME)/bin/Rscript -e 'RcppThread::LdFlags()'.
 }
