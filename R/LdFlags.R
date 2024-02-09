@@ -25,9 +25,6 @@ writeLibAtomicTest <- function(file) {
 }
 
 checkForLibAtomic <- function() {
-    if (.Platform$OS.type == "windows")
-        return(TRUE)
-
     tmp <- createTestFiles()
     writeLibAtomicTest(tmp["src"])
     failed <- runCmd(getCompiler(), tmp["src"], "-o", tmp["out"], "-latomic")
