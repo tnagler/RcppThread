@@ -1,3 +1,10 @@
+# RcppThread 2.1.7
+
+BUG FIX
+
+* enable check for standalone libatomic on Windows (#72, thanks @kalibera)
+
+
 # RcppThread 2.1.6
 
 NEW FEATURES
