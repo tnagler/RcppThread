@@ -2,9 +2,8 @@
 //
 // This file is part of the RcppThread and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE.md file in the root 
-directory of
-// RcppThread or 
-https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
+// directory of RcppThread or
+// https://github.com/tnagler/RcppThread/blob/master/LICENSE.md.
 
 #pragma once
 
