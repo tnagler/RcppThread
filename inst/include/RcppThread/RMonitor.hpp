@@ -7,7 +7,9 @@
 #pragma once
 
 // R API
+#ifndef R_NO_REMAP
 #define R_NO_REMAP
+#endif
 #include "Rinternals.h"
 #include "R.h"
 
