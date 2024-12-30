@@ -13,3 +13,4 @@
 #include "RcppThread/ThreadPool.hpp"
 #include "RcppThread/parallelFor.hpp"
 #include "RcppThread/Progress.hpp"
+#include "RcppThread/SafeTypes.hpp"
