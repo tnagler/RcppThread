@@ -1,3 +1,9 @@
+# RcppThread 2.1.8
+
+BUG FIX
+
+* Fixed compilation warning about R_NO_REMAP being defined multiple times (thanks @tylermorganwall)
+
 # RcppThread 2.1.7
 
 BUG FIX
