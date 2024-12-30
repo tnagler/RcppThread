@@ -1,8 +1,14 @@
-# RcppThread 2.1.8
+# RcppThread 2.2.0
+
+NEW FEATURE
+
+* Added `RMatrix` class (from the RcppParallel package) to allow 
+  for thread safe access to R matrices (#74, thanks @rorynolan).
 
 BUG FIX
 
-* Fixed compilation warning about R_NO_REMAP being defined multiple times (thanks @tylermorganwall)
+* Fixed compilation warning about R_NO_REMAP being defined multiple times 
+  (#77, thanks @tylermorganwall)
 
 # RcppThread 2.1.7
 

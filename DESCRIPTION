@@ -1,6 +1,6 @@
 Package: RcppThread
 Title: R-Friendly Threading in C++
-Version: 2.1.8
+Version: 2.2.0
 Authors@R: c(
     person("Thomas", "Nagler",, "mail@tnagler.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1855-0046"))
@@ -12,7 +12,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 URL: https://github.com/tnagler/RcppThread
 BugReports: https://github.com/tnagler/RcppThread/issues
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2.9000
 Suggests: 
     testthat,
     R.rsp,

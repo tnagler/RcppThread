@@ -2,8 +2,8 @@
 % Please edit documentation in R/RcppThread-package.R
 \docType{package}
 \name{RcppThread}
-\alias{RcppThread}
 \alias{RcppThread-package}
+\alias{RcppThread}
 \title{R-friendly C++11 threads}
 \description{
 Provides a C++11-style thread class and thread pool that can safely be
