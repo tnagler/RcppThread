@@ -926,6 +926,15 @@ class ThreadPool
     //! @param millis if > 0: stops waiting after millis ms.
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
+    //! @brief Stops the pool, waits for all tasks to finish, resets to neutral 
+    // state, and rethrows an exception if one is pending.
+    void stop_and_reset() 
+    { 
+        task_manager_.report_fail(std::current_exception());
+        task_manager_.wait_for_finish();
+        task_manager_.rethrow_exception();
+    }
+
     //! @brief checks whether all jobs are done.
     bool done() const { return task_manager_.done(); }
 
@@ -939,6 +948,7 @@ class ThreadPool
     static void operator delete(void* ptr) { mem::aligned::free(ptr); }
 
   private:
+  
     //! joins all worker threads.
     void join_threads()
     {
