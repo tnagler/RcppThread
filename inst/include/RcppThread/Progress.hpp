@@ -30,6 +30,9 @@ public:
         , startTime_(std::chrono::steady_clock::now())
     {}
 
+    // Add virtual destructor
+    virtual ~ProgressPrinter() = default;
+
     //! prints progress whenever an update is necessary.
     virtual void printProgress() = 0;
 
