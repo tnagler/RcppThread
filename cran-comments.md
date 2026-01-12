@@ -1,14 +1,14 @@
-Also includes a fix for the @doctype isseu (now documenting "_PACKAGE" instead of NULL).
-
 ## Test environments
 
-* ubuntu 22.04 (devel, release, old-rel)
-* macOS X (release)
-* Windows Server 2019 (release)
+* ubuntu 20.04 (devel, release, old-rel)
+* macOS 14.7.2 (release)
+* Windows Server 2022 (release)
 * CRAN win builder (devel)
 
 ## Check status summary
 
-                  NOTE OK
-  Source packages    0  1
-  Reverse depends   19  3
+We checked 19 reverse dependencies (1 from CRAN + 18 from Bioconductor), 
+comparing R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
