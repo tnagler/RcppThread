@@ -18,11 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          # - {os: macOS-latest,   r: 'release'}
-          # - {os: windows-latest, r: 'release'}
+          - {os: macOS-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest", http-user-agent: "R/devel (ubuntu-122.04) on GitHub Actions" }
-          # - {os: ubuntu-latest,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
-          # - {os: ubuntu-latest,   r: 'oldrel',  rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
+          - {os: ubuntu-latest,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
+          - {os: ubuntu-latest,   r: 'oldrel',  rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
