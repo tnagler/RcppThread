@@ -167,7 +167,7 @@ ThreadPool::map(F&& f, I&& items)
 //! The parallel equivalent is given by:
 //! ```
 //! ThreadPool pool(2);
-//! pool.forIndex(0, 10, [&] (size_t i) {
+//! pool.parallelFor(0, 10, [&] (size_t i) {
 //!     x[i] = i;
 //! });
 //! ```
@@ -228,6 +228,11 @@ ThreadPool::parallelFor(int begin, int end, F f, size_t nBatches)
 //! ```
 //! **Caution**: if the iterations are not independent from another,
 //! the tasks need to be synchronized manually (e.g., using mutexes).
+//!
+//' The worker callable `f(i)` should be **interrupt-friendly**:
+//' insert `RcppThread::isInterrupted()` checks at a reasonable cadence and
+//' **return early** when it is true. On user interrupt, RcppThread waits for
+//' running tasks to reach a check point or finish, and then unwinds to R.
 template<class F, class I>
 inline void
 ThreadPool::parallelForEach(I& items, F f, size_t nBatches)
@@ -248,8 +253,11 @@ ThreadPool::wait()
         pool_->wait(100);
         Rcout << "";
         Rcerr << "";
-        checkUserInterrupt();
-
+        try {
+            checkUserInterrupt();
+        } catch (const UserInterruptException& err) {
+            pool_->stop_and_reset();
+        }
     } while (!pool_->done());
     Rcout << "";
     Rcerr << "";
