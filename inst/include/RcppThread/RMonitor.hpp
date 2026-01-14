@@ -90,17 +90,28 @@ protected:
     //! adds a printable version of `object` to a buffer for deferred printing.
     //! @param object a string or coercible object to print.
     template<class T>
-    void safelyPrint(const T& object)
-    {
+    void safelyPrint(const T& object, bool asErr = false) {
+      std::string to_print;
+      {
         std::lock_guard<std::mutex> lk(m_);
         msgs_ << object;
-        if ( calledFromMainThread() && (msgs_.str() != std::string("")) ) {
-            // release messages in buffer
-            Rprintf("%s", msgs_.str().c_str());
-            R_FlushConsole();
-            // clear message buffer
+        
+        if (calledFromMainThread()) {
+          to_print = msgs_.str();
+          if (!to_print.empty()) {
             msgs_.str("");
+            msgs_.clear();
+          }
         }
+      } // mutex released here, before touching R API
+    
+      if (!to_print.empty()) {
+        // Contain possible longjmp from Rgui/event loop
+        PrintData pd{&to_print};
+        void (*printfun)(void*) = asErr ? &printErr : &print;
+        Rboolean ok = R_ToplevelExec(printfun, &pd);
+        if (!ok) throw UserInterruptException();
+      }
     }
 
     //! prints `object` to R error stream íf called from main thread; otherwise
@@ -109,18 +120,23 @@ protected:
     template<class T>
     void safelyPrintErr(const T& object)
     {
-        std::lock_guard<std::mutex> lk(m_);
-        msgsErr_ << object;
-        if ( calledFromMainThread() && (msgsErr_.str() != std::string("")) ) {
-            // release messages in buffer
-            REprintf("%s", msgsErr_.str().c_str());
-            // R_FlushConsole();
-            // clear message buffer
-            msgsErr_.str("");
-        }
+        safelyPrint(object, true);
     }
 
 private:
+    struct PrintData { std::string* s; };
+
+    static void print(void* data) {
+      auto* pd = static_cast<PrintData*>(data);
+      Rprintf("%s", pd->s->c_str());
+      R_FlushConsole();
+    }
+
+    static void printErr(void* data) {
+      auto* pd = static_cast<PrintData*>(data);
+      REprintf("%s", pd->s->c_str());
+    }
+  
     //! Ctors declared private, to instantiate class use `::instance()`.
     RMonitor(void) : isInterrupted_(false) {}
 
