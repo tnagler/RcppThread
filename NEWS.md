@@ -1,3 +1,5 @@
+# RcppThread (development version)
+
 # RcppThread 2.2.0
 
 NEW FEATURE
