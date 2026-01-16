@@ -1,4 +1,8 @@
-# RcppThread (development version)
+# RcppThread 2.3.0
+
+* fixed issues with hanging interrupts on Rgui.exe and similar (#82).
+
+* fixed non-virtual destructor warning in ProgressPrinter base class (#80, thanks @SpatLyu).
 
 # RcppThread 2.2.0
 
