@@ -11,7 +11,7 @@ Provides R-friendly threading functionality:
   * thread safe versions of [Rcpp's](https://www.rcpp.org/)
     `checkUserInterrupt()`, `Rcout`, and `Rcerr`,
   * an interruptible thread class that otherwise behaves like 
-   [`std::thread`](https://en.cppreference.com/w/cpp/thread/thread),
+   [`std::thread`](https://en.cppreference.com/w/cpp/thread/thread.html),
   * classes for the [thread pool
     pattern](https://en.wikipedia.org/wiki/Thread_pool) and parallel for loops
     for easy and flexible parallelism,
@@ -20,7 +20,7 @@ Provides R-friendly threading functionality:
 
 The library is header-only, platform-independent, and only 
 requires a 
-[C++11-compatible compiler](https://en.cppreference.com/w/cpp/compiler_support#cpp11).
+[C++11-compatible compiler](https://en.cppreference.com/w/cpp/compiler_support.html#cpp11).
 
 ## Functionality
 
