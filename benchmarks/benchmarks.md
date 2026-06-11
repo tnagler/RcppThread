@@ -2,59 +2,30 @@ Graphs show speedup over single-threaded execution (higher is better)
 
 #### Libraries
 
-    library("tidyverse")
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-    ## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
-    ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
-    ## ✔ readr   2.1.2     ✔ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-
+    library("ggplot2")
+    library("dplyr")
+    library("tidyr")
     library("Rcpp")
     library("RcppParallel")
-
-    ## 
-    ## Attaching package: 'RcppParallel'
-
-    ## The following object is masked from 'package:Rcpp':
-    ## 
-    ##     LdFlags
-
     library("RcppThread")
-
-    ## 
-    ## Attaching package: 'RcppThread'
-
-    ## The following object is masked from 'package:RcppParallel':
-    ## 
-    ##     LdFlags
-
-    ## The following object is masked from 'package:Rcpp':
-    ## 
-    ##     LdFlags
-
-    library("ggthemes")
 
 #### Utilities
 
     Rcpp::sourceCpp(here::here("benchmarks/benchmarks.cpp"))
+
+    ##  -latomic -lpthread
+
     wait_for <- 5
 
     plot_df <- function(df, title = NULL) {
       p <- df %>%
-        pivot_longer(-n, "call") %>%
+        pivot_longer(-n, names_to = "call") %>%
         ggplot(aes(n, value, color = call)) +
         geom_line(size = 0.6) +
         expand_limits(y = 0) +
-        labs(color = "", linetype = "") +
-        naglr::theme_naglr(plot_title_size = 12) +
+        labs(color = "") +
+        theme_minimal() +
         theme(legend.margin = margin(1, 1, 1, 1)) +
-        theme(legend.position = "bottom") +
         scale_x_log10() +
         ylab("speedup") +
         labs(title = title)
@@ -70,6 +41,12 @@ Graphs show speedup over single-threaded execution (higher is better)
     df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
     plot_df(df, "empty jobs")
 
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once per session.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
 ![](benchmarks_files/figure-markdown_strict/unnamed-chunk-3-1.png)
 
     ggsave(here::here("benchmarks/benchEmptyThread.pdf"), width = 7.5, height = 3)
@@ -84,17 +61,6 @@ Graphs show speedup over single-threaded execution (higher is better)
 ![](benchmarks_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
     ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 7.5, height = 3)
-
-### compute and write 1000 square roots per thread
-
-    ns <- 10^(2:6)
-    res <- benchSqrtWrite(rev(ns), wait_for)
-    df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
-    plot_df(df, "1000x sqrt modify inplace")
-
-![](benchmarks_files/figure-markdown_strict/unnamed-chunk-5-1.png)
-
-    ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 7.5, height = 3)
 
 ### kernel density estimation (d = 10)
 

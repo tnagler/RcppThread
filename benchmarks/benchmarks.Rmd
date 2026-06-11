@@ -13,12 +13,13 @@ Graphs show speedup over single-threaded execution (higher is better)
 
 
 #### Libraries
-```{r}
-library("tidyverse")
+```{r, message=FALSE}
+library("ggplot2")
+library("dplyr")
+library("tidyr")
 library("Rcpp")
 library("RcppParallel")
 library("RcppThread")
-library("ggthemes")
 ```
 
 #### Utilities
@@ -29,14 +30,13 @@ wait_for <- 5
 
 plot_df <- function(df, title = NULL) {
   p <- df %>%
-    pivot_longer(-n, "call") %>%
+    pivot_longer(-n, names_to = "call") %>%
     ggplot(aes(n, value, color = call)) +
     geom_line(size = 0.6) +
     expand_limits(y = 0) +
-    labs(color = "", linetype = "") +
-    naglr::theme_naglr(plot_title_size = 12) +
+    labs(color = "") +
+    theme_minimal() +
     theme(legend.margin = margin(1, 1, 1, 1)) +
-    theme(legend.position = "bottom") +
     scale_x_log10() +
     ylab("speedup") +
     labs(title = title)
@@ -67,17 +67,6 @@ df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
 plot_df(df, "1000x sqrt")
 ggsave(here::here("benchmarks/benchSqrt.pdf"), width = 7.5, height = 3)
 ```
-
-### compute and write 1000 square roots per thread
-
-```{r}
-ns <- 10^(2:6)
-res <- benchSqrtWrite(rev(ns), wait_for)
-df <- cbind(data.frame(n = rev(ns)), as.data.frame(res[, -1]))
-plot_df(df, "1000x sqrt modify inplace")
-ggsave(here::here("benchmarks/benchSqrtWrite.pdf"), width = 7.5, height = 3)
-```
-
 
 ### kernel density estimation (d = 10)
 
