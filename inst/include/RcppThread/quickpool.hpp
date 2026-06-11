@@ -1,4 +1,4 @@
-// Copyright 2021 Thomas Nagler (MIT License)
+// Copyright 2026 Thomas Nagler (MIT License)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,19 @@
 #include <numeric>
 #include <stdexcept>
 #include <thread>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #if (defined __linux__ || defined AFFINITY)
 #include <pthread.h>
+#endif
+
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#define QUICKPOOL_HAS_CPP17 1
+#else
+#define QUICKPOOL_HAS_CPP17 0
 #endif
 
 // Layout of quickpool.hpp
@@ -58,6 +67,36 @@
 
 //! quickpool namespace
 namespace quickpool {
+
+namespace detail {
+
+template<class Function, class... Args>
+struct Task
+{
+#if QUICKPOOL_HAS_CPP17
+    using type = std::invoke_result_t<Function, Args...>;
+
+    static auto make(Function&& f, Args&&... args)
+    {
+        return [f = std::forward<Function>(f),
+                args = std::make_tuple(std::forward<Args>(args)...)]() mutable {
+            return std::apply(f, args);
+        };
+    }
+#else
+    using type = decltype(std::declval<Function>()(std::declval<Args>()...));
+
+    static auto make(Function&& f, Args&&... args)
+      -> decltype(std::bind(std::forward<Function>(f),
+                            std::forward<Args>(args)...))
+    {
+        return std::bind(std::forward<Function>(f),
+                         std::forward<Args>(args)...);
+    }
+#endif
+};
+
+} // namespace detail
 
 // 1. --------------------------------------------------------------------------
 
@@ -983,8 +1022,8 @@ class ThreadPool
             std::forward<Function>(f)(std::forward<Args>(args)...);
             return;
         }
-        task_manager_.push(
-          std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
+        task_manager_.push(detail::Task<Function, Args...>::make(
+          std::forward<Function>(f), std::forward<Args>(args)...));
     }
 
     //! @brief executes a job asynchronously on the global thread pool.
@@ -994,11 +1033,12 @@ class ThreadPool
     //! retrieve the results at a later point in time (blocking).
     template<class Function, class... Args>
     auto async(Function&& f, Args&&... args)
-      -> std::future<decltype(f(args...))>
+      -> std::future<typename detail::Task<Function, Args...>::type>
     {
-        auto pack =
-          std::bind(std::forward<Function>(f), std::forward<Args>(args)...);
-        using pack_t = std::packaged_task<decltype(f(args...))()>;
+        auto pack = detail::Task<Function, Args...>::make(
+          std::forward<Function>(f), std::forward<Args>(args)...);
+        using result_t = typename detail::Task<Function, Args...>::type;
+        using pack_t = std::packaged_task<result_t()>;
         auto task_ptr = std::make_shared<pack_t>(std::move(pack));
         this->push([task_ptr] { (*task_ptr)(); });
         return task_ptr->get_future();
@@ -1075,10 +1115,10 @@ class ThreadPool
     //! @param millis if > 0: stops waiting after millis ms.
     void wait(size_t millis = 0) { task_manager_.wait_for_finish(millis); }
 
-    //! @brief Stops the pool, waits for all tasks to finish, resets to neutral 
+    //! @brief Stops the pool, waits for all tasks to finish, resets to neutral
     // state, and rethrows an exception if one is pending.
-    void stop_and_reset()  
-    { 
+    void stop_and_reset()
+    {
         task_manager_.report_fail(std::current_exception());
         task_manager_.wait_for_finish();
         task_manager_.rethrow_exception();
@@ -1179,7 +1219,8 @@ push(Function&& f, Args&&... args)
 //! the results at a later point in time (blocking).
 template<class Function, class... Args>
 inline auto
-async(Function&& f, Args&&... args) -> std::future<decltype(f(args...))>
+async(Function&& f, Args&&... args)
+  -> std::future<typename detail::Task<Function, Args...>::type>
 {
     return ThreadPool::global_instance().async(std::forward<Function>(f),
                                                std::forward<Args>(args)...);
@@ -1252,3 +1293,5 @@ parallel_for_each(Items& items, UnaryFunction&& f)
 }
 
 } // end namespace quickpool
+
+#undef QUICKPOOL_HAS_CPP17
