@@ -1,3 +1,7 @@
+# RcppThread 2.4.0
+
+* update quickpool version 1.7.0: faster algorithms and better CXX23 compatibility.
+
 # RcppThread 2.3.0
 
 * fixed issues with hanging interrupts on Rgui.exe and similar (#82).

@@ -26,9 +26,12 @@
 #include <exception>
 #include <functional>
 #include <future>
+#include <iterator>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 
@@ -162,6 +165,15 @@ class allocator : public std::allocator<T>
         typedef allocator<U, Alignment> other;
     };
 
+    allocator() noexcept
+      : std::allocator<T>()
+    {}
+
+    template<class U, std::size_t UAlignment>
+    allocator(const allocator<U, UAlignment>& other) noexcept
+      : std::allocator<T>(other)
+    {}
+
     T* allocate(size_t size, const void* = 0)
     {
         if (size == 0) {
@@ -174,16 +186,23 @@ class allocator : public std::allocator<T>
         return static_cast<T*>(p);
     }
 
+#if defined(__cpp_lib_allocate_at_least)
+    std::allocation_result<T*> allocate_at_least(std::size_t size)
+    {
+        return { allocate(size), size };
+    }
+#endif
+
     void deallocate(T* ptr, size_t) { mem::aligned::free(ptr); }
 
     template<class U, class... Args>
     void construct(U* ptr, Args&&... args)
     {
-        ::new ((void*)ptr) U(std::forward<Args>(args)...);
+      ::new (static_cast<void *>(ptr)) U(std::forward<Args>(args)...);
     }
 
-    template<class U>
-    void destroy(U* ptr)
+    template <class U>
+    void destroy(U *ptr) noexcept
     {
         (void)ptr;
         ptr->~U();
@@ -247,6 +266,38 @@ using vector = std::vector<T, mem::aligned::allocator<T, Alignment>>;
 //! Loop related utilities.
 namespace loop {
 
+template<class Iterator, class UnaryFunction, class Pool>
+void
+parallel_for_each_impl(Iterator begin,
+                       Iterator end,
+                       int size,
+                       UnaryFunction f,
+                       Pool& pool,
+                       std::random_access_iterator_tag)
+{
+    (void)end;
+    pool.parallel_for(0, static_cast<int>(size), [=](int i) { f(begin[i]); });
+}
+
+template<class Iterator, class UnaryFunction, class Pool, class IteratorCategory>
+void
+parallel_for_each_impl(Iterator begin,
+                       Iterator end,
+                       int size,
+                       UnaryFunction f,
+                       Pool& pool,
+                       IteratorCategory)
+{
+    auto iterators = std::make_shared<std::vector<Iterator>>();
+    iterators->reserve(static_cast<size_t>(size));
+    for (auto it = begin; it != end; ++it) {
+        iterators->push_back(it);
+    }
+    pool.parallel_for(0, static_cast<int>(iterators->size()), [=](int i) {
+        f(*iterators->at(static_cast<size_t>(i)));
+    });
+}
+
 //! Worker state.
 struct State
 {
@@ -281,7 +332,8 @@ struct Worker
     size_t tasks_left() const
     {
         State s = state.load();
-        return s.end - s.pos;
+        return (s.end > s.pos) ? static_cast<size_t>(s.end - s.pos)
+                               : static_cast<size_t>(0);
     }
 
     bool done() const { return (tasks_left() == 0); }
@@ -353,14 +405,16 @@ struct Worker
     //! @param others vector of all workers.
     Worker& find_victim(mem::aligned::vector<Worker>& workers)
     {
-        std::vector<size_t> tasks_left;
-        tasks_left.reserve(workers.size());
-        for (const auto& worker : workers) {
-            tasks_left.push_back(worker.tasks_left());
+        size_t best = 0;
+        size_t most_tasks_left = 0;
+        for (size_t i = 0; i < workers.size(); ++i) {
+            const auto tasks_left = workers[i].tasks_left();
+            if (tasks_left > most_tasks_left) {
+                best = i;
+                most_tasks_left = tasks_left;
+            }
         }
-        auto max_it = std::max_element(tasks_left.begin(), tasks_left.end());
-        auto idx = std::distance(tasks_left.begin(), max_it);
-        return workers[idx];
+        return workers[best];
     }
 
     mem::aligned::relaxed_atomic<State> state; //!< worker state `{pos, end}`
@@ -376,15 +430,18 @@ create_workers(const Function& f, int begin, int end, size_t num_workers)
 {
     auto num_tasks = std::max(end - begin, static_cast<int>(0));
     num_workers = std::max(num_workers, static_cast<size_t>(1));
-    auto workers = new mem::aligned::vector<Worker<Function>>;
+    auto workers = std::make_shared<mem::aligned::vector<Worker<Function>>>();
     workers->reserve(num_workers);
     for (size_t i = 0; i < num_workers; i++) {
-        workers->emplace_back(begin + num_tasks * i / num_workers,
-                              begin + num_tasks * (i + 1) / num_workers,
-                              f);
+        const auto first =
+          begin + static_cast<int>(static_cast<size_t>(num_tasks) * i /
+                                   num_workers);
+        const auto last =
+          begin + static_cast<int>(static_cast<size_t>(num_tasks) * (i + 1) /
+                                   num_workers);
+        workers->emplace_back(first, last, f);
     }
-    return std::shared_ptr<mem::aligned::vector<Worker<Function>>>(
-      std::move(workers));
+    return workers;
 }
 
 } // end namespace loop
@@ -400,16 +457,24 @@ class RingBuffer
 {
   public:
     explicit RingBuffer(size_t capacity)
-      : buffer_{ std::unique_ptr<T[]>(new T[capacity]) }
+      : buffer_{
+          std::unique_ptr<std::atomic<T>[]>(new std::atomic<T>[capacity])
+        }
       , capacity_{ capacity }
       , mask_{ capacity - 1 }
     {}
 
     size_t capacity() const { return capacity_; }
 
-    void set_entry(size_t i, T val) { buffer_[i & mask_] = val; }
+    void set_entry(size_t i, T val)
+    {
+        buffer_[i & mask_].store(val, mem::relaxed);
+    }
 
-    T get_entry(size_t i) const { return buffer_[i & mask_]; }
+    T get_entry(size_t i) const
+    {
+        return buffer_[i & mask_].load(mem::relaxed);
+    }
 
     RingBuffer<T>* enlarged_copy(size_t bottom, size_t top) const
     {
@@ -420,7 +485,7 @@ class RingBuffer
     }
 
   private:
-    std::unique_ptr<T[]> buffer_;
+    std::unique_ptr<std::atomic<T>[]> buffer_;
     size_t capacity_;
     size_t mask_;
 };
@@ -430,19 +495,21 @@ class TaskQueue
 {
     using Task = std::function<void()>;
 
+    struct TaskNode
+    {
+        Task task;
+        TaskNode* next{ nullptr };
+    };
+
   public:
     //! @param capacity must be a power of two.
     TaskQueue(size_t capacity = 256)
-      : buffer_{ new RingBuffer<Task*>(capacity) }
+      : buffer_{ new RingBuffer<TaskNode*>(capacity) }
     {}
 
     ~TaskQueue() noexcept
     {
-        // Must free memory allocated by push(), but not freed by try_pop().
-        auto buf_ptr = buffer_.load();
-        for (int i = top_; i < bottom_.load(mem::relaxed); ++i)
-            delete buf_ptr->get_entry(i);
-        delete buf_ptr;
+        delete buffer_.load();
     }
 
     TaskQueue(TaskQueue const& other) = delete;
@@ -462,18 +529,26 @@ class TaskQueue
         std::unique_lock<std::mutex> lk(mutex_);
         auto b = bottom_.load(mem::relaxed);
         auto t = top_.load(mem::acquire);
-        RingBuffer<Task*>* buf_ptr = buffer_.load(mem::relaxed);
+        RingBuffer<TaskNode*>* buf_ptr = buffer_.load(mem::relaxed);
 
-        if (static_cast<int>(buf_ptr->capacity()) < (b - t) + 1) {
+        const auto size = b - t;
+        if (buf_ptr->capacity() < size + 1) {
             // Buffer is full, create enlarged copy before continuing.
             auto old_buf = buf_ptr;
             buf_ptr = std::move(buf_ptr->enlarged_copy(b, t));
             old_buffers_.emplace_back(old_buf);
-            buffer_.store(buf_ptr, mem::relaxed);
+            buffer_.store(buf_ptr, mem::release);
         }
 
-        //! Store pointer to new task in ring buffer.
-        buf_ptr->set_entry(b, new Task{ std::forward<Task>(task) });
+        auto node = acquire_node();
+        try {
+            node->task = std::forward<Task>(task);
+        } catch (...) {
+            recycle_node(node);
+            throw;
+        }
+        //! Store pointer to task node in ring buffer.
+        buf_ptr->set_entry(b, node);
         bottom_.store(b + 1, mem::release);
 
         lk.unlock(); // can release before signal
@@ -490,13 +565,13 @@ class TaskQueue
         if (t < b) {
             // Must load task pointer before acquiring the slot, because it
             // could be overwritten immediately after.
-            auto task_ptr = buffer_.load(mem::acquire)->get_entry(t);
+            auto node = buffer_.load(mem::acquire)->get_entry(t);
 
             // Atomically try to advance top.
             if (top_.compare_exchange_strong(
                   t, t + 1, mem::seq_cst, mem::relaxed)) {
-                task = std::move(*task_ptr); // won race, get task
-                delete task_ptr;             // fre memory allocated in push()
+                task = std::move(node->task); // won race, get task
+                recycle_node(node);
                 return true;
             }
         }
@@ -530,14 +605,48 @@ class TaskQueue
 
   private:
     //! queue indices
-    mem::aligned::atomic<int> top_{ 0 };
-    mem::aligned::atomic<int> bottom_{ 0 };
+    mem::aligned::atomic<size_t> top_{ 0 };
+    mem::aligned::atomic<size_t> bottom_{ 0 };
 
     //! ring buffer holding task pointers
-    std::atomic<RingBuffer<Task*>*> buffer_{ nullptr };
+    std::atomic<RingBuffer<TaskNode*>*> buffer_{ nullptr };
 
     //! pointers to buffers that were replaced by enlarged buffer
-    std::vector<std::unique_ptr<RingBuffer<Task*>>> old_buffers_;
+    std::vector<std::unique_ptr<RingBuffer<TaskNode*>>> old_buffers_;
+
+    //! owning storage for all allocated task nodes
+    std::vector<std::unique_ptr<TaskNode>> allocated_nodes_;
+
+    //! nodes available for reuse
+    std::atomic<TaskNode*> free_nodes_{ nullptr };
+
+    // Only push() calls acquire_node(), and push() holds mutex_, while many
+    // worker threads may recycle nodes concurrently.
+    TaskNode* acquire_node()
+    {
+        auto node = free_nodes_.load(mem::acquire);
+        while (node != nullptr) {
+            auto next = node->next;
+            if (free_nodes_.compare_exchange_weak(
+                  node, next, mem::acquire, mem::acquire)) {
+                node->next = nullptr;
+                return node;
+            }
+        }
+
+        allocated_nodes_.emplace_back(new TaskNode);
+        return allocated_nodes_.back().get();
+    }
+
+    void recycle_node(TaskNode* node) noexcept
+    {
+        node->task = nullptr;
+        auto head = free_nodes_.load(mem::relaxed);
+        do {
+            node->next = head;
+        } while (!free_nodes_.compare_exchange_weak(
+          head, node, mem::release, mem::relaxed));
+    }
 
     //! synchronization variables
     std::mutex mutex_;
@@ -550,8 +659,8 @@ class TaskManager
 {
   public:
     explicit TaskManager(size_t num_queues)
-      : queues_(num_queues)
-      , num_queues_(num_queues)
+      : queues_(std::max(num_queues, static_cast<size_t>(1)))
+      , num_queues_(std::max(num_queues, static_cast<size_t>(1)))
       , owner_id_(std::this_thread::get_id())
     {}
 
@@ -568,9 +677,12 @@ class TaskManager
 
     void resize(size_t num_queues)
     {
+        if (!done()) {
+            throw std::logic_error("cannot resize with pending tasks");
+        }
         num_queues_ = std::max(num_queues, static_cast<size_t>(1));
-        if (num_queues > queues_.size()) {
-            queues_ = mem::aligned::vector<TaskQueue>(num_queues);
+        if (num_queues_ > queues_.size()) {
+            queues_ = mem::aligned::vector<TaskQueue>(num_queues_);
             // thread pool must have stopped the manager, reset
             num_waiting_ = 0;
             todo_ = 0;
@@ -584,7 +696,12 @@ class TaskManager
         rethrow_exception(); // push() throws if a task has errored.
         if (is_running()) {
             todo_.fetch_add(1, mem::release);
-            queues_[push_idx_++ % num_queues_].push(task);
+            try {
+                queues_[push_idx_++ % num_queues_].push(task);
+            } catch (...) {
+                report_success();
+                throw;
+            }
         }
     }
 
@@ -592,7 +709,7 @@ class TaskManager
     bool try_pop(Task& task, size_t worker_id = 0)
     {
         // Always start pop cycle at own queue to avoid contention.
-        for (size_t k = 0; k <= num_queues_; k++) {
+        for (size_t k = 0; k < num_queues_; k++) {
             if (queues_[(worker_id + k) % num_queues_].try_pop(task)) {
                 if (is_running()) {
                     return true;
@@ -748,7 +865,6 @@ class TaskManager
     std::exception_ptr err_ptr_{ nullptr };
 };
 
-#if (defined __linux__)
 // find out which cores are allowed for use by pthread
 inline std::vector<size_t>
 get_avail_cores()
@@ -756,6 +872,7 @@ get_avail_cores()
     auto ncores = std::thread::hardware_concurrency();
     std::vector<size_t> avail_cores;
     avail_cores.reserve(ncores);
+#if (defined __linux__)
     cpu_set_t cpuset;
     int rc = pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
     if (rc != 0) {
@@ -766,9 +883,9 @@ get_avail_cores()
             avail_cores.push_back(id);
         }
     }
+#endif
     return avail_cores;
 }
-#endif
 
 inline size_t
 num_cores_avail()
@@ -829,24 +946,28 @@ class ThreadPool
         if (!task_manager_.called_from_owner_thread())
             return;
 
-        active_threads_ = threads;
-
-        if (threads <= workers_.size()) {
-            task_manager_.resize(threads);
-        } else {
-            if (workers_.size() > 0) {
-                task_manager_.stop();
-                join_threads();
-            }
-            workers_ = std::vector<std::thread>{ threads };
-            task_manager_ = quickpool::sched::TaskManager{ threads };
-            for (size_t id = 0; id < threads; ++id) {
-                add_worker(id);
-            }
-#if (defined __linux__)
-            set_thread_affinity();
-#endif
+        if (threads == active_threads_.load(mem::relaxed)) {
+            return;
         }
+
+        this->wait();
+        if (workers_.size() > 0) {
+            task_manager_.stop();
+            join_threads();
+            workers_.clear();
+        }
+
+        task_manager_ = quickpool::sched::TaskManager{ threads };
+        workers_ = std::vector<std::thread>{ threads };
+        for (size_t id = 0; id < threads; ++id) {
+            add_worker(id);
+        }
+#if (defined __linux__)
+        if (threads > 0) {
+            set_thread_affinity();
+        }
+#endif
+        active_threads_ = threads;
     }
 
     //! @brief retrieves the number of active worker threads in the thread pool.
@@ -858,8 +979,10 @@ class ThreadPool
     template<class Function, class... Args>
     void push(Function&& f, Args&&... args)
     {
-        if (active_threads_ == 0)
-            return f(args...);
+        if (active_threads_ == 0) {
+            std::forward<Function>(f)(std::forward<Args>(args)...);
+            return;
+        }
         task_manager_.push(
           std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
     }
@@ -893,17 +1016,30 @@ class ThreadPool
     template<class UnaryFunction>
     void parallel_for(int begin, int end, UnaryFunction f)
     {
+        if (end <= begin) {
+            return;
+        }
+        const auto active_threads = active_threads_.load(mem::relaxed);
+        if (active_threads == 0) {
+            for (auto i = begin; i < end; ++i) {
+                f(i);
+            }
+            return;
+        }
+
         // each worker has its dedicated range, but can steal part of
         // another worker's ranges when done with own
-        auto n = std::min(end - begin, static_cast<int>(1));
+        const auto num_tasks = static_cast<size_t>(end - begin);
+        const auto n =
+          std::min(std::max(active_threads, static_cast<size_t>(1)), num_tasks);
         auto workers = loop::create_workers<UnaryFunction>(f, begin, end, n);
-        for (int k = 0; k < n; k++) {
+        for (size_t k = 0; k < n; k++) {
             this->push([=] { workers->at(k).run(workers); });
         }
         this->wait();
     }
 
-    //! @brief computes a iterator-based parallel for loop.
+    //! @brief computes an iterator-based parallel for loop.
     //!
     //! Waits until all tasks have finished, unless called from a thread
     //! that didn't create the pool. If this is taken into account, parallel
@@ -917,7 +1053,20 @@ class ThreadPool
     {
         auto begin = std::begin(items);
         auto size = std::distance(begin, std::end(items));
-        this->parallel_for(0, size, [=](int i) { f(begin[i]); });
+        if (size <= 0) {
+            return;
+        }
+        if (size > std::numeric_limits<int>::max()) {
+            throw std::length_error("parallel_for_each range is too large");
+        }
+        typedef typename std::iterator_traits<decltype(begin)>::iterator_category
+          iterator_category;
+        loop::parallel_for_each_impl(begin,
+                                     std::end(items),
+                                     static_cast<int>(size),
+                                     f,
+                                     *this,
+                                     iterator_category{});
     }
 
     //! @brief waits for all jobs currently running on the thread
@@ -928,7 +1077,7 @@ class ThreadPool
 
     //! @brief Stops the pool, waits for all tasks to finish, resets to neutral 
     // state, and rethrows an exception if one is pending.
-    void stop_and_reset() 
+    void stop_and_reset()  
     { 
         task_manager_.report_fail(std::current_exception());
         task_manager_.wait_for_finish();
@@ -948,7 +1097,6 @@ class ThreadPool
     static void operator delete(void* ptr) { mem::aligned::free(ptr); }
 
   private:
-  
     //! joins all worker threads.
     void join_threads()
     {
@@ -981,7 +1129,7 @@ class ThreadPool
     {
         cpu_set_t cpuset;
         auto avail_cores = sched::get_avail_cores();
-        for (size_t id = 0; id < active_threads_; id++) {
+        for (size_t id = 0; id < workers_.size(); id++) {
             CPU_ZERO(&cpuset);
             CPU_SET(avail_cores[id % avail_cores.size()], &cpuset);
             int rc = pthread_setaffinity_np(
@@ -1006,7 +1154,7 @@ class ThreadPool
 
     sched::TaskManager task_manager_;
     std::vector<std::thread> workers_;
-    std::atomic_size_t active_threads_;
+    std::atomic_size_t active_threads_{ 0 };
 };
 
 // 5. ---------------------------------------------------
@@ -1086,7 +1234,7 @@ parallel_for(int begin, int end, UnaryFunction&& f)
       begin, end, std::forward<UnaryFunction>(f));
 }
 
-//! @brief computes a iterator-based parallel for loop.
+//! @brief computes an iterator-based parallel for loop.
 //!
 //! Waits until all tasks have finished, unless called from a thread that
 //! didn't create the pool. If this is taken into account, parallel loops

@@ -25,4 +25,9 @@ Useful links:
 \author{
 \strong{Maintainer}: Thomas Nagler \email{mail@tnagler.com} (\href{https://orcid.org/0000-0003-1855-0046}{ORCID})
 
+Authors:
+\itemize{
+  \item Thomas Nagler \email{mail@tnagler.com} (\href{https://orcid.org/0000-0003-1855-0046}{ORCID})
+}
+
 }
